@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "YekanBakh";
+  src: url("/fonts/YekanBakhFaNum-VF.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(37, 99, 235, 0.13), transparent 30%),
+    radial-gradient(circle at 90% 20%, rgba(220, 38, 38, 0.14), transparent 34%),
+    #f8fafc;
+  color: #0f172a;
+  font-family: "YekanBakh", "Vazirmatn", "IRANSans", "Tahoma", sans-serif;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.section-padding {
+  @apply py-16 md:py-20;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+}
+
+.animated-gradient {
+  background: linear-gradient(120deg, #1d4ed8, #dc2626, #2563eb);
+  background-size: 200% 200%;
+  animation: gradientMove 10s ease infinite;
+}
+
+.float-soft {
+  animation: floatSoft 5s ease-in-out infinite;
+}
+
+.reveal-up {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: revealUp 0.9s ease forwards;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes floatSoft {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes revealUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
