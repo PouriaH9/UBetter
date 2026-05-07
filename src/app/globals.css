@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "YekanBakh";
+  src: url("/fonts/YekanBakhFaNum-VF.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 :root {
   --accent: #00ff88;
   --accent-dim: rgba(0, 255, 136, 0.12);

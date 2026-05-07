@@ -101,74 +101,97 @@ function Pill({ label }: { label: string }) {
 // 1. NAVBAR
 // ══════════════════════════════════════════════════════════════════════════════
 
+const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
+const ACCENT = "#7CFF00";
+
 function Navbar({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) {
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const other: Locale = locale === "en" ? "fa" : "en";
+  const isRTL = locale === "fa";
 
-  useEffect(() => {
-    const h = () => setScrolled(window.scrollY > 48);
-    window.addEventListener("scroll", h, { passive: true });
-    return () => window.removeEventListener("scroll", h);
-  }, []);
-
-  const navLinks = [
-    { href: "#solutions", label: locale === "en" ? "Solutions" : "راهکارها" },
-    { href: "#products", label: locale === "en" ? "Products" : "محصولات" },
-    { href: "#about", label: locale === "en" ? "About" : "درباره ما" },
-    { href: "#contact", label: locale === "en" ? "Contact" : "تماس" },
+  const faLinks = [
+    { href: `/${locale}`, label: "صفحه اصلی" },
+    { href: "#products", label: "محصولات" },
+    { href: "#solutions", label: "ویژگی‌ها" },
+    { href: "#about", label: "تکنولوژی" },
+    { href: "#about", label: "درباره ما" },
+    { href: "#contact", label: "تماس با ما" },
   ];
+  const enLinks = [
+    { href: `/${locale}`, label: "Home" },
+    { href: "#products", label: "Products" },
+    { href: "#solutions", label: "Features" },
+    { href: "#about", label: "Technology" },
+    { href: "#about", label: "About" },
+    { href: "#contact", label: "Contact" },
+  ];
+  const navLinks = isRTL ? faLinks : enLinks;
 
   return (
     <motion.header
-      initial={{ opacity: 0, y: -24 }}
+      initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.9, ease: easeOut }}
-      dir={t.dir}
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-black/75 backdrop-blur-2xl border-b border-white/[0.07]"
-          : "bg-transparent"
-      }`}
+      transition={{ duration: 0.8, ease: easeOut }}
+      className="fixed inset-x-0 top-0 z-50"
+      style={{
+        height: "80px",
+        background: "rgba(0,0,0,0.45)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+      }}
     >
-      <div className="max-w-7xl mx-auto px-6 h-[64px] flex items-center justify-between gap-8">
-        {/* Logo */}
-        <Link href={`/${locale}`} className="flex items-center gap-2.5 shrink-0 group">
-          <div className="w-7 h-7 relative rounded-md overflow-hidden">
-            <Image src={logoImg} alt="UBETTER" fill className="object-cover" sizes="28px" />
-          </div>
-          <span className="text-white font-bold text-[15px] tracking-tight group-hover:text-[#00ff88] transition-colors duration-300">
-            UBETTER
+      <div className="h-full px-12 flex items-center justify-between gap-6" dir="ltr">
+        {/* Logo — always LTR so "ALL IN ONE" reads correctly in both locales */}
+        <Link href={`/${locale}`} className="shrink-0 flex items-center gap-1.5 select-none" dir="ltr">
+          <span
+            className="text-[18px] font-black tracking-tight leading-none"
+            style={{ color: ACCENT, fontFamily: "'Inter', system-ui, sans-serif" }}
+          >
+            ALL
+          </span>
+          <span
+            className="text-[18px] font-black tracking-tight leading-none text-white"
+            style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+          >
+            IN ONE
           </span>
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-7">
+        {/* Desktop nav — centered */}
+        <nav className="hidden md:flex items-center gap-10 ml-auto mr-8" dir={isRTL ? "rtl" : "ltr"}>
           {navLinks.map((l) => (
             <a
-              key={l.href}
+              key={l.label}
               href={l.href}
-              className="text-white/55 hover:text-white text-[13.5px] font-medium transition-colors duration-200"
+              className="text-white transition-colors duration-300 hover:text-[#7CFF00]"
+              style={{ fontFamily: YK, fontSize: "14px", fontWeight: 500, letterSpacing: "-0.01em" }}
             >
               {l.label}
             </a>
           ))}
         </nav>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2.5">
+        {/* Right actions */}
+        <div className="flex items-center gap-3 shrink-0">
           <Link
             href={`/${other}`}
-            className="hidden sm:flex items-center px-3 py-1.5 rounded-full border border-white/20 text-white/55 hover:text-white hover:border-white/40 text-[11px] font-bold tracking-widest uppercase transition-all duration-200"
+            className="hidden sm:flex items-center text-white/50 hover:text-[#7CFF00] text-[12px] font-bold tracking-widest uppercase transition-colors duration-200"
           >
             {other === "fa" ? "فا" : "EN"}
           </Link>
-          <a
-            href="#contact"
-            className="hidden sm:flex px-5 py-2.5 bg-[#00ff88] text-black text-[13px] font-bold rounded-full hover:bg-[#00e67a] transition-colors duration-200 hover:shadow-[0_0_24px_rgba(0,255,136,0.4)]"
+
+          {/* User outline icon */}
+          <button
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:border-[#7CFF00]/50"
+            style={{ border: "1px solid rgba(255,255,255,0.22)" }}
+            aria-label="Profile"
           >
-            {locale === "en" ? "Get Quote" : "پیش‌فاکتور"}
-          </a>
+            <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="7" r="3.5" stroke="white" strokeWidth="1.5" />
+              <path d="M3 18c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
 
           {/* Hamburger */}
           <button
@@ -184,7 +207,7 @@ function Navbar({ locale, t }: { locale: Locale; t: (typeof translations)["en"] 
                     ? i === 0
                       ? "rotate-45 translate-y-[6.8px]"
                       : i === 1
-                        ? "opacity-0 scale-x-0"
+                        ? "opacity-0"
                         : "-rotate-45 -translate-y-[6.8px]"
                     : ""
                 }`}
@@ -202,33 +225,27 @@ function Navbar({ locale, t }: { locale: Locale; t: (typeof translations)["en"] 
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-[#060606]/95 backdrop-blur-2xl border-t border-white/[0.07] px-6 py-5 flex flex-col gap-3"
+            className="md:hidden border-t border-white/[0.07] px-6 py-5 flex flex-col gap-3"
+            style={{ background: "rgba(0,0,0,0.92)", backdropFilter: "blur(16px)" }}
+            dir={isRTL ? "rtl" : "ltr"}
           >
             {navLinks.map((l) => (
               <a
-                key={l.href}
+                key={l.label}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="text-white/65 hover:text-white py-2.5 text-[15px] border-b border-white/[0.05] transition-colors"
+                className="py-3 border-b border-white/[0.06] transition-colors duration-200 hover:text-[#7CFF00]"
+                style={{ fontFamily: YK, fontSize: "16px", color: "rgba(255,255,255,0.72)" }}
               >
                 {l.label}
               </a>
             ))}
-            <div className="flex gap-2.5 pt-3">
-              <Link
-                href={`/${other}`}
-                className="flex-1 text-center py-2.5 rounded-full border border-white/20 text-white/60 text-sm font-medium"
-              >
-                {other === "fa" ? "فارسی" : "English"}
-              </Link>
-              <a
-                href="#contact"
-                onClick={() => setOpen(false)}
-                className="flex-1 text-center py-2.5 rounded-full bg-[#00ff88] text-black text-sm font-bold"
-              >
-                {locale === "en" ? "Get Quote" : "پیش‌فاکتور"}
-              </a>
-            </div>
+            <Link
+              href={`/${other}`}
+              className="mt-2 text-center py-2.5 rounded-2xl border border-white/20 text-white/60 text-sm font-semibold"
+            >
+              {other === "fa" ? "فارسی" : "English"}
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
@@ -248,19 +265,40 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
 
   const isRTL = locale === "fa";
 
+  const heroImages = [hero1Img, hero2Img];
+  const [activeImg, setActiveImg] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveImg((i) => (i + 1) % heroImages.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [heroImages.length]);
+
   return (
     <section ref={sectionRef} className="relative h-screen min-h-[640px] flex items-center justify-center overflow-hidden">
-      {/* Parallax background */}
+      {/* Parallax background with crossfading images */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 scale-110 will-change-transform">
-        <Image
-          src={hero1Img}
-          alt="UBETTER Energy Facility"
-          fill
-          priority
-          quality={92}
-          sizes="100vw"
-          className="object-cover object-center"
-        />
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={activeImg}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.8, ease: "easeInOut" }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={heroImages[activeImg]}
+              alt="UBETTER Energy"
+              fill
+              priority={activeImg === 0}
+              quality={92}
+              sizes="100vw"
+              className="object-cover object-center"
+            />
+          </motion.div>
+        </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-transparent to-black/25" />
       </motion.div>
@@ -275,134 +313,218 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
         }}
       />
 
-      {/* Content */}
+      {/* ── Hero overlay content ─────────────────────────────────────────────── */}
       <motion.div
         style={{ opacity: contentOpacity }}
-        className="relative z-10 text-center px-6 max-w-5xl mx-auto pt-20"
-        dir={t.dir}
+        className="absolute inset-0 z-10 flex flex-col"
       >
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.35, duration: 0.6, ease: easeOut }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#00ff88]/10 border border-[#00ff88]/30 text-[#00ff88] text-[11px] font-semibold tracking-[0.16em] uppercase mb-8"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00ff88] animate-pulse" />
-          {isRTL ? "قدرت‌بخشی به آینده سبز" : "Powering a Greener Future"}
-        </motion.div>
-
-        {/* H1 */}
-        <motion.h1
-          initial={{ opacity: 0, y: 56 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 1, ease: easeOut }}
-          className="text-5xl sm:text-[60px] md:text-[74px] lg:text-[90px] font-bold text-white leading-[1.04] tracking-tight mb-7"
-        >
-          {isRTL ? (
-            <>
-              انرژی لیتیومی
-              <br />
-              <span className="bg-gradient-to-r from-[#00ff88] via-[#00dd77] to-[#00ff88] bg-clip-text text-transparent">
-                سیستم‌های هوشمند
-              </span>
-            </>
-          ) : (
-            <>
-              Smart Lithium
-              <br />
-              <span className="bg-gradient-to-r from-[#00ff88] via-[#00cc66] to-[#00ff88] bg-clip-text text-transparent">
-                Energy Systems
-              </span>
-            </>
-          )}
-        </motion.h1>
-
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 32 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.72, duration: 0.85 }}
-          className="text-[17px] sm:text-[19px] text-white/62 max-w-2xl mx-auto mb-10 leading-relaxed"
-        >
-          {isRTL
-            ? "سیستم‌های پیشرفته LiFePO4 از ذخیره‌سازی 2.5kWh خانگی تا پروژه‌های کانتینری 2MWh صنعتی."
-            : "Advanced LiFePO₄ battery systems for residential, commercial and industrial use. From 2.5 kWh to 2 MWh — engineered for the long run."}
-        </motion.p>
-
-        {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.92, duration: 0.75 }}
-          className="flex flex-wrap items-center justify-center gap-3"
-        >
-          <a
-            href="#products"
-            className="group inline-flex items-center gap-2 px-9 py-4 bg-[#00ff88] text-black font-bold rounded-full text-[15px] hover:bg-[#00e67a] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_52px_rgba(0,255,136,0.38)]"
+        {/* Text block — vertically centered, responsive horizontal padding */}
+        <div className={`flex-1 flex items-center ${isRTL ? "justify-end pr-8 sm:pr-12 md:pr-16 lg:pr-[6vw] xl:pr-24 2xl:pr-32 ml-8 sm:ml-12 md:ml-16 lg:ml-[6vw] xl:ml-24" : "justify-start pl-8 sm:pl-12 md:pl-16 lg:pl-[6vw] xl:pl-24 2xl:pl-32"}`}>
+          <div
+            className="flex flex-col items-start"
+            style={{ maxWidth: "480px" }}
+            dir={isRTL ? "rtl" : "ltr"}
           >
-            {stripLeadingEmoji(t.hero.ctaProducts)}
-            <svg
-              className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
-              fill="none"
-              viewBox="0 0 16 16"
+            {/* Main title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.9, ease: easeOut }}
+              className="text-white leading-none mb-1"
+              style={{
+                fontFamily: YK,
+                fontSize: "clamp(36px, 4.2vw, 62px)",
+                fontWeight: 800,
+                lineHeight: 1.1,
+                textShadow: "0 2px 40px rgba(0,0,0,0.5)",
+              }}
             >
-              <path
-                d="M3 8h10M9 4l4 4-4 4"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
-          <a
-            href="#contact"
-            className="inline-flex items-center px-9 py-4 border border-white/28 text-white font-medium rounded-full text-[15px] backdrop-blur-sm hover:bg-white/[0.08] hover:border-white/45 transition-all duration-300"
-          >
-            {stripLeadingEmoji(t.hero.ctaConsultation)}
-          </a>
-        </motion.div>
+              {isRTL ? "پاور استیشن" : "Power Station"}
+            </motion.h1>
 
-        {/* Quick stats */}
+            {/* "ALL IN ONE" — neon green with glow */}
+            <motion.h2
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55, duration: 0.9, ease: easeOut }}
+              className="leading-none mb-5"
+              style={{
+                fontFamily: YK,
+                fontSize: "clamp(32px, 3.8vw, 56px)",
+                fontWeight: 900,
+                color: ACCENT,
+                textShadow: "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)",
+                lineHeight: 1.1,
+              }}
+            >
+              ALL IN ONE
+            </motion.h2>
+
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.72, duration: 0.85 }}
+              className="text-white mb-8"
+              style={{
+                fontFamily: YK,
+                fontSize: "clamp(14px, 1.4vw, 20px)",
+                fontWeight: 400,
+                lineHeight: 1.75,
+                textShadow: "0 1px 20px rgba(0,0,0,0.4)",
+                maxWidth: "400px",
+                color: "rgba(255,255,255,0.88)",
+              }}
+            >
+              {isRTL
+                ? <>تمام انرژی مورد نیاز شما،<br />هر زمان، هر مکان</>
+                : <>All the energy you need,<br />anytime, anywhere</>}
+            </motion.p>
+
+            {/* CTA button */}
+            <motion.a
+              href="#products"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.75 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="inline-flex items-center gap-2 text-black font-bold cursor-pointer"
+              style={{
+                fontFamily: YK,
+                fontSize: "clamp(14px, 1.1vw, 18px)",
+                fontWeight: 700,
+                background: ACCENT,
+                padding: "14px 34px",
+                borderRadius: "16px",
+                boxShadow: "0 0 24px rgba(124,255,0,0.32), 0 4px 16px rgba(0,0,0,0.28)",
+                transition: "background 0.25s ease, box-shadow 0.25s ease",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.background = "#90ff1a";
+                (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 44px rgba(124,255,0,0.52), 0 4px 20px rgba(0,0,0,0.3)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.background = ACCENT;
+                (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 24px rgba(124,255,0,0.32), 0 4px 16px rgba(0,0,0,0.28)";
+              }}
+            >
+              {isRTL ? "مشاهده محصولات" : "Explore Products"}
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d={isRTL ? "M14 10H6M9 6l-4 4 4 4" : "M6 10h8M11 6l4 4-4 4"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </motion.a>
+          </div>
+        </div>
+
+        {/* ── Features glass panel ─────────────────────────────────────────── */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.15, duration: 0.8 }}
-          className="mt-16 pt-12 border-t border-white/[0.1] flex flex-wrap justify-center gap-10"
+          transition={{ delay: 1.1, duration: 0.9, ease: easeOut }}
+          className="mb-4 sm:mb-8 ml-8 sm:ml-12 md:ml-16 lg:ml-[6vw] xl:ml-24 mr-16 sm:mr-28 md:mr-40 lg:mr-56 xl:mr-72"
+          style={{
+            background: "rgba(0,0,0,0.35)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderRadius: "20px",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
         >
-          {[
-            { v: "10,848m²", l: t.hero.stats[0].label },
-            { v: "60M ¥", l: t.hero.stats[1].label },
-            { v: "30+", l: t.hero.stats[2].label },
-            { v: "20+", l: isRTL ? "کشور تحت پوشش" : "Countries Served" },
-          ].map((s) => (
-            <div key={s.l} className="text-center">
-              <div className="text-[26px] sm:text-[30px] font-bold text-white tracking-tight">{s.v}</div>
-              <div className="text-[11px] text-white/38 mt-1.5 tracking-wide">{s.l}</div>
-            </div>
-          ))}
+          <div
+            className="grid grid-cols-4 py-4 sm:py-0 sm:h-[170px]"
+            dir={isRTL ? "rtl" : "ltr"}
+          >
+            {[
+              {
+                icon: (
+                  <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+                    <rect x="9" y="13" width="24" height="20" rx="3" stroke={ACCENT} strokeWidth="1.6" />
+                    <path d="M16 13V10a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" />
+                    <path d="M21 19v8M17 23h8" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" />
+                  </svg>
+                ),
+                title: isRTL ? "ظرفیت بالا" : "High Capacity",
+                desc: isRTL ? "توان بالا برای\nتمام دستگاه‌های شما" : "High power for\nall your devices",
+              },
+              {
+                icon: (
+                  <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+                    <path d="M23 8l-8 13h8l-2 13L29 21h-8l2-13z" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ),
+                title: isRTL ? "شارژ سریع" : "Fast Charging",
+                desc: isRTL ? "شارژ سریع در\nهر شرایطی" : "Fast charging in\nany condition",
+              },
+              {
+                icon: (
+                  <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+                    <path d="M14 21a7 7 0 1 1 14 0 7 7 0 0 1-14 0z" stroke={ACCENT} strokeWidth="1.6" />
+                    <path d="M21 14v-4M21 32v-4M14 21h-4M32 21h-4" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" />
+                    <circle cx="21" cy="21" r="2.5" fill={ACCENT} />
+                  </svg>
+                ),
+                title: isRTL ? "باتری با عمر طولانی" : "Long Life Battery",
+                desc: isRTL ? "ساخته شده با سلول‌های\nباکیفیت و بادوام" : "Built with premium\nhigh-durability cells",
+              },
+              {
+                icon: (
+                  <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+                    <path d="M21 8l-10 4v9c0 6.075 4.477 11.745 10 13 5.523-1.255 10-6.925 10-13V12L21 8z" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M16 21l3.5 3.5L26 18" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ),
+                title: isRTL ? "ایمن و قابل اعتماد" : "Safe & Reliable",
+                desc: isRTL ? "مجهز به سیستم‌های\nحفاظتی پیشرفته" : "Equipped with advanced\nprotection systems",
+              },
+            ].map((feat, i) => (
+              <div
+                key={i}
+                className="relative flex flex-col items-center justify-center text-center px-1.5 sm:px-4 gap-1.5 sm:gap-2.5 py-4 sm:py-0 group"
+              >
+                {/* Vertical separator */}
+                {(isRTL ? i > 0 : i < 3) && (
+                  <div
+                    className="absolute right-0 top-4 sm:top-8 bottom-4 sm:bottom-8"
+                    style={{ width: "1px", background: "rgba(255,255,255,0.1)" }}
+                  />
+                )}
+
+                {/* Icon — smaller on mobile */}
+                <div className="transition-transform duration-300 group-hover:scale-110 scale-[0.65] sm:scale-100 origin-center">
+                  {feat.icon}
+                </div>
+
+                {/* Title */}
+                <div
+                  className="text-white font-bold"
+                  style={{
+                    fontFamily: YK,
+                    fontSize: "clamp(9px, 1.1vw, 15px)",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {feat.title}
+                </div>
+
+                {/* Description */}
+                <div
+                  className="whitespace-pre-line"
+                  style={{
+                    fontFamily: YK,
+                    fontSize: "clamp(8px, 0.85vw, 12px)",
+                    color: "rgba(255,255,255,0.5)",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {feat.desc}
+                </div>
+              </div>
+            ))}
+          </div>
         </motion.div>
       </motion.div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.9, duration: 0.8 }}
-        className="absolute bottom-8 inset-x-0 flex flex-col items-center gap-2.5 pointer-events-none"
-      >
-        <span className="text-white/28 text-[9px] tracking-[0.22em] uppercase">
-          {isRTL ? "اسکرول" : "Scroll"}
-        </span>
-        <motion.div
-          animate={{ y: [0, 7, 0] }}
-          transition={{ duration: 1.7, repeat: Infinity, ease: "easeInOut" }}
-          className="w-5 h-8 rounded-full border border-white/22 flex justify-center pt-[7px]"
-        >
-          <span className="w-[3px] h-2 rounded-full bg-white/45" />
-        </motion.div>
-      </motion.div>
     </section>
   );
 }
