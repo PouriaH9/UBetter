@@ -4,27 +4,22 @@ const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}"
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
+      },
       colors: {
-        primary: {
-          50: "#edf4ff",
-          100: "#d7e8ff",
-          200: "#b6d5ff",
-          300: "#84b8ff",
-          400: "#4c92ff",
-          500: "#226bff",
-          600: "#124fff",
-          700: "#0f3ee8",
-          800: "#1337bc",
-          900: "#173693"
-        }
-      }
-    }
+        accent: "#00ff88",
+      },
+      animation: {
+        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      },
+    },
   },
-  plugins: []
+  plugins: [],
 };
 
 export default config;
