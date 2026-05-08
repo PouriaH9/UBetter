@@ -21,6 +21,9 @@ import hero3MImg from "@/assets/HERO3M.png";
 
 import { translations } from "@/i18n/translations";
 import type { Locale } from "@/i18n/config";
+import SharedNavbar from "@/components/shared-navbar";
+import SharedFooter from "@/components/shared-footer";
+import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -60,175 +63,30 @@ function Reveal({
 // ─── Section label pill ───────────────────────────────────────────────────────
 
 function Pill({ label }: { label: string }) {
+  const { isDark } = useTheme();
+  const C = isDark ? DARK_C : LIGHT_C;
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#00ff88]/10 border border-[#00ff88]/25 text-[#00ff88] text-[11px] font-semibold tracking-[0.18em] uppercase mb-6">
-      <span className="w-1 h-1 rounded-full bg-[#00ff88]" />
+    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-semibold tracking-[0.18em] uppercase mb-6"
+      style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
+      <span className="w-1 h-1 rounded-full" style={{ background: C.accent }} />
       {label}
     </div>
   );
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// 1. NAVBAR
+// 1. CONSTANTS (shared with sections below)
 // ══════════════════════════════════════════════════════════════════════════════
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
-const ACCENT = "#7CFF00";
-
-function Navbar({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) {
-  const [open, setOpen] = useState(false);
-  const other: Locale = locale === "en" ? "fa" : "en";
-  const isRTL = locale === "fa";
-
-  const faLinks = [
-    { href: `/${locale}`, label: "صفحه اصلی" },
-    { href: "#products", label: "محصولات" },
-    { href: "#solutions", label: "ویژگی‌ها" },
-    { href: "#about", label: "تکنولوژی" },
-    { href: "#about", label: "درباره ما" },
-    { href: "#contact", label: "تماس با ما" },
-  ];
-  const enLinks = [
-    { href: `/${locale}`, label: "Home" },
-    { href: "#products", label: "Products" },
-    { href: "#solutions", label: "Features" },
-    { href: "#about", label: "Technology" },
-    { href: "#about", label: "About" },
-    { href: "#contact", label: "Contact" },
-  ];
-  const navLinks = isRTL ? faLinks : enLinks;
-
-  return (
-    <motion.header
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: easeOut }}
-      className="fixed inset-x-0 top-0 z-50"
-      style={{
-        height: "80px",
-        background: "rgba(0,0,0,0.45)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
-      }}
-    >
-      <div className="h-full px-4 sm:px-12 flex items-center justify-between gap-6" dir="ltr">
-        {/* Logo — always LTR so "ALL IN ONE" reads correctly in both locales */}
-        <Link href={`/${locale}`} className="shrink-0 flex items-center gap-1.5 select-none" dir="ltr">
-          <span
-            className="text-[18px] font-black tracking-tight leading-none"
-            style={{ color: ACCENT, fontFamily: "'Inter', system-ui, sans-serif" }}
-          >
-            ALL
-          </span>
-          <span
-            className="text-[18px] font-black tracking-tight leading-none text-white"
-            style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-          >
-            IN ONE
-          </span>
-        </Link>
-
-        {/* Desktop nav — centered */}
-        <nav className="hidden md:flex items-center gap-10 ml-auto mr-8" dir={isRTL ? "rtl" : "ltr"}>
-          {navLinks.map((l) => (
-            <a
-              key={l.label}
-              href={l.href}
-              className="text-white transition-colors duration-300 hover:text-[#7CFF00]"
-              style={{ fontFamily: YK, fontSize: "14px", fontWeight: 500, letterSpacing: "-0.01em" }}
-            >
-              {l.label}
-            </a>
-          ))}
-        </nav>
-
-        {/* Right actions */}
-        <div className="flex items-center gap-3 shrink-0">
-          <Link
-            href={`/${other}`}
-            className="hidden sm:flex items-center text-white/50 hover:text-[#7CFF00] text-[12px] font-bold tracking-widest uppercase transition-colors duration-200"
-          >
-            {other === "fa" ? "فا" : "EN"}
-          </Link>
-
-          {/* User outline icon */}
-          <button
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:border-[#7CFF00]/50"
-            style={{ border: "1px solid rgba(255,255,255,0.22)" }}
-            aria-label="Profile"
-          >
-            <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="7" r="3.5" stroke="white" strokeWidth="1.5" />
-              <path d="M3 18c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </button>
-
-          {/* Hamburger */}
-          <button
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Toggle menu"
-            className="md:hidden p-2 flex flex-col gap-[5px]"
-          >
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                className={`block w-5 h-[1.8px] bg-white rounded-full transition-all duration-300 ${
-                  open
-                    ? i === 0
-                      ? "rotate-45 translate-y-[6.8px]"
-                      : i === 1
-                        ? "opacity-0"
-                        : "-rotate-45 -translate-y-[6.8px]"
-                    : ""
-                }`}
-              />
-            ))}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile drawer */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden border-t border-white/[0.07] px-6 py-5 flex flex-col gap-3"
-            style={{ background: "rgba(0,0,0,0.92)", backdropFilter: "blur(16px)" }}
-            dir={isRTL ? "rtl" : "ltr"}
-          >
-            {navLinks.map((l) => (
-              <a
-                key={l.label}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="py-3 border-b border-white/[0.06] transition-colors duration-200 hover:text-[#7CFF00]"
-                style={{ fontFamily: YK, fontSize: "16px", color: "rgba(255,255,255,0.72)" }}
-              >
-                {l.label}
-              </a>
-            ))}
-            <Link
-              href={`/${other}`}
-              className="mt-2 text-center py-2.5 rounded-2xl border border-white/20 text-white/60 text-sm font-semibold"
-            >
-              {other === "fa" ? "فارسی" : "English"}
-            </Link>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.header>
-  );
-}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // 2. HERO
 // ══════════════════════════════════════════════════════════════════════════════
 
 function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) {
+  // Hero has full-screen photo background, always uses dark/neon accent
+  const ACCENT = "#7CFF00";
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "28%"]);
@@ -376,7 +234,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
 
             {/* CTA button */}
             <motion.a
-              href="#products"
+              href={`/${locale}/products`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.75 }}
@@ -534,6 +392,8 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
 // ══════════════════════════════════════════════════════════════════════════════
 
 function Testimonials({ locale }: { locale: Locale }) {
+  const { isDark } = useTheme();
+  const C = isDark ? DARK_C : LIGHT_C;
   const [active, setActive] = useState(0);
   const isRTL = locale === "fa";
 
@@ -570,55 +430,43 @@ function Testimonials({ locale }: { locale: Locale }) {
   }, [items.length]);
 
   return (
-    <section className="py-32 bg-[#050505]" dir={isRTL ? "rtl" : "ltr"}>
+    <section className="py-32" dir={isRTL ? "rtl" : "ltr"}
+      style={{ background: isDark ? "#050505" : "#f0f0f0", transition: "background 0.35s ease" }}>
       <div className="max-w-4xl mx-auto px-6">
         <Reveal className="text-center mb-16">
           <Pill label={isRTL ? "نظرات مشتریان" : "Testimonials"} />
-          <h2 className="text-4xl md:text-5xl font-bold text-white">
+          <h2 className="text-4xl md:text-5xl font-bold" style={{ color: C.text1 }}>
             {isRTL ? "اعتماد رهبران صنعت" : "Trusted by Industry Leaders"}
           </h2>
         </Reveal>
 
         <div className="relative">
           <AnimatePresence mode="wait">
-            <motion.div
-              key={active}
-              initial={{ opacity: 0, y: 32 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -24 }}
-              transition={{ duration: 0.55 }}
-              className="bg-[#0f0f0f] border border-white/[0.08] rounded-3xl p-8 md:p-14 text-center"
-            >
-              {/* Stars */}
+            <motion.div key={active} initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -24 }} transition={{ duration: 0.55 }}
+              className="rounded-3xl p-8 md:p-14 text-center"
+              style={{ background: C.card, border: `1px solid ${C.cardBorder}`, transition: "background 0.35s ease" }}>
               <div className="flex justify-center gap-1 mb-8">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-[#00ff88]" fill="currentColor" viewBox="0 0 20 20">
+                  <svg key={i} className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style={{ color: C.accent }}>
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 ))}
               </div>
-
-              <blockquote className="text-[19px] md:text-[22px] text-white/75 leading-relaxed mb-10 italic">
+              <blockquote className="text-[19px] md:text-[22px] leading-relaxed mb-10 italic" style={{ color: C.text2 }}>
                 &ldquo;{items[active].quote}&rdquo;
               </blockquote>
-
               <div>
-                <div className="text-white font-bold text-[17px]">{items[active].author}</div>
-                <div className="text-white/42 text-sm mt-1.5">
-                  {items[active].role} — {items[active].company}
-                </div>
+                <div className="font-bold text-[17px]" style={{ color: C.text1 }}>{items[active].author}</div>
+                <div className="text-sm mt-1.5" style={{ color: C.text3 }}>{items[active].role} — {items[active].company}</div>
               </div>
             </motion.div>
           </AnimatePresence>
 
-          {/* Dots */}
           <div className="flex justify-center gap-2 mt-8">
             {items.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActive(i)}
-                className={`h-1.5 rounded-full transition-all duration-400 ${i === active ? "w-8 bg-[#00ff88]" : "w-1.5 bg-white/20 hover:bg-white/35"}`}
-              />
+              <button key={i} onClick={() => setActive(i)}
+                className="h-1.5 rounded-full transition-all duration-400"
+                style={{ width: i === active ? "32px" : "6px", background: i === active ? C.accent : C.divider }} />
             ))}
           </div>
         </div>
@@ -632,37 +480,32 @@ function Testimonials({ locale }: { locale: Locale }) {
 // ══════════════════════════════════════════════════════════════════════════════
 
 function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) {
+  const { isDark } = useTheme();
+  const C = isDark ? DARK_C : LIGHT_C;
   const isRTL = locale === "fa";
 
   return (
-    <section id="contact" className="py-32 bg-[#050505]" dir={isRTL ? "rtl" : "ltr"}>
+    <section id="contact" className="py-32" dir={isRTL ? "rtl" : "ltr"}
+      style={{ background: isDark ? "#050505" : "#f0f0f0", transition: "background 0.35s ease" }}>
       <div className="max-w-7xl mx-auto px-6">
         {/* Banner */}
         <motion.div
-          initial={{ opacity: 0, y: 48 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.85, ease: easeOut }}
-          className="relative rounded-3xl overflow-hidden border border-[#00ff88]/18 p-12 md:p-20 text-center mb-12"
-          style={{ background: "linear-gradient(135deg, rgba(0,255,136,0.06) 0%, #0a0a0a 50%, #111111 100%)" }}
+          initial={{ opacity: 0, y: 48 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.85, ease: easeOut }}
+          className="relative rounded-3xl overflow-hidden p-12 md:p-20 text-center mb-12"
+          style={{ background: isDark ? `linear-gradient(135deg,${C.accentBg} 0%,#0a0a0a 50%,#111 100%)` : `linear-gradient(135deg,${C.accentBg} 0%,#ffffff 50%,#f8f8f8 100%)`, border: `1px solid ${C.accentBorder}` }}
         >
-          {/* Radial glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#00ff88]/15 rounded-full blur-3xl pointer-events-none" />
-
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl pointer-events-none" style={{ background: C.accentGlow }} />
           <div className="relative z-10">
             <Pill label={isRTL ? "شروع کنید" : "Get Started Today"} />
-            <h2 className="text-4xl md:text-[60px] font-bold text-white leading-tight mb-5">
+            <h2 className="text-4xl md:text-[60px] font-bold leading-tight mb-5" style={{ color: C.text1 }}>
               {isRTL ? "آماده‌اید آینده انرژی\nخود را بسازید؟" : "Ready to Power\nYour Future?"}
             </h2>
-            <p className="text-white/55 text-[17px] max-w-2xl mx-auto mb-10 leading-relaxed">
-              {isRTL
-                ? "با تیم مهندسی ما تماس بگیرید تا مشاوره رایگان و پیش‌فاکتور اختصاصی برای پروژه ذخیره‌سازی انرژی شما دریافت کنید."
-                : "Contact our engineering team for a free consultation and tailored quotation for your residential, commercial, or industrial energy storage project."}
+            <p className="text-[17px] max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: C.text2 }}>
+              {isRTL ? "با تیم مهندسی ما تماس بگیرید تا مشاوره رایگان و پیش‌فاکتور اختصاصی برای پروژه ذخیره‌سازی انرژی شما دریافت کنید." : "Contact our engineering team for a free consultation and tailored quotation for your residential, commercial, or industrial energy storage project."}
             </p>
-            <a
-              href="mailto:info@ubetterenergy.com"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-[#00ff88] text-black font-bold rounded-full text-[16px] hover:bg-[#00e67a] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_64px_rgba(0,255,136,0.45)]"
-            >
+            <a href="mailto:info@ubetterenergy.com"
+              className="inline-flex items-center gap-3 px-10 py-5 text-black font-bold rounded-full text-[16px] transition-all duration-300 hover:scale-105"
+              style={{ background: C.accent, boxShadow: `0 0 40px ${C.accentGlow}` }}>
               {isRTL ? "دریافت پیش‌فاکتور رایگان" : "Get Free Quote"}
               <svg className="w-5 h-5" fill="none" viewBox="0 0 20 20">
                 <path d="M4 10h12M12 5l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -673,13 +516,10 @@ function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) 
 
         {/* Contact form */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2, ease: easeOut }}
-          className="bg-[#0f0f0f] border border-white/[0.07] rounded-3xl p-8 md:p-12"
-        >
-          <h3 className="text-[22px] font-bold text-white mb-8 text-center">
+          initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2, ease: easeOut }}
+          className="rounded-3xl p-8 md:p-12"
+          style={{ background: C.card, border: `1px solid ${C.cardBorder}`, transition: "background 0.35s ease" }}>
+          <h3 className="text-[22px] font-bold mb-8 text-center" style={{ color: C.text1 }}>
             {isRTL ? "ارسال درخواست" : "Send an Inquiry"}
           </h3>
           <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={(e) => e.preventDefault()}>
@@ -690,27 +530,21 @@ function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) 
               { label: t.contact.company, type: "text", ph: isRTL ? "نام شرکت" : "Your company" },
             ].map((f) => (
               <div key={f.label}>
-                <label className="block text-white/45 text-[13px] mb-2 font-medium">{f.label}</label>
-                <input
-                  type={f.type}
-                  placeholder={f.ph}
-                  className="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3.5 text-white placeholder-white/18 text-[14px] focus:outline-none focus:border-[#00ff88]/45 focus:bg-white/[0.07] transition-all duration-200"
-                />
+                <label className="block text-[13px] mb-2 font-medium" style={{ color: C.text3 }}>{f.label}</label>
+                <input type={f.type} placeholder={f.ph}
+                  className="w-full rounded-xl px-4 py-3.5 text-[14px] focus:outline-none transition-all duration-200"
+                  style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${C.cardBorder}`, color: C.text1 }} />
               </div>
             ))}
             <div className="md:col-span-2">
-              <label className="block text-white/45 text-[13px] mb-2 font-medium">{t.contact.message}</label>
-              <textarea
-                rows={4}
-                placeholder={t.contact.message}
-                className="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3.5 text-white placeholder-white/18 text-[14px] focus:outline-none focus:border-[#00ff88]/45 focus:bg-white/[0.07] transition-all duration-200 resize-none"
-              />
+              <label className="block text-[13px] mb-2 font-medium" style={{ color: C.text3 }}>{t.contact.message}</label>
+              <textarea rows={4} placeholder={t.contact.message}
+                className="w-full rounded-xl px-4 py-3.5 text-[14px] focus:outline-none transition-all duration-200 resize-none"
+                style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${C.cardBorder}`, color: C.text1 }} />
             </div>
             <div className="md:col-span-2 flex justify-center">
-              <button
-                type="submit"
-                className="px-12 py-4 bg-[#00ff88] text-black font-bold rounded-full text-[15px] hover:bg-[#00e67a] transition-all duration-300 hover:scale-105"
-              >
+              <button type="submit" className="px-12 py-4 text-black font-bold rounded-full text-[15px] transition-all duration-300 hover:scale-105"
+                style={{ background: C.accent }}>
                 {stripLeadingEmoji(t.contact.send)}
               </button>
             </div>
@@ -722,99 +556,55 @@ function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) 
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// 6. FOOTER
+// 6. FOOTER — now handled by SharedFooter
 // ══════════════════════════════════════════════════════════════════════════════
-
-function Footer({ locale }: { locale: Locale }) {
-  const isRTL = locale === "fa";
-  const other: Locale = locale === "en" ? "fa" : "en";
-
-  const columns = isRTL
-    ? [
-        { head: "محصولات", links: ["سری خانگی", "سری تجاری", "سری صنعتی", "OEM / ODM"] },
-        { head: "شرکت", links: ["درباره ما", "تکنولوژی", "گواهینامه‌ها", "اخبار"] },
-        { head: "پشتیبانی", links: ["مستندات فنی", "پشتیبانی مهندسی", "گارانتی", "تماس با ما"] },
-      ]
-    : [
-        { head: "Products", links: ["Home Series", "Commercial Series", "Industrial Series", "Custom OEM"] },
-        { head: "Company", links: ["About Us", "Technology", "Certifications", "News"] },
-        { head: "Support", links: ["Documentation", "Engineering Support", "Warranty", "Contact"] },
-      ];
-
-  return (
-    <footer className="bg-[#020202] border-t border-white/[0.06] pt-20 pb-10" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
-          {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
-            <Link href={`/${locale}`} className="flex items-center gap-2.5 mb-5">
-              <div className="w-7 h-7 relative rounded-md overflow-hidden">
-                <Image src={logoImg} alt="UBETTER" fill className="object-cover" sizes="28px" />
-              </div>
-              <span className="text-white font-bold text-[15px]">UBETTER</span>
-            </Link>
-            <p className="text-white/36 text-[13px] leading-relaxed mb-5">
-              {isRTL
-                ? "سیستم‌های پیشرفته باتری LiFePO4 برای آینده‌ای پایدار."
-                : "Advanced LiFePO4 battery systems for a sustainable future."}
-            </p>
-            <div className="text-[#00ff88] text-[12px] font-semibold">Ubetter Technology Co., Ltd.</div>
-          </div>
-
-          {columns.map((col) => (
-            <div key={col.head}>
-              <div className="text-white font-semibold text-[13px] mb-5 tracking-wide">{col.head}</div>
-              <ul className="space-y-3">
-                {col.links.map((l) => (
-                  <li key={l}>
-                    <a href="#" className="text-white/35 hover:text-white text-[13px] transition-colors duration-200">
-                      {l}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-white/[0.06] gap-4">
-          <div className="text-white/25 text-[12px]">
-            © 2025 Ubetter Technology Co., Ltd. {isRTL ? "تمام حقوق محفوظ است." : "All rights reserved."}
-          </div>
-          <div className="flex items-center gap-5">
-            <a href="#" className="text-white/25 hover:text-white text-[12px] transition-colors">
-              {isRTL ? "حریم خصوصی" : "Privacy Policy"}
-            </a>
-            <a href="#" className="text-white/25 hover:text-white text-[12px] transition-colors">
-              {isRTL ? "شرایط استفاده" : "Terms of Service"}
-            </a>
-            <Link
-              href={`/${other}`}
-              className="px-3 py-1 rounded-full border border-white/18 text-white/45 hover:text-white hover:border-white/35 text-[11px] font-semibold tracking-widest uppercase transition-all duration-200"
-            >
-              {other === "fa" ? "فا" : "EN"}
-            </Link>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // ROOT EXPORT
 // ══════════════════════════════════════════════════════════════════════════════
 
 export default function HomePageClient({ locale }: { locale: Locale }) {
+  const { isDark } = useTheme();
+  const C = isDark ? DARK_C : LIGHT_C;
   const t = translations[locale];
+  const isRTL = locale === "fa";
 
   return (
-    <div className="bg-[#0a0a0a] text-white overflow-x-hidden" dir={t.dir}>
-      <Navbar locale={locale} t={t} />
+    <div className="overflow-x-hidden" dir={t.dir}
+      style={{ background: C.pageBg, color: C.text1, transition: "background 0.35s ease, color 0.35s ease" }}>
+      <SharedNavbar locale={locale} activePage="home" />
       <Hero locale={locale} t={t} />
+
+      {/* Products teaser — links to the dedicated products page */}
+      <div style={{ background: isDark ? "#050505" : "#f0f0f0", borderTop: `1px solid ${C.divider}`, transition: "background 0.35s ease" }}>
+        <div className="max-w-[1200px] mx-auto px-6 sm:px-10 py-20 text-center" dir={isRTL ? "rtl" : "ltr"}>
+          <motion.div initial={{ opacity: 0, y: 36 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 text-[10px] font-bold tracking-[0.2em] uppercase"
+              style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.accent }} />
+              {isRTL ? "پورتفولیو محصولات" : "Product Portfolio"}
+            </div>
+            <h2 className="font-black mb-5 leading-none" style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(26px, 4vw, 60px)", letterSpacing: isRTL ? "0" : "-0.03em" }}>
+              {isRTL ? (<>۲۳ محصول در <span style={{ color: C.accent }}>۳ دسته‌بندی</span></>) : (<>23 Products across <span style={{ color: C.accent }}>3 Categories</span></>)}
+            </h2>
+            <p className="mx-auto mb-10" style={{ color: C.text3, fontSize: "clamp(13px, 1.1vw, 16px)", lineHeight: 1.9, maxWidth: "560px" }}>
+              {isRTL ? "سیستم‌های ذخیره انرژی مسکونی، تجاری و صنعتی با فناوری LiFePO4 و پشتیبانی هوشمند EMS" : "Residential, commercial, and industrial energy storage systems with LiFePO4 technology and smart EMS support"}
+            </p>
+            <Link href={`/${locale}/products`}
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-black text-[14px] transition-all duration-300 hover:scale-105"
+              style={{ background: C.accent, boxShadow: `0 0 24px ${C.accentGlow}`, fontFamily: YK }}>
+              {isRTL ? "مشاهده همه محصولات" : "View All Products"}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d={isRTL ? "M10 8H4M7 5L4 8l3 3" : "M4 8h8M9 5l3 3-3 3"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
+          </motion.div>
+        </div>
+      </div>
+
       <Testimonials locale={locale} />
       <CTA locale={locale} t={t} />
-      <Footer locale={locale} />
+      <SharedFooter locale={locale} />
     </div>
   );
 }
