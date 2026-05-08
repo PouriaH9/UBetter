@@ -187,7 +187,7 @@ function ProductCard({ productNum, product, locale, onOpenSpecs }: {
 
           <div className="space-y-2 mb-4 flex-1">
             {product.features.slice(0, 4).map((feat, i) => (
-              <div key={i} className={`flex items-start gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+              <div key={i} className="flex items-start gap-2">
                 <div className="w-[5px] h-[5px] rounded-full mt-[6px] shrink-0" style={{ background: C.accent }} />
                 <span style={{ color: C.text2, fontSize: "12px", lineHeight: 1.55 }}>{tx(feat, locale)}</span>
               </div>
@@ -333,7 +333,7 @@ function PageHeader({ locale }: { locale: string }) {
   const totalProducts = CATEGORIES.reduce((sum, c) => sum + c.products.length, 0);
 
   return (
-    <div className="relative overflow-hidden pt-[80px]">
+    <div className="relative overflow-hidden pt-[80px] min-h-[70vh] flex flex-col justify-center">
       {/* Background images */}
       <div className="absolute inset-0">
         <Image src={productsHeroDesktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority />
@@ -347,7 +347,7 @@ function PageHeader({ locale }: { locale: string }) {
       {/* Accent line at top */}
       <div className="absolute top-[80px] inset-x-0 h-px z-10 pointer-events-none" style={{ background: `linear-gradient(90deg,transparent,${C.accentBorder} 30%,${C.accent}55 50%,${C.accentBorder} 70%,transparent)` }} />
 
-      <div className="relative z-10 max-w-[1280px] mx-auto px-6 sm:px-10 py-14 lg:py-20" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="relative z-10 max-w-[1280px] mx-auto px-6 sm:px-10 py-16 lg:py-24" dir={isRTL ? "rtl" : "ltr"}>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: easeOut }}>
           {/* Breadcrumb */}
           <div className={`flex items-center gap-2 mb-6 text-[12px] ${isRTL ? "flex-row-reverse" : ""}`} style={{ color: C.breadcrumb }}>
@@ -366,9 +366,6 @@ function PageHeader({ locale }: { locale: string }) {
                 style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(28px, 4vw, 56px)", letterSpacing: isRTL ? "0" : "-0.03em" }}>
                 {isRTL ? (<>راهکارهای ذخیره{" "}<span style={{ color: C.accent }}>انرژی</span></>) : (<>Energy Storage{" "}<span style={{ color: C.accent }}>Solutions</span></>)}
               </h1>
-              <p style={{ color: C.text3, fontSize: "clamp(13px, 1.1vw, 16px)", lineHeight: 1.85, maxWidth: "560px" }}>
-                {isRTL ? "کاتالوگ کامل محصولات UBETTER — از سیستم‌های مسکونی تا راهکارهای صنعتی در مقیاس شبکه" : "Complete UBETTER product catalog — from residential systems to utility-scale industrial solutions"}
-              </p>
             </div>
 
             <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>

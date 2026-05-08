@@ -107,10 +107,15 @@ export default function SharedNavbar({
       style={{
         height: "80px",
         background: C.navBg,
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        borderBottom: `1px solid ${C.navBorder}`,
-        transition: "background 0.35s ease, border-color 0.35s ease",
+        backdropFilter: "blur(28px) saturate(180%)",
+        WebkitBackdropFilter: "blur(28px) saturate(180%)",
+        borderBottom: isDark
+          ? `1px solid ${C.navBorder}`
+          : "1px solid rgba(255,255,255,0.7)",
+        boxShadow: isDark
+          ? "none"
+          : "0 4px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
+        transition: "background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease",
       }}
     >
       <div className="h-full px-4 sm:px-12 flex items-center justify-between gap-6" dir="ltr">
@@ -162,19 +167,6 @@ export default function SharedNavbar({
           {/* Theme toggle */}
           <ThemeToggle />
 
-          {/* Profile icon */}
-          <button
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300"
-            style={{ border: `1px solid ${C.navBorder}` }}
-            aria-label="Profile"
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = C.accentBorder; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = C.navBorder; }}
-          >
-            <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="7" r="3.5" stroke={C.text2} strokeWidth="1.5" />
-              <path d="M3 18c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke={C.text2} strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </button>
 
           {/* Hamburger */}
           <button
@@ -211,7 +203,7 @@ export default function SharedNavbar({
             transition={{ duration: 0.3 }}
             className="md:hidden px-6 py-5 flex flex-col gap-3"
             style={{
-              background: isDark ? "rgba(0,0,0,0.97)" : "rgba(255,255,255,0.98)",
+              background: isDark ? "rgba(0,0,0,0.92)" : "rgba(255,255,255,0.72)",
               backdropFilter: "blur(20px)",
               borderTop: `1px solid ${C.navBorder}`,
             }}

@@ -277,11 +277,12 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
           transition={{ delay: 1.1, duration: 0.9, ease: easeOut }}
           className="mb-6 sm:mb-8 mx-4 sm:ml-12 md:ml-16 lg:ml-[6vw] xl:ml-24 sm:mr-28 md:mr-40 lg:mr-56 xl:mr-72"
           style={{
-            background: "rgba(0,0,0,0.45)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
+            background: "rgba(0,0,0,0.22)",
+            backdropFilter: "blur(24px) saturate(160%)",
+            WebkitBackdropFilter: "blur(24px) saturate(160%)",
             borderRadius: "20px",
-            border: "1px solid rgba(255,255,255,0.1)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
           }}
         >
           <div
@@ -583,33 +584,38 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
         <div className="absolute inset-0">
           <Image src={productsHeroDesktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority={false} />
           <Image src={productsHeroMobile} alt="" fill className="object-cover object-top sm:hidden" sizes="100vw" priority={false} />
-          {/* Gradient overlay for text readability */}
+          {/* Very subtle vignette — just enough for text shadows to pop */}
           <div className="absolute inset-0" style={{ background: isDark
-            ? "linear-gradient(to bottom, rgba(5,5,5,0.52) 0%, rgba(5,5,5,0.35) 50%, rgba(5,5,5,0.55) 100%)"
-            : "linear-gradient(to bottom, rgba(255,255,255,0.50) 0%, rgba(255,255,255,0.32) 50%, rgba(255,255,255,0.52) 100%)"
+            ? "linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.22) 100%)"
+            : "linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.18) 100%)"
           }} />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-[1200px] mx-auto px-6 sm:px-10 py-24 sm:py-32 text-center" dir={isRTL ? "rtl" : "ltr"}>
-          <motion.div initial={{ opacity: 0, y: 36 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 text-[10px] font-bold tracking-[0.2em] uppercase"
-              style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.accent }} />
-              {isRTL ? "پورتفولیو محصولات" : "Product Portfolio"}
-            </div>
-            <h2 className="font-black mb-5 leading-none" style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(26px, 4vw, 60px)", letterSpacing: isRTL ? "0" : "-0.03em" }}>
-              {isRTL ? (<>۲۳ محصول در <span style={{ color: C.accent }}>۳ دسته‌بندی</span></>) : (<>23 Products across <span style={{ color: C.accent }}>3 Categories</span></>)}
-            </h2>
-            <Link href={`/${locale}/products`}
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-black text-[14px] transition-all duration-300 hover:scale-105"
-              style={{ background: C.accent, boxShadow: `0 0 24px ${C.accentGlow}`, fontFamily: YK }}>
-              {isRTL ? "مشاهده همه محصولات" : "View All Products"}
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d={isRTL ? "M10 8H4M7 5L4 8l3 3" : "M4 8h8M9 5l3 3-3 3"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
-          </motion.div>
+        <div className="relative z-10 flex flex-col justify-between min-h-[calc(100vh-0px)]" dir={isRTL ? "rtl" : "ltr"}>
+          {/* Top: title + CTA */}
+          <div className="flex-1 flex flex-col items-center justify-center max-w-[1200px] mx-auto px-6 sm:px-10 py-16 text-center w-full">
+            <motion.div initial={{ opacity: 0, y: 36 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 text-[10px] font-bold tracking-[0.2em] uppercase"
+                style={{ background: "rgba(0,0,0,0.22)", border: "1px solid rgba(255,255,255,0.25)", color: C.accent, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.accent }} />
+                {isRTL ? "پورتفولیو محصولات" : "Product Portfolio"}
+              </div>
+              <h2 className="font-black mb-8 leading-none" style={{ color: "#ffffff", fontFamily: YK, fontSize: "clamp(26px, 4vw, 60px)", letterSpacing: isRTL ? "0" : "-0.03em", textShadow: "0 2px 24px rgba(0,0,0,0.65), 0 4px 48px rgba(0,0,0,0.45)" }}>
+                {isRTL ? (<>۲۳ محصول در <span style={{ color: C.accent }}>۳ دسته‌بندی</span></>) : (<>23 Products across <span style={{ color: C.accent }}>3 Categories</span></>)}
+              </h2>
+              <Link href={`/${locale}/products`}
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-black text-[14px] transition-all duration-300 hover:scale-105"
+                style={{ background: C.accent, boxShadow: `0 0 24px ${C.accentGlow}`, fontFamily: YK }}>
+                {isRTL ? "مشاهده همه محصولات" : "View All Products"}
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d={isRTL ? "M10 8H4M7 5L4 8l3 3" : "M4 8h8M9 5l3 3-3 3"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Bottom: glass feature strip */}
         </div>
       </div>
 
