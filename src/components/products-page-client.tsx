@@ -8,6 +8,8 @@ import SharedFooter from "@/components/shared-footer";
 import { CATEGORIES, tx } from "@/components/products-section";
 import { PRODUCT_IMAGES, DETAIL_IMAGES } from "@/assets/productImages";
 import { useTheme, DARK_C, LIGHT_C, type ColorPalette } from "@/contexts/theme-context";
+import productsHeroDesktop from "@/assets/Source/products HERO desktopsize.png";
+import productsHeroMobile from "@/assets/Source/products HERO mobilesize.png";
 import type { Locale } from "@/i18n/config";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -331,11 +333,21 @@ function PageHeader({ locale }: { locale: string }) {
   const totalProducts = CATEGORIES.reduce((sum, c) => sum + c.products.length, 0);
 
   return (
-    <div className="relative overflow-hidden pt-[80px]" style={{ background: isDark ? "#030303" : "#ebebeb", transition: "background 0.35s ease" }}>
-      <div className="absolute inset-0 pointer-events-none" style={{ background: C.heroGrad }} />
-      <div className="absolute top-[80px] inset-x-0 h-px" style={{ background: `linear-gradient(90deg,transparent,${C.accentBorder} 30%,${C.accent}55 50%,${C.accentBorder} 70%,transparent)` }} />
+    <div className="relative overflow-hidden pt-[80px]">
+      {/* Background images */}
+      <div className="absolute inset-0">
+        <Image src={productsHeroDesktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority />
+        <Image src={productsHeroMobile} alt="" fill className="object-cover object-top sm:hidden" sizes="100vw" priority />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0" style={{ background: isDark
+          ? "linear-gradient(to bottom, rgba(3,3,3,0.55) 0%, rgba(3,3,3,0.38) 50%, rgba(3,3,3,0.58) 100%)"
+          : "linear-gradient(to bottom, rgba(240,240,240,0.52) 0%, rgba(240,240,240,0.32) 50%, rgba(240,240,240,0.55) 100%)"
+        }} />
+      </div>
+      {/* Accent line at top */}
+      <div className="absolute top-[80px] inset-x-0 h-px z-10 pointer-events-none" style={{ background: `linear-gradient(90deg,transparent,${C.accentBorder} 30%,${C.accent}55 50%,${C.accentBorder} 70%,transparent)` }} />
 
-      <div className="max-w-[1280px] mx-auto px-6 sm:px-10 py-14 lg:py-20" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="relative z-10 max-w-[1280px] mx-auto px-6 sm:px-10 py-14 lg:py-20" dir={isRTL ? "rtl" : "ltr"}>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: easeOut }}>
           {/* Breadcrumb */}
           <div className={`flex items-center gap-2 mb-6 text-[12px] ${isRTL ? "flex-row-reverse" : ""}`} style={{ color: C.breadcrumb }}>
@@ -361,7 +373,7 @@ function PageHeader({ locale }: { locale: string }) {
 
             <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
               {[{ val: String(totalProducts), label: isRTL ? "محصول" : "Products" }, { val: "3", label: isRTL ? "دسته" : "Categories" }, { val: "MW+", label: isRTL ? "مقیاس" : "Capacity" }].map((s, i) => (
-                <div key={i} className="flex flex-col items-center px-5 py-3 rounded-2xl" style={{ background: C.statBg, border: `1px solid ${C.statBorder}` }}>
+                <div key={i} className="flex flex-col items-center px-5 py-3 rounded-2xl" style={{ background: isDark ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.55)", backdropFilter: "blur(12px)", border: `1px solid ${C.statBorder}` }}>
                   <span className="font-black leading-none mb-0.5" style={{ fontSize: "22px", color: C.accent, fontFamily: "'Inter', system-ui" }}>{s.val}</span>
                   <span style={{ fontSize: "10px", color: C.text4, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>{s.label}</span>
                 </div>

@@ -12,6 +12,8 @@ import {
 } from "framer-motion";
 
 import logoImg from "@/assets/LOGO.jpg";
+import productsHeroDesktop from "@/assets/Source/products HERO desktopsize.png";
+import productsHeroMobile from "@/assets/Source/products HERO mobilesize.png";
 import hero1Img from "@/assets/HERO1.png";
 import hero2Img from "@/assets/HERO2.png";
 import hero3Img from "@/assets/HERO3.jpg";
@@ -576,8 +578,20 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
       <Hero locale={locale} t={t} />
 
       {/* Products teaser — links to the dedicated products page */}
-      <div style={{ background: isDark ? "#050505" : "#f0f0f0", borderTop: `1px solid ${C.divider}`, transition: "background 0.35s ease" }}>
-        <div className="max-w-[1200px] mx-auto px-6 sm:px-10 py-20 text-center" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="relative overflow-hidden min-h-screen flex flex-col justify-center" style={{ borderTop: `1px solid ${C.divider}` }}>
+        {/* Background images — desktop / mobile */}
+        <div className="absolute inset-0">
+          <Image src={productsHeroDesktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority={false} />
+          <Image src={productsHeroMobile} alt="" fill className="object-cover object-top sm:hidden" sizes="100vw" priority={false} />
+          {/* Gradient overlay for text readability */}
+          <div className="absolute inset-0" style={{ background: isDark
+            ? "linear-gradient(to bottom, rgba(5,5,5,0.52) 0%, rgba(5,5,5,0.35) 50%, rgba(5,5,5,0.55) 100%)"
+            : "linear-gradient(to bottom, rgba(255,255,255,0.50) 0%, rgba(255,255,255,0.32) 50%, rgba(255,255,255,0.52) 100%)"
+          }} />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-[1200px] mx-auto px-6 sm:px-10 py-24 sm:py-32 text-center" dir={isRTL ? "rtl" : "ltr"}>
           <motion.div initial={{ opacity: 0, y: 36 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 text-[10px] font-bold tracking-[0.2em] uppercase"
               style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
@@ -587,9 +601,6 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
             <h2 className="font-black mb-5 leading-none" style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(26px, 4vw, 60px)", letterSpacing: isRTL ? "0" : "-0.03em" }}>
               {isRTL ? (<>۲۳ محصول در <span style={{ color: C.accent }}>۳ دسته‌بندی</span></>) : (<>23 Products across <span style={{ color: C.accent }}>3 Categories</span></>)}
             </h2>
-            <p className="mx-auto mb-10" style={{ color: C.text3, fontSize: "clamp(13px, 1.1vw, 16px)", lineHeight: 1.9, maxWidth: "560px" }}>
-              {isRTL ? "سیستم‌های ذخیره انرژی مسکونی، تجاری و صنعتی با فناوری LiFePO4 و پشتیبانی هوشمند EMS" : "Residential, commercial, and industrial energy storage systems with LiFePO4 technology and smart EMS support"}
-            </p>
             <Link href={`/${locale}/products`}
               className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-black text-[14px] transition-all duration-300 hover:scale-105"
               style={{ background: C.accent, boxShadow: `0 0 24px ${C.accentGlow}`, fontFamily: YK }}>
