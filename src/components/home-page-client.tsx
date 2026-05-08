@@ -8,20 +8,16 @@ import {
   useScroll,
   useTransform,
   useInView,
-  animate,
   AnimatePresence,
 } from "framer-motion";
 
 import logoImg from "@/assets/LOGO.jpg";
 import hero1Img from "@/assets/HERO1.png";
 import hero2Img from "@/assets/HERO2.png";
-import bannerImg from "@/assets/BANNER.jpg";
-import frontProductImg from "@/assets/FrontOfProduct.png";
-import productHeroImg from "@/assets/Product image and detail hero.jpg";
-import productDetailsImg from "@/assets/Product details.jpg";
-import sideProductImg from "@/assets/SideOfProduct.png";
-import side2ProductImg from "@/assets/Side2 Product.png";
-import front2ProductImg from "@/assets/product Front2.png";
+import hero3Img from "@/assets/HERO3.jpg";
+import hero1MImg from "@/assets/HERO1M.jpg";
+import hero2MImg from "@/assets/HERO2M.png";
+import hero3MImg from "@/assets/HERO3M.png";
 
 import { translations } from "@/i18n/translations";
 import type { Locale } from "@/i18n/config";
@@ -32,31 +28,6 @@ const easeOut = [0.22, 1, 0.36, 1] as const;
 
 function stripLeadingEmoji(s: string) {
   return s.replace(/^[\s\S]*?([A-Za-z\u0600-\u06FF])/, "$1");
-}
-
-// ─── Animated counter ─────────────────────────────────────────────────────────
-
-function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
-  const [val, setVal] = useState(0);
-  const spanRef = useRef<HTMLSpanElement>(null);
-  const inView = useInView(spanRef, { once: true, margin: "-60px" });
-
-  useEffect(() => {
-    if (!inView) return;
-    const ctrl = animate(0, end, {
-      duration: 2.2,
-      ease: "easeOut",
-      onUpdate: (v) => setVal(Math.round(v)),
-    });
-    return ctrl.stop;
-  }, [inView, end]);
-
-  return (
-    <span ref={spanRef} className="tabular-nums">
-      {val.toLocaleString()}
-      {suffix}
-    </span>
-  );
 }
 
 // ─── Reveal wrapper ────────────────────────────────────────────────────────────
@@ -141,7 +112,7 @@ function Navbar({ locale, t }: { locale: Locale; t: (typeof translations)["en"] 
         borderBottom: "1px solid rgba(255,255,255,0.06)",
       }}
     >
-      <div className="h-full px-12 flex items-center justify-between gap-6" dir="ltr">
+      <div className="h-full px-4 sm:px-12 flex items-center justify-between gap-6" dir="ltr">
         {/* Logo — always LTR so "ALL IN ONE" reads correctly in both locales */}
         <Link href={`/${locale}`} className="shrink-0 flex items-center gap-1.5 select-none" dir="ltr">
           <span
@@ -265,7 +236,8 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
 
   const isRTL = locale === "fa";
 
-  const heroImages = [hero1Img, hero2Img];
+  const heroImages = [hero1Img, hero2Img, hero3Img];
+  const heroMobileImages = [hero1MImg, hero2MImg, hero3MImg];
   const [activeImg, setActiveImg] = useState(0);
 
   useEffect(() => {
@@ -280,13 +252,14 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
       {/* Parallax background with crossfading images */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 scale-110 will-change-transform">
         <AnimatePresence mode="sync">
+          {/* Desktop images — hidden on mobile */}
           <motion.div
-            key={activeImg}
+            key={`desktop-${activeImg}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.8, ease: "easeInOut" }}
-            className="absolute inset-0"
+            className="absolute inset-0 hidden sm:block"
           >
             <Image
               src={heroImages[activeImg]}
@@ -298,9 +271,29 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
               className="object-cover object-center"
             />
           </motion.div>
+
+          {/* Mobile images — hidden on desktop */}
+          <motion.div
+            key={`mobile-${activeImg}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.8, ease: "easeInOut" }}
+            className="absolute inset-0 block sm:hidden"
+          >
+            <Image
+              src={heroMobileImages[activeImg]}
+              alt="UBETTER Energy"
+              fill
+              priority={activeImg === 0}
+              quality={92}
+              sizes="100vw"
+              className="object-cover object-center"
+            />
+          </motion.div>
         </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-transparent to-black/25" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/75" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/15 via-transparent to-black/15" />
       </motion.div>
 
       {/* Noise overlay for cinematic texture */}
@@ -330,10 +323,10 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.9, ease: easeOut }}
-              className="text-white leading-none mb-1"
+              className="text-white leading-none mb-0.5 sm:mb-1"
               style={{
                 fontFamily: YK,
-                fontSize: "clamp(36px, 4.2vw, 62px)",
+                fontSize: "clamp(28px, 4.2vw, 62px)",
                 fontWeight: 800,
                 lineHeight: 1.1,
                 textShadow: "0 2px 40px rgba(0,0,0,0.5)",
@@ -347,10 +340,10 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.55, duration: 0.9, ease: easeOut }}
-              className="leading-none mb-5"
+              className="leading-none mb-2 sm:mb-5"
               style={{
                 fontFamily: YK,
-                fontSize: "clamp(32px, 3.8vw, 56px)",
+                fontSize: "clamp(26px, 3.8vw, 56px)",
                 fontWeight: 900,
                 color: ACCENT,
                 textShadow: "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)",
@@ -365,10 +358,10 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.72, duration: 0.85 }}
-              className="text-white mb-8"
+              className="text-white mb-4 sm:mb-8"
               style={{
                 fontFamily: YK,
-                fontSize: "clamp(14px, 1.4vw, 20px)",
+                fontSize: "clamp(12px, 1.4vw, 20px)",
                 fontWeight: 400,
                 lineHeight: 1.75,
                 textShadow: "0 1px 20px rgba(0,0,0,0.4)",
@@ -392,11 +385,11 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
               className="inline-flex items-center gap-2 text-black font-bold cursor-pointer"
               style={{
                 fontFamily: YK,
-                fontSize: "clamp(14px, 1.1vw, 18px)",
+                fontSize: "clamp(12px, 1.1vw, 18px)",
                 fontWeight: 700,
                 background: ACCENT,
-                padding: "14px 34px",
-                borderRadius: "16px",
+                padding: "clamp(9px, 1.2vw, 14px) clamp(18px, 2.5vw, 34px)",
+                borderRadius: "14px",
                 boxShadow: "0 0 24px rgba(124,255,0,0.32), 0 4px 16px rgba(0,0,0,0.28)",
                 transition: "background 0.25s ease, box-shadow 0.25s ease",
               }}
@@ -422,23 +415,23 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.1, duration: 0.9, ease: easeOut }}
-          className="mb-4 sm:mb-8 ml-8 sm:ml-12 md:ml-16 lg:ml-[6vw] xl:ml-24 mr-16 sm:mr-28 md:mr-40 lg:mr-56 xl:mr-72"
+          className="mb-6 sm:mb-8 mx-4 sm:ml-12 md:ml-16 lg:ml-[6vw] xl:ml-24 sm:mr-28 md:mr-40 lg:mr-56 xl:mr-72"
           style={{
-            background: "rgba(0,0,0,0.35)",
+            background: "rgba(0,0,0,0.45)",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
             borderRadius: "20px",
-            border: "1px solid rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.1)",
           }}
         >
           <div
-            className="grid grid-cols-4 py-4 sm:py-0 sm:h-[170px]"
+            className="grid grid-cols-2 sm:grid-cols-4 sm:h-[170px]"
             dir={isRTL ? "rtl" : "ltr"}
           >
             {[
               {
                 icon: (
-                  <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+                  <svg width="36" height="36" viewBox="0 0 42 42" fill="none">
                     <rect x="9" y="13" width="24" height="20" rx="3" stroke={ACCENT} strokeWidth="1.6" />
                     <path d="M16 13V10a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" />
                     <path d="M21 19v8M17 23h8" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" />
@@ -449,7 +442,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
               },
               {
                 icon: (
-                  <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+                  <svg width="36" height="36" viewBox="0 0 42 42" fill="none">
                     <path d="M23 8l-8 13h8l-2 13L29 21h-8l2-13z" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ),
@@ -458,7 +451,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
               },
               {
                 icon: (
-                  <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+                  <svg width="36" height="36" viewBox="0 0 42 42" fill="none">
                     <path d="M14 21a7 7 0 1 1 14 0 7 7 0 0 1-14 0z" stroke={ACCENT} strokeWidth="1.6" />
                     <path d="M21 14v-4M21 32v-4M14 21h-4M32 21h-4" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" />
                     <circle cx="21" cy="21" r="2.5" fill={ACCENT} />
@@ -469,7 +462,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
               },
               {
                 icon: (
-                  <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+                  <svg width="36" height="36" viewBox="0 0 42 42" fill="none">
                     <path d="M21 8l-10 4v9c0 6.075 4.477 11.745 10 13 5.523-1.255 10-6.925 10-13V12L21 8z" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                     <path d="M16 21l3.5 3.5L26 18" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -480,39 +473,46 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
             ].map((feat, i) => (
               <div
                 key={i}
-                className="relative flex flex-col items-center justify-center text-center px-1.5 sm:px-4 gap-1.5 sm:gap-2.5 py-4 sm:py-0 group"
+                className="relative flex flex-col items-center justify-center text-center px-4 sm:px-4 py-3 sm:py-0 gap-1.5 sm:gap-2.5 group"
               >
-                {/* Vertical separator */}
+                {/* Vertical separator — desktop only */}
                 {(isRTL ? i > 0 : i < 3) && (
                   <div
-                    className="absolute right-0 top-4 sm:top-8 bottom-4 sm:bottom-8"
+                    className="hidden sm:block absolute right-0 top-8 bottom-8"
+                    style={{ width: "1px", background: "rgba(255,255,255,0.1)" }}
+                  />
+                )}
+                {/* Horizontal separator — mobile 2×2 grid bottom row divider */}
+                {i < 2 && (
+                  <div
+                    className="sm:hidden absolute bottom-0 left-4 right-4"
+                    style={{ height: "1px", background: "rgba(255,255,255,0.1)" }}
+                  />
+                )}
+                {/* Vertical separator — mobile between 2 columns */}
+                {(i === 0 || i === 2) && (
+                  <div
+                    className="sm:hidden absolute right-0 top-4 bottom-4"
                     style={{ width: "1px", background: "rgba(255,255,255,0.1)" }}
                   />
                 )}
 
-                {/* Icon — smaller on mobile */}
-                <div className="transition-transform duration-300 group-hover:scale-110 scale-[0.65] sm:scale-100 origin-center">
+                <div className="transition-transform duration-300 group-hover:scale-110 origin-center scale-75 sm:scale-100">
                   {feat.icon}
                 </div>
 
-                {/* Title */}
                 <div
                   className="text-white font-bold"
-                  style={{
-                    fontFamily: YK,
-                    fontSize: "clamp(9px, 1.1vw, 15px)",
-                    lineHeight: 1.2,
-                  }}
+                  style={{ fontFamily: YK, fontSize: "clamp(11px, 1.1vw, 15px)", lineHeight: 1.2 }}
                 >
                   {feat.title}
                 </div>
 
-                {/* Description */}
                 <div
                   className="whitespace-pre-line"
                   style={{
                     fontFamily: YK,
-                    fontSize: "clamp(8px, 0.85vw, 12px)",
+                    fontSize: "clamp(10px, 0.85vw, 12px)",
                     color: "rgba(255,255,255,0.5)",
                     lineHeight: 1.6,
                   }}
@@ -530,573 +530,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// 3. STATISTICS
-// ══════════════════════════════════════════════════════════════════════════════
-
-function Stats({ locale }: { locale: Locale }) {
-  const isRTL = locale === "fa";
-
-  const stats = [
-    { end: 10848, suffix: "m²", label: isRTL ? "مساحت کارخانه" : "Factory Area", sub: isRTL ? "مجهزترین خط تولید" : "State-of-the-art facility" },
-    { end: 60, suffix: "M ¥", label: isRTL ? "دارایی تجهیزات" : "Equipment Assets", sub: isRTL ? "سرمایه‌گذاری جهانی" : "World-class investment" },
-    { end: 30, suffix: "+", label: isRTL ? "مهندس متخصص" : "Expert Engineers", sub: isRTL ? "اساتید + متخصصان" : "Professors & specialists" },
-    { end: 500, suffix: "+", label: isRTL ? "پروژه اجرایی" : "Projects Deployed", sub: isRTL ? "در سراسر جهان" : "Globally deployed" },
-    { end: 10, suffix: "M ¥", label: isRTL ? "سرمایه ثبت‌شده" : "Registered Capital", sub: isRTL ? "شرکت پایدار مالی" : "Financially stable" },
-    { end: 20, suffix: "+", label: isRTL ? "کشور صادرات" : "Export Countries", sub: isRTL ? "حضور جهانی" : "Global presence" },
-  ];
-
-  return (
-    <section className="py-28 bg-[#050505]" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="max-w-7xl mx-auto px-6">
-        <Reveal className="text-center mb-16">
-          <Pill label={isRTL ? "ارقام و آمار" : "By the Numbers"} />
-          <h2 className="text-4xl md:text-5xl font-bold text-white">
-            {isRTL ? "مقیاس صنعتی،" : "Enterprise Scale,"}{" "}
-            <span className="text-white/40">{isRTL ? "بلندپروازی جهانی" : "Global Ambition"}</span>
-          </h2>
-        </Reveal>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-px bg-white/[0.05] rounded-2xl overflow-hidden border border-white/[0.06]">
-          {stats.map((s, i) => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.6, delay: i * 0.07, ease: easeOut }}
-              className="group bg-[#0a0a0a] hover:bg-[#111111] transition-colors duration-400 p-8 md:p-10"
-            >
-              <div className="text-[42px] md:text-[52px] font-bold text-white group-hover:text-[#00ff88] transition-colors duration-400 leading-none mb-3">
-                <Counter end={s.end} suffix={s.suffix} />
-              </div>
-              <div className="text-white font-semibold text-[14px] mb-1">{s.label}</div>
-              <div className="text-white/35 text-[12px]">{s.sub}</div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 4. SOLUTIONS
-// ══════════════════════════════════════════════════════════════════════════════
-
-function Solutions({ locale }: { locale: Locale }) {
-  const isRTL = locale === "fa";
-
-  const cards = [
-    {
-      icon: "⌂",
-      title: isRTL ? "ذخیره خانگی" : "Residential Storage",
-      desc: isRTL
-        ? "سیستم‌های دیواری و عمودی از 2.5 تا 20 کیلووات ساعت برای خانه‌ها."
-        : "Wall-mounted & vertical LiFePO4 systems from 2.5–20 kWh for homes.",
-      tag: "2.5–20 kWh",
-    },
-    {
-      icon: "◫",
-      title: isRTL ? "ESS تجاری" : "Commercial ESS",
-      desc: isRTL
-        ? "سیستم‌های رک و استک‌بل برای دفاتر، فروشگاه‌ها و کسب‌وکارهای متوسط."
-        : "Rack-mounted & stackable all-in-ones for offices and retail.",
-      tag: "20–261 kWh",
-    },
-    {
-      icon: "▣",
-      title: isRTL ? "ESS صنعتی" : "Industrial ESS",
-      desc: isRTL
-        ? "ذخیره‌ساز کانتینری 500kWh تا 2MWh برای کارخانه و دیتاسنتر."
-        : "Containerized ESS 500 kWh – 2 MWh for factories & data centers.",
-      tag: "0.5–2 MWh",
-    },
-    {
-      icon: "◉",
-      title: isRTL ? "یکپارچه‌سازی خورشیدی" : "Solar Integration",
-      desc: isRTL
-        ? "سیستم‌های مستقل و متصل به شبکه با مدیریت هوشمند انرژی."
-        : "Grid-tied & off-grid solar + storage with smart energy management.",
-      tag: isRTL ? "آماده PV" : "PV Ready",
-    },
-    {
-      icon: "⚙",
-      title: isRTL ? "OEM / ODM سفارشی" : "Custom OEM / ODM",
-      desc: isRTL
-        ? "سیستم‌های باتری کاملاً سفارشی برای شرکای جهانی."
-        : "Fully customized battery systems for OEM & ODM partners worldwide.",
-      tag: isRTL ? "سفارشی" : "Tailored",
-    },
-    {
-      icon: "⚡",
-      title: isRTL ? "پشتیبان اضطراری" : "Emergency Backup",
-      desc: isRTL
-        ? "برق بی‌وقفه برای بیمارستان‌ها، مخابرات و مراکز داده."
-        : "Mission-critical power for hospitals, telecom stations & data rooms.",
-      tag: isRTL ? "حیاتی" : "Mission Critical",
-    },
-  ];
-
-  return (
-    <section id="solutions" className="py-32 bg-[#0a0a0a]" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="max-w-7xl mx-auto px-6">
-        <Reveal className="text-center mb-20">
-          <Pill label={isRTL ? "راهکارها" : "Solutions"} />
-          <h2 className="text-4xl md:text-[58px] font-bold text-white leading-tight mb-5">
-            {isRTL ? "راهکار انرژی برای هر مقیاس" : "Energy Solutions\nfor Every Scale"}
-          </h2>
-          <p className="text-white/48 text-[17px] max-w-2xl mx-auto leading-relaxed">
-            {isRTL
-              ? "از ذخیره خورشیدی خانگی تا استقرارهای صنعتی چند مگاواتی، UBETTER راهکارهای مهندسی‌شده ارائه می‌دهد."
-              : "From residential solar storage to multi-megawatt industrial deployments, UBETTER delivers engineered solutions built to last."}
-          </p>
-        </Reveal>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {cards.map((card, i) => (
-            <motion.div
-              key={card.title}
-              initial={{ opacity: 0, y: 44 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.65, delay: i * 0.08, ease: easeOut }}
-              className="group relative p-8 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.14] transition-all duration-500 cursor-default overflow-hidden"
-            >
-              {/* Glow on hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#00ff88]/[0.06] to-transparent rounded-2xl" />
-
-              <div className="relative z-10">
-                <div className="w-11 h-11 rounded-xl bg-[#00ff88]/10 border border-[#00ff88]/20 flex items-center justify-center text-[#00ff88] text-lg font-bold mb-5">
-                  {card.icon}
-                </div>
-                <div className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#00ff88]/[0.08] text-[#00ff88] text-[11px] font-semibold mb-4">
-                  {card.tag}
-                </div>
-                <h3 className="text-[18px] font-bold text-white mb-3 group-hover:text-[#00ff88] transition-colors duration-300">
-                  {card.title}
-                </h3>
-                <p className="text-white/48 text-[13.5px] leading-relaxed mb-6">{card.desc}</p>
-                <div className="flex items-center gap-2 text-white/28 group-hover:text-[#00ff88] text-[13px] font-medium transition-all duration-300">
-                  <span>{isRTL ? "بیشتر بدانید" : "Learn more"}</span>
-                  <svg
-                    className={`w-3.5 h-3.5 transition-transform duration-300 ${isRTL ? "group-hover:-translate-x-1 rotate-180" : "group-hover:translate-x-1"}`}
-                    fill="none"
-                    viewBox="0 0 14 14"
-                  >
-                    <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 5. PRODUCT SHOWCASE
-// ══════════════════════════════════════════════════════════════════════════════
-
-function Products({ locale }: { locale: Locale }) {
-  const isRTL = locale === "fa";
-
-  const products = [
-    {
-      img: frontProductImg,
-      name: isRTL ? "سری خانگی" : "Home Series",
-      model: "HB-2.5 / HB-5.0 / HB-10",
-      desc: isRTL
-        ? "باتری LiFePO4 دیواری برای یکپارچه‌سازی خورشیدی خانگی. فشرده، ساکت و کارآمد."
-        : "Wall-mounted LiFePO4 for residential solar integration. Compact, silent, and highly efficient.",
-      specs: ["2.5–10 kWh", "LiFePO4", isRTL ? "دیواری" : "Wall-mount", isRTL ? "آماده خورشیدی" : "Solar-ready"],
-    },
-    {
-      img: productHeroImg,
-      name: isRTL ? "سری تجاری" : "Commercial Series",
-      model: "CB-60 / CB-100 / CB-261",
-      desc: isRTL
-        ? "سیستم‌های رک‌مونت و استک‌بل یکپارچه برای کاربردهای تجاری و صنعتی کوچک."
-        : "Rack-mounted & stackable all-in-one systems for commercial and light industrial applications.",
-      specs: ["60–261 kWh", isRTL ? "رک / استک" : "Rack / Stack", isRTL ? "متصل به شبکه" : "Grid-tied", "SCADA"],
-    },
-    {
-      img: productDetailsImg,
-      name: isRTL ? "سری صنعتی" : "Industrial Series",
-      model: "IE-500 / IE-1000 / IE-2000",
-      desc: isRTL
-        ? "ذخیره‌سازی صنعتی کانتینری برای کارخانه‌ها، مراکز داده و تأسیسات بزرگ."
-        : "Containerized industrial ESS for factories, data centers, and large-scale facilities.",
-      specs: ["500 kWh – 2 MWh", isRTL ? "کانتینری" : "Container", isRTL ? "ماژولار" : "Modular", "BMS"],
-    },
-  ];
-
-  return (
-    <section id="products" className="py-32 bg-[#050505]" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="max-w-7xl mx-auto px-6">
-        <Reveal className="text-center mb-20">
-          <Pill label={isRTL ? "محصولات" : "Products"} />
-          <h2 className="text-4xl md:text-[58px] font-bold text-white leading-tight mb-5">
-            {isRTL ? "مهندسی‌شده برای هر کاربرد" : "Engineered for\nEvery Application"}
-          </h2>
-          <p className="text-white/48 text-[17px] max-w-2xl mx-auto leading-relaxed">
-            {isRTL
-              ? "سه خط محصول برای هر نیاز ذخیره‌سازی انرژی — از واحدهای خانگی کوچک تا استقرارهای صنعتی عظیم."
-              : "Three product lines covering every energy storage need — from compact residential units to massive industrial deployments."}
-          </p>
-        </Reveal>
-
-        <div className="space-y-4">
-          {products.map((p, i) => (
-            <motion.div
-              key={p.name}
-              initial={{ opacity: 0, x: i % 2 === 0 ? -48 : 48 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.85, ease: easeOut }}
-              className={`group flex flex-col ${i % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"} rounded-2xl overflow-hidden border border-white/[0.07] hover:border-white/[0.14] bg-[#0f0f0f] transition-all duration-500`}
-            >
-              {/* Image */}
-              <div className="md:w-1/2 relative h-64 md:h-[400px] overflow-hidden shrink-0">
-                <Image
-                  src={p.img}
-                  alt={p.name}
-                  fill
-                  sizes="(max-width:768px) 100vw, 50vw"
-                  className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                />
-                <div
-                  className={`absolute inset-0 bg-gradient-to-t md:bg-gradient-to-${i % 2 === 0 ? "r" : "l"} from-[#0f0f0f] via-transparent to-transparent`}
-                />
-              </div>
-
-              {/* Content */}
-              <div className="md:w-1/2 flex flex-col justify-center p-8 md:p-12 lg:p-16">
-                <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-[#00ff88]/10 text-[#00ff88] text-[11px] font-semibold mb-6 w-fit tracking-wide">
-                  {p.model}
-                </div>
-                <h3 className="text-3xl md:text-[40px] font-bold text-white leading-tight mb-4">{p.name}</h3>
-                <p className="text-white/50 text-[15px] leading-relaxed mb-8">{p.desc}</p>
-                <div className="flex flex-wrap gap-2 mb-9">
-                  {p.specs.map((spec) => (
-                    <span
-                      key={spec}
-                      className="px-3.5 py-1.5 rounded-lg bg-white/[0.05] border border-white/[0.1] text-white/65 text-[13px] font-medium"
-                    >
-                      {spec}
-                    </span>
-                  ))}
-                </div>
-                <a
-                  href="#contact"
-                  className="inline-flex items-center gap-2 text-[#00ff88] font-semibold text-[14px] group/link"
-                >
-                  {isRTL ? "درخواست مشخصات فنی" : "Request Specifications"}
-                  <svg
-                    className={`w-4 h-4 transition-transform duration-300 ${isRTL ? "group-hover/link:-translate-x-1 rotate-180" : "group-hover/link:translate-x-1"}`}
-                    fill="none"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </a>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 6. CASE STUDIES
-// ══════════════════════════════════════════════════════════════════════════════
-
-function CaseStudies({ locale }: { locale: Locale }) {
-  const isRTL = locale === "fa";
-
-  const cases = [
-    {
-      img: bannerImg,
-      tag: isRTL ? "صنعتی" : "Industrial",
-      location: isRTL ? "جیانگشی، چین" : "Jiangxi, China",
-      title: isRTL ? "مدیریت اوج مصرف کارخانه" : "Factory Peak Shaving",
-      desc: isRTL
-        ? "ذخیره‌ساز 500kWh در یک کارخانه تولیدی نصب شد و هزینه برق اوج مصرف را ۴۰٪ کاهش داد."
-        : "500 kWh ESS deployed at a manufacturing plant — peak demand charges reduced by 40%.",
-      metric: "40%",
-      metricLabel: isRTL ? "کاهش هزینه" : "Cost Reduction",
-    },
-    {
-      img: hero2Img,
-      tag: isRTL ? "تجاری" : "Commercial",
-      location: isRTL ? "اندونزی" : "Indonesia",
-      title: isRTL ? "ریزورت خارج از شبکه" : "Resort Off-Grid Storage",
-      desc: isRTL
-        ? "خورشیدی + 200kWh ذخیره UBETTER، استقلال انرژی کامل برای یک اکوریزورت دورافتاده."
-        : "Solar + 200 kWh UBETTER storage enabling full energy independence for a remote eco-resort.",
-      metric: "100%",
-      metricLabel: isRTL ? "استقلال انرژی" : "Energy Independence",
-    },
-    {
-      img: side2ProductImg,
-      tag: isRTL ? "جهانی" : "Global",
-      location: isRTL ? "نمایشگاه کانتون، گوانگژو" : "Canton Fair, Guangzhou",
-      title: isRTL ? "138امین نمایشگاه کانتون" : "138th Canton Fair",
-      desc: isRTL
-        ? "حضور بین‌المللی نمایشگاهی، همکاری OEM/ODM با بیش از ۲۰ کشور را تقویت کرد."
-        : "Global exhibition establishing OEM/ODM partnerships across 20+ countries.",
-      metric: "20+",
-      metricLabel: isRTL ? "شریک جدید" : "New Partners",
-    },
-  ];
-
-  return (
-    <section className="py-32 bg-[#0a0a0a]" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="max-w-7xl mx-auto px-6">
-        <Reveal className="text-center mb-20">
-          <Pill label={isRTL ? "مطالعات موردی" : "Case Studies"} />
-          <h2 className="text-4xl md:text-[58px] font-bold text-white leading-tight mb-5">
-            {isRTL ? "نتایج واقعی در سراسر جهان" : "Proven Results\nAcross the Globe"}
-          </h2>
-          <p className="text-white/48 text-[17px] max-w-2xl mx-auto leading-relaxed">
-            {isRTL
-              ? "استقرارهای واقعی نشان‌دهنده قابلیت اطمینان و عملکرد سیستم‌های ذخیره‌سازی UBETTER است."
-              : "Real-world deployments demonstrating the reliability and performance of UBETTER energy storage systems."}
-          </p>
-        </Reveal>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {cases.map((c, i) => (
-            <motion.div
-              key={c.title}
-              initial={{ opacity: 0, y: 52 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.7, delay: i * 0.14, ease: easeOut }}
-              className="group rounded-2xl overflow-hidden border border-white/[0.07] hover:border-white/[0.18] transition-all duration-500"
-            >
-              <div className="relative h-60 overflow-hidden">
-                <Image
-                  src={c.img}
-                  alt={c.title}
-                  fill
-                  sizes="(max-width:768px) 100vw, 33vw"
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/30 to-transparent" />
-                <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#00ff88]/15 border border-[#00ff88]/35 text-[#00ff88] text-[11px] font-semibold">
-                  {c.tag}
-                </div>
-              </div>
-              <div className="bg-[#111111] p-6">
-                <div className="text-white/35 text-[11px] uppercase tracking-widest mb-2">{c.location}</div>
-                <h3 className="text-[19px] font-bold text-white mb-3">{c.title}</h3>
-                <p className="text-white/48 text-[13px] leading-relaxed mb-6">{c.desc}</p>
-                <div className="flex items-end gap-2">
-                  <span className="text-[42px] font-bold text-[#00ff88] leading-none">{c.metric}</span>
-                  <span className="text-white/45 text-[13px] pb-1.5">{c.metricLabel}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 7. ABOUT
-// ══════════════════════════════════════════════════════════════════════════════
-
-function About({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) {
-  const isRTL = locale === "fa";
-
-  const kpis = [
-    { label: isRTL ? "سرمایه ثبت‌شده" : "Registered Capital", val: "10M ¥" },
-    { label: isRTL ? "دارایی تجهیزات" : "Equipment Assets", val: "60M ¥" },
-    { label: isRTL ? "مساحت کارخانه" : "Factory Building", val: "10,848m²" },
-    { label: isRTL ? "تیم مهندسی" : "Engineering Team", val: "30+" },
-  ];
-
-  return (
-    <section id="about" className="py-32 bg-[#050505]" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left text */}
-          <Reveal>
-            <Pill label={isRTL ? "درباره UBETTER" : "About UBETTER"} />
-            <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-6">
-              {isRTL ? "فناوری ملی،\nاستاندارد جهانی" : "National Innovation,\nGlobal Standard"}
-            </h2>
-            <p className="text-white/55 text-[16px] leading-relaxed mb-5">
-              {stripLeadingEmoji(t.about.p1)}
-            </p>
-            <p className="text-white/55 text-[16px] leading-relaxed mb-10">
-              {stripLeadingEmoji(t.about.p2)}
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              {kpis.map((k) => (
-                <div
-                  key={k.label}
-                  className="p-5 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:border-[#00ff88]/30 transition-colors duration-300"
-                >
-                  <div className="text-[22px] font-bold text-[#00ff88] mb-1">{k.val}</div>
-                  <div className="text-white/50 text-[13px]">{k.label}</div>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-
-          {/* Right image */}
-          <Reveal delay={0.2} className="relative">
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
-              <Image
-                src={bannerImg}
-                alt="UBETTER Factory"
-                fill
-                sizes="(max-width:1024px) 100vw, 50vw"
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-              {/* Cert badges */}
-              <div className="absolute bottom-5 left-5 right-5 flex gap-2">
-                {["ISO 9001", "ISO 14001", "CE", "UL"].map((c) => (
-                  <div
-                    key={c}
-                    className="flex-1 text-center py-2 bg-black/65 backdrop-blur-sm border border-white/18 rounded-lg text-white/78 text-[11px] font-bold tracking-wide"
-                  >
-                    {c}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Floating badge */}
-            <motion.div
-              initial={{ opacity: 0, x: isRTL ? -40 : 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.5, duration: 0.8, ease: easeOut }}
-              className={`absolute -bottom-6 ${isRTL ? "left-6" : "right-6"} bg-[#111] border border-[#00ff88]/35 rounded-2xl p-5 shadow-2xl`}
-            >
-              <div className="text-[36px] font-bold text-[#00ff88] leading-none">10+</div>
-              <div className="text-white/55 text-[13px] mt-1">{isRTL ? "سال تجربه" : "Years Experience"}</div>
-            </motion.div>
-          </Reveal>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 8. GLOBAL PRESENCE
-// ══════════════════════════════════════════════════════════════════════════════
-
-function GlobalPresence({ locale }: { locale: Locale }) {
-  const isRTL = locale === "fa";
-
-  const regions = [
-    { name: isRTL ? "آسیا-پاسیفیک" : "Asia Pacific", countries: 8, projects: 180, x: 77, y: 42 },
-    { name: isRTL ? "خاورمیانه" : "Middle East", countries: 6, projects: 95, x: 62, y: 50 },
-    { name: isRTL ? "اروپا" : "Europe", countries: 4, projects: 60, x: 49, y: 30 },
-    { name: isRTL ? "آمریکا" : "Americas", countries: 3, projects: 40, x: 21, y: 40 },
-    { name: isRTL ? "آفریقا" : "Africa", countries: 2, projects: 25, x: 51, y: 62 },
-  ];
-
-  return (
-    <section className="py-32 bg-[#0a0a0a] overflow-hidden" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="max-w-7xl mx-auto px-6">
-        <Reveal className="text-center mb-16">
-          <Pill label={isRTL ? "حضور جهانی" : "Global Reach"} />
-          <h2 className="text-4xl md:text-[58px] font-bold text-white leading-tight mb-5">
-            {isRTL ? "تأمین انرژی در سراسر جهان" : "Powering Projects\nWorldwide"}
-          </h2>
-          <p className="text-white/48 text-[17px] max-w-2xl mx-auto">
-            {isRTL
-              ? "سیستم‌های UBETTER در پنج قاره مستقر شده‌اند."
-              : "UBETTER systems are deployed across five continents, supporting diverse commercial and industrial applications."}
-          </p>
-        </Reveal>
-
-        {/* World dot map */}
-        <div className="relative rounded-2xl overflow-hidden border border-white/[0.07] mb-10 bg-[#080808]">
-          <div
-            className="absolute inset-0 opacity-[0.07]"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle, rgba(0,255,136,0.6) 1px, transparent 1px)",
-              backgroundSize: "28px 28px",
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#080808]/60" />
-
-          <div className="relative w-full" style={{ paddingBottom: "48%" }}>
-            {regions.map((r, i) => (
-              <motion.div
-                key={r.name}
-                initial={{ scale: 0, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.18 + 0.3, duration: 0.5, ease: "backOut" }}
-                className="absolute"
-                style={{ left: `${r.x}%`, top: `${r.y}%` }}
-              >
-                <div className="relative -translate-x-1/2 -translate-y-1/2 group cursor-default">
-                  {/* Pulse rings */}
-                  {[1, 2].map((ring) => (
-                    <motion.div
-                      key={ring}
-                      animate={{ scale: [1, ring === 1 ? 2.5 : 3.5], opacity: [0.7, 0] }}
-                      transition={{
-                        duration: 2.5,
-                        repeat: Infinity,
-                        delay: ring * 0.5 + i * 0.2,
-                        ease: "easeOut",
-                      }}
-                      className="absolute inset-0 rounded-full border border-[#00ff88]/50"
-                    />
-                  ))}
-                  <div className="relative w-3 h-3 rounded-full bg-[#00ff88] shadow-[0_0_16px_rgba(0,255,136,0.9)]" />
-                  <div className="absolute top-5 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/80 px-2 py-1 rounded text-white text-[11px] font-medium pointer-events-none">
-                    {r.name}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Region cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          {regions.map((r, i) => (
-            <motion.div
-              key={r.name}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08, duration: 0.55 }}
-              className="bg-[#0f0f0f] border border-white/[0.07] hover:border-[#00ff88]/28 rounded-xl p-5 text-center transition-colors duration-300"
-            >
-              <div className="text-[26px] font-bold text-white mb-0.5">{r.countries}</div>
-              <div className="text-[#00ff88] text-[11px] font-semibold mb-2">
-                {isRTL ? "کشور" : "Countries"}
-              </div>
-              <div className="text-white/55 text-[12px] font-medium">{r.name}</div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 9. TESTIMONIALS
+// 3. TESTIMONIALS
 // ══════════════════════════════════════════════════════════════════════════════
 
 function Testimonials({ locale }: { locale: Locale }) {
@@ -1194,103 +628,7 @@ function Testimonials({ locale }: { locale: Locale }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// 10. NEWS / MEDIA
-// ══════════════════════════════════════════════════════════════════════════════
-
-function News({ locale }: { locale: Locale }) {
-  const isRTL = locale === "fa";
-
-  const posts = [
-    {
-      img: hero2Img,
-      tag: isRTL ? "اخبار شرکت" : "Company News",
-      date: isRTL ? "فروردین ۱۴۰۴" : "April 2025",
-      title: isRTL ? "UBETTER سیستم ESS تجاری 261kWh را عرضه کرد" : "UBETTER Launches New 261 kWh Commercial ESS",
-      desc: isRTL
-        ? "آخرین سیستم ذخیره‌سازی تجاری ما با عمر سیکل بهبودیافته و BMS یکپارچه."
-        : "Our latest commercial ESS sets a new benchmark with improved cycle life and integrated BMS.",
-    },
-    {
-      img: bannerImg,
-      tag: isRTL ? "صنعت" : "Industry",
-      date: isRTL ? "اسفند ۱۴۰۳" : "March 2025",
-      title: isRTL ? "UBETTER در 138امین نمایشگاه کانتون" : "UBETTER at the 138th Canton Fair",
-      desc: isRTL
-        ? "نمایش کامل محصولات در گوانگژو و انعقاد شراکت‌های جدید در اروپا و خاورمیانه."
-        : "Full product showcase in Guangzhou, forming new partnerships across Europe and the Middle East.",
-    },
-    {
-      img: front2ProductImg,
-      tag: isRTL ? "تکنولوژی" : "Technology",
-      date: isRTL ? "بهمن ۱۴۰۳" : "February 2025",
-      title: isRTL ? "شیمی LiFePO4 نسل بعدی" : "Next-Generation LiFePO4 Chemistry",
-      desc: isRTL
-        ? "تیم R&D ما به عمر سیکل بیش از ۸۰۰۰ دست یافته و گارانتی محصول را به ۱۵ سال افزایش داده است."
-        : "Our R&D team achieves 8000+ cycle life in new cell development, extending warranty to 15 years.",
-    },
-  ];
-
-  return (
-    <section className="py-32 bg-[#0a0a0a]" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="max-w-7xl mx-auto px-6">
-        <Reveal className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-16">
-          <div>
-            <Pill label={isRTL ? "اخبار و رسانه" : "News & Media"} />
-            <h2 className="text-4xl md:text-5xl font-bold text-white">
-              {isRTL ? "آخرین اخبار" : "Latest Updates"}
-            </h2>
-          </div>
-          <a
-            href="#"
-            className="mt-6 sm:mt-0 text-[#00ff88] text-[13px] font-semibold flex items-center gap-2 hover:gap-3 transition-all duration-200"
-          >
-            {isRTL ? "مشاهده همه" : "View all news"}
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </a>
-        </Reveal>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {posts.map((post, i) => (
-            <motion.article
-              key={post.title}
-              initial={{ opacity: 0, y: 44 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.65, delay: i * 0.12, ease: easeOut }}
-              className="group rounded-2xl overflow-hidden bg-[#0f0f0f] border border-white/[0.07] hover:border-white/[0.17] transition-all duration-500 cursor-pointer"
-            >
-              <div className="relative h-52 overflow-hidden">
-                <Image
-                  src={post.img}
-                  alt={post.title}
-                  fill
-                  sizes="(max-width:768px) 100vw, 33vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-black/20 to-transparent" />
-                <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-black/55 backdrop-blur-sm border border-white/18 text-white/72 text-[11px] font-semibold">
-                  {post.tag}
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="text-white/30 text-[11px] mb-3 tracking-wide">{post.date}</div>
-                <h3 className="text-[17px] font-bold text-white mb-3 group-hover:text-[#00ff88] transition-colors duration-300 leading-snug">
-                  {post.title}
-                </h3>
-                <p className="text-white/45 text-[13px] leading-relaxed">{post.desc}</p>
-              </div>
-            </motion.article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 11. CTA SECTION
+// 5. CTA SECTION
 // ══════════════════════════════════════════════════════════════════════════════
 
 function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) {
@@ -1384,7 +722,7 @@ function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) 
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// 12. FOOTER
+// 6. FOOTER
 // ══════════════════════════════════════════════════════════════════════════════
 
 function Footer({ locale }: { locale: Locale }) {
@@ -1474,14 +812,7 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
     <div className="bg-[#0a0a0a] text-white overflow-x-hidden" dir={t.dir}>
       <Navbar locale={locale} t={t} />
       <Hero locale={locale} t={t} />
-      <Stats locale={locale} />
-      <Solutions locale={locale} />
-      <Products locale={locale} />
-      <CaseStudies locale={locale} />
-      <About locale={locale} t={t} />
-      <GlobalPresence locale={locale} />
       <Testimonials locale={locale} />
-      <News locale={locale} />
       <CTA locale={locale} t={t} />
       <Footer locale={locale} />
     </div>
