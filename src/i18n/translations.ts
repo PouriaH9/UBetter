@@ -1,4 +1,6 @@
 import type { Locale } from "@/i18n/config";
+import type { UpsCalculatorDict } from "@/i18n/ups-calculator.dict";
+import { upsCalculatorEn, upsCalculatorFa } from "@/i18n/ups-calculator.dict";
 
 type Translation = {
   dir: "ltr" | "rtl";
@@ -37,6 +39,7 @@ type Translation = {
     send: string;
   };
   brandTagline: string;
+  upsCalculator: UpsCalculatorDict;
 };
 
 export const translations: Record<Locale, Translation> = {
@@ -123,7 +126,8 @@ export const translations: Record<Locale, Translation> = {
       message: "Tell us your required capacity, application, and timeline...",
       send: "✉️ Send Inquiry"
     },
-    brandTagline: "🔋 Reliable LiFePO4 Battery & Solar Storage Manufacturer"
+    brandTagline: "🔋 Reliable LiFePO4 Battery & Solar Storage Manufacturer",
+    upsCalculator: upsCalculatorEn,
   },
   fa: {
     dir: "rtl",
@@ -207,6 +211,7 @@ export const translations: Record<Locale, Translation> = {
       message: "ظرفیت مورد نیاز، نوع کاربرد و زمان‌بندی پروژه را بنویسید...",
       send: "✉️ ارسال درخواست"
     },
-    brandTagline: "🔋 تولیدکننده مطمئن باتری LiFePO4 و ذخیره‌سازی خورشیدی"
-  }
+    brandTagline: "🔋 تولیدکننده مطمئن باتری LiFePO4 و ذخیره‌سازی خورشیدی",
+    upsCalculator: upsCalculatorFa,
+  },
 };

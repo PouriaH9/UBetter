@@ -58,6 +58,21 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 999px; }
 
+/* UPS wizard step strip — horizontal bar matches theme (not brand accent) */
+.ups-wizard-steps-scroll::-webkit-scrollbar {
+  height: 3px;
+}
+.ups-wizard-steps-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ups-wizard-steps-scroll::-webkit-scrollbar-thumb {
+  background: rgba(10, 10, 10, 0.35);
+  border-radius: 999px;
+}
+[data-theme="dark"] .ups-wizard-steps-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+}
+
 /* Selection */
 ::selection {
   background-color: var(--accent-dim);

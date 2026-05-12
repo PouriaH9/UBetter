@@ -25,6 +25,7 @@ import { translations } from "@/i18n/translations";
 import type { Locale } from "@/i18n/config";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
+import { UsageCalculatorSection } from "@/components/usage-calculator-section";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -638,6 +639,7 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
         </div>
       </div>
 
+      <UsageCalculatorSection locale={locale} />
       <Testimonials locale={locale} />
       <CTA locale={locale} t={t} />
       <SharedFooter locale={locale} />
