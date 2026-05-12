@@ -43,7 +43,7 @@ export const CATEGORIES: ProductCategory[] = [
   // ── 1. Residential & Villa ────────────────────────────────────────────────
   {
     id: "residential",
-    pill: { fa: "دسته ۰۱", en: "Category 01" },
+    pill: { fa: "دسته ۱", en: "Category 1" },
     title: { fa: "خانگی و ویلایی", en: "Residential & Villa" },
     description: {
       fa: "سیستم‌های ذخیره انرژی هوشمند برای منازل، آپارتمان‌ها و ویلاها. طراحی شده برای برق پشتیبان، ادغام با انرژی خورشیدی و تأمین برق بدون وقفه در فضاهای مسکونی.",
@@ -169,7 +169,7 @@ export const CATEGORIES: ProductCategory[] = [
   // ── 2. Commercial & Office ────────────────────────────────────────────────
   {
     id: "commercial",
-    pill: { fa: "دسته ۰۲", en: "Category 02" },
+    pill: { fa: "دسته ۲", en: "Category 2" },
     title: { fa: "تجاری و اداری", en: "Commercial & Office" },
     description: {
       fa: "سیستم‌های ذخیره انرژی مقیاس‌پذیر برای ساختمان‌های تجاری، دفاتر، مراکز خرید و کسب‌وکارهای متوسط. با قابلیت ادغام با شبکه و انرژی‌های تجدیدپذیر.",
@@ -276,7 +276,7 @@ export const CATEGORIES: ProductCategory[] = [
   // ── 3. Industrial ─────────────────────────────────────────────────────────
   {
     id: "industrial",
-    pill: { fa: "دسته ۰۳", en: "Category 03" },
+    pill: { fa: "دسته ۳", en: "Category 3" },
     title: { fa: "صنعتی", en: "Industrial" },
     description: {
       fa: "سیستم‌های ذخیره انرژی با ظرفیت بالا برای کارخانه‌ها، شهرک‌های صنعتی و تأسیسات سنگین. مجهز به سیستم‌های حفاظتی پیشرفته و مدیریت حرارتی هوشمند.",
@@ -465,7 +465,7 @@ export const CATEGORIES: ProductCategory[] = [
   // ── 4. Solar & Hybrid ─────────────────────────────────────────────────────
   {
     id: "solar",
-    pill: { fa: "دسته ۰۴", en: "Category 04" },
+    pill: { fa: "دسته ۴", en: "Category 4" },
     title: { fa: "خورشیدی و هیبریدی", en: "Solar & Hybrid" },
     description: {
       fa: "سیستم‌های ذخیره انرژی فضای باز هیبریدی طراحی شده برای ادغام با نیروگاه‌های خورشیدی و منابع انرژی تجدیدپذیر. مناسب برای محیط‌های فضای باز با مقاومت محیطی بالا.",
@@ -523,7 +523,7 @@ export const CATEGORIES: ProductCategory[] = [
   // ── 5. Large Projects & Microgrid ─────────────────────────────────────────
   {
     id: "large-scale",
-    pill: { fa: "دسته ۰۵", en: "Category 05" },
+    pill: { fa: "دسته ۵", en: "Category 5" },
     title: { fa: "پروژه‌های بزرگ و میکروگرید", en: "Large Projects & Microgrid" },
     description: {
       fa: "سیستم‌های ذخیره انرژی کانتینری در مقیاس شبکه برای پروژه‌های زیرساختی بزرگ، میکروگریدها و نیروگاه‌های تجدیدپذیر. با قابلیت Plug & Play و استقرار سریع.",
@@ -579,7 +579,7 @@ export const CATEGORIES: ProductCategory[] = [
   // ── 6. Emergency Power & UPS ──────────────────────────────────────────────
   {
     id: "ups",
-    pill: { fa: "دسته ۰۶", en: "Category 06" },
+    pill: { fa: "دسته ۶", en: "Category 6" },
     title: { fa: "برق اضطراری و UPS", en: "Emergency Power & UPS" },
     description: {
       fa: "پلتفرم‌های مدیریت انرژی و اینورترهای هیبریدی با کارایی بالا برای تأمین برق اضطراری، سوئیچینگ بی‌وقفه و مدیریت هوشمند میکروگرید.",

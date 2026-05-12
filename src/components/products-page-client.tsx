@@ -197,7 +197,7 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: 
 
   return (
     <Reveal className="h-full">
-      <div className="card-shimmer-border" style={{ color: isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.14)" }}>
+      <div className="card-shimmer-border" style={{ color: isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.45)" }}>
       <motion.div
         whileHover={{ y: -3 }}
         transition={{ duration: 0.25 }}
@@ -207,6 +207,7 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: 
           backdropFilter: "blur(6px) saturate(140%)",
           WebkitBackdropFilter: "blur(6px) saturate(140%)",
           boxShadow: isDark ? "inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 24px rgba(0,0,0,0.22)" : "inset 0 1px 0 rgba(255,255,255,0.9), 0 4px 20px rgba(0,0,0,0.06)",
+          outline: isDark ? "1px solid rgba(255,255,255,0.09)" : "1px solid rgba(0,0,0,0.1)",
         }}
       >
         {/* Image area */}
@@ -352,24 +353,18 @@ function CategorySection({ cat, catIndex, startIndex, locale, onOpenSpecs }: {
   return (
     <section id={`cat-${cat.id}`} className="scroll-mt-[120px] sm:scroll-mt-[140px]">
       <div className="relative overflow-hidden" style={{ background: headBg, borderBottom: `1px solid ${C.divider}`, transition: "background 0.35s ease" }}>
-        <div className="max-w-[1280px] mx-auto px-6 sm:px-10 py-12 lg:py-16" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-10 py-3" dir={isRTL ? "rtl" : "ltr"}>
           <Reveal>
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
-              <div style={{ maxWidth: "600px" }}>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-[9px] font-bold tracking-[0.2em] uppercase"
-                  style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <div dir="ltr" className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold tracking-[0.18em] uppercase shrink-0"
+                  style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
                   <span className="w-1 h-1 rounded-full animate-pulse" style={{ background: C.accent }} />
                   {tx(cat.pill, locale)}
                 </div>
-                <h2 className="font-black mb-3 leading-tight" style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(20px, 2.5vw, 32px)" }}>
+                <h2 className="font-black leading-tight" style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(16px, 2vw, 22px)" }}>
                   {tx(cat.title, locale)}
                 </h2>
-                <p style={{ color: C.text3, fontSize: "13.5px", lineHeight: 1.8 }}>{tx(cat.description, locale)}</p>
-              </div>
-              <div className="flex items-center gap-3 shrink-0 px-5 py-3 rounded-2xl self-start sm:self-auto"
-                style={{ background: C.catCountBg, border: `1px solid ${C.catCountBdr}` }}>
-                <span className="font-black" style={{ fontSize: "28px", color: C.accent, fontFamily: "'Inter', system-ui" }}>{cat.products.length}</span>
-                <span style={{ color: C.text3, fontSize: "12px", lineHeight: 1.4 }}>{isRTL ? "محصول\nدر این دسته" : "Products\nin category"}</span>
               </div>
             </div>
           </Reveal>
@@ -377,7 +372,7 @@ function CategorySection({ cat, catIndex, startIndex, locale, onOpenSpecs }: {
       </div>
 
       <div style={{ background: gridBg, transition: "background 0.35s ease" }}>
-        <div className="max-w-[1280px] mx-auto px-6 sm:px-10 py-10 lg:py-14">
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-10 py-6 lg:py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {cat.products.map((product, pi) => {
               const productNum = startIndex + pi + 1;
