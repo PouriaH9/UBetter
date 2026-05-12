@@ -135,3 +135,27 @@ img { image-rendering: -webkit-optimize-contrast; }
   position: relative;
   z-index: 1;
 }
+
+/* ─── UPS report PNG export (html-to-image): force print palette on the live node
+   so dark-theme white text is not painted onto white canvas (was "blank" PNG). */
+.ups-export-png-active {
+  background: #ffffff !important;
+  border-color: #d4d4d4 !important;
+  box-shadow: none !important;
+  /* Extra space at bottom of captured PNG (html-to-image) */
+  padding-bottom: 2.5rem !important;
+}
+.ups-export-png-active,
+.ups-export-png-active * {
+  color: #0a0a0a !important;
+  -webkit-text-fill-color: #0a0a0a !important;
+}
+.ups-export-png-active svg {
+  color: #0a0a0a !important;
+}
+.ups-export-png-active svg [stroke]:not([stroke="none"]) {
+  stroke: #0a0a0a !important;
+}
+.ups-export-png-active svg [fill]:not([fill="none"]) {
+  fill: #0a0a0a !important;
+}

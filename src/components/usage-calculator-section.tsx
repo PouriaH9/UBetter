@@ -348,14 +348,29 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
   const runtime = rec ? calcRuntime(totalW, rec.battQty, rec.battAh) : 0;
 
   const reportCardRef = useRef<HTMLDivElement | null>(null);
+  const EXPORT_PNG_CLASS = "ups-export-png-active";
 
   async function downloadReportImage() {
     const el = reportCardRef.current;
     if (!rec || !el) return;
+    const w = Math.max(1, el.offsetWidth);
+    const h = Math.max(1, el.offsetHeight);
+    const maxCanvasSide = 8192;
+    let pixelRatio = Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio || 1 : 2);
+    pixelRatio = Math.min(pixelRatio, maxCanvasSide / w, maxCanvasSide / h);
+    if (!Number.isFinite(pixelRatio) || pixelRatio < 1) pixelRatio = 1;
+
+    el.classList.add(EXPORT_PNG_CLASS);
+    await (document.fonts?.ready ?? Promise.resolve());
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
     try {
       const dataUrl = await toPng(el, {
         cacheBust: true,
-        pixelRatio: 2,
+        pixelRatio,
         backgroundColor: "#ffffff",
       });
       const a = document.createElement("a");
@@ -367,6 +382,8 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
       a.remove();
     } catch (e) {
       console.error(e);
+    } finally {
+      el.classList.remove(EXPORT_PNG_CLASS);
     }
   }
 
