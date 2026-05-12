@@ -579,39 +579,58 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
       <Hero locale={locale} t={t} />
 
       {/* Products teaser — links to the dedicated products page */}
-      <div className="relative overflow-hidden min-h-screen flex flex-col justify-center" style={{ borderTop: `1px solid ${C.divider}` }}>
+      <div className="relative min-h-screen flex flex-col justify-center" style={{ borderTop: `1px solid ${C.divider}`, overflow: "clip" }}>
         {/* Background images — desktop / mobile */}
         <div className="absolute inset-0">
           <Image src={productsHeroDesktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority={false} />
           <Image src={productsHeroMobile} alt="" fill className="object-cover object-top sm:hidden" sizes="100vw" priority={false} />
           {/* Very subtle vignette — just enough for text shadows to pop */}
           <div className="absolute inset-0" style={{ background: isDark
-            ? "linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.22) 100%)"
-            : "linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.18) 100%)"
+            ? "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.32) 50%, rgba(0,0,0,0.50) 100%)"
+            : "linear-gradient(to bottom, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.18) 50%, rgba(0,0,0,0.32) 100%)"
           }} />
         </div>
 
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-between min-h-[calc(100vh-0px)]" dir={isRTL ? "rtl" : "ltr"}>
           {/* Top: title + CTA */}
-          <div className="flex-1 flex flex-col items-center justify-center max-w-[1200px] mx-auto px-6 sm:px-10 py-16 text-center w-full">
-            <motion.div initial={{ opacity: 0, y: 36 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 text-[10px] font-bold tracking-[0.2em] uppercase"
-                style={{ background: "rgba(0,0,0,0.22)", border: "1px solid rgba(255,255,255,0.25)", color: C.accent, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
-                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.accent }} />
+          <div className="flex-1 flex flex-col items-center justify-start max-w-[1200px] mx-auto px-6 sm:px-10 pt-10 pb-8 text-center w-full">
+            <motion.div
+              initial={{ opacity: 0, y: 36 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                backdropFilter: "blur(4px) saturate(120%)",
+                WebkitBackdropFilter: "blur(4px) saturate(120%)",
+                borderRadius: "24px",
+                border: "1px solid rgba(255,255,255,0.18)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.06), 0 8px 40px rgba(0,0,0,0.12)",
+                padding: "28px 40px 32px",
+              }}
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-5 text-[10px] font-bold tracking-[0.2em] uppercase"
+                style={{ background: "rgba(0,0,0,0.22)", border: "1px solid rgba(255,255,255,0.25)", color: C.text1, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.text1 }} />
                 {isRTL ? "پورتفولیو محصولات" : "Product Portfolio"}
               </div>
-              <h2 className="font-black mb-8 leading-none" style={{ color: "#ffffff", fontFamily: YK, fontSize: "clamp(26px, 4vw, 60px)", letterSpacing: isRTL ? "0" : "-0.03em", textShadow: "0 2px 24px rgba(0,0,0,0.65), 0 4px 48px rgba(0,0,0,0.45)" }}>
-                {isRTL ? (<>۲۳ محصول در <span style={{ color: C.accent }}>۳ دسته‌بندی</span></>) : (<>23 Products across <span style={{ color: C.accent }}>3 Categories</span></>)}
+              <h2 className="font-black mb-6 leading-none" style={{ color: "#ffffff", fontFamily: YK, fontSize: "clamp(22px, 3.2vw, 48px)", letterSpacing: isRTL ? "0" : "-0.03em", textShadow: "0 2px 24px rgba(0,0,0,0.65), 0 4px 48px rgba(0,0,0,0.45)" }}>
+                {isRTL ? (<>۲۳ محصول در <span style={{ color: C.text1 }}>۶ دسته‌بندی</span></>) : (<>23 Products across <span style={{ color: C.text1 }}>6 Categories</span></>)}
               </h2>
-              <Link href={`/${locale}/products`}
-                className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-black text-[14px] transition-all duration-300 hover:scale-105"
-                style={{ background: C.accent, boxShadow: `0 0 24px ${C.accentGlow}`, fontFamily: YK }}>
-                {isRTL ? "مشاهده همه محصولات" : "View All Products"}
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d={isRTL ? "M10 8H4M7 5L4 8l3 3" : "M4 8h8M9 5l3 3-3 3"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </Link>
+              <div className="btn-gradient-border" style={{ color: C.text1 }}>
+                <Link href={`/${locale}/products`}
+                  className="btn-gradient-border-inner inline-flex items-center gap-2 px-5 py-2 font-semibold text-[13px] transition-all duration-300 hover:scale-105"
+                  style={{ background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)", color: C.text1, fontFamily: YK, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+                  onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = C.text1; el.style.color = isDark ? "#000" : "#fff"; }}
+                  onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)"; el.style.color = C.text1; }}
+                >
+                  {isRTL ? "مشاهده همه محصولات" : "View All Products"}
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d={isRTL ? "M10 8H4M7 5L4 8l3 3" : "M4 8h8M9 5l3 3-3 3"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </Link>
+              </div>
             </motion.div>
           </div>
 

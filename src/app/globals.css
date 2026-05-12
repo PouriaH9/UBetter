@@ -66,3 +66,57 @@ body {
 
 /* Smooth image rendering */
 img { image-rendering: -webkit-optimize-contrast; }
+
+/* ── Shimmer sweep border for product CTA button ─────────────────────────── */
+@keyframes shimmer-rtl {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+/* shared shimmer mixin — applied to both button and card variants */
+.btn-gradient-border,
+.card-shimmer-border {
+  position: relative;
+  padding: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 30%,
+    currentColor 50%,
+    transparent 70%,
+    transparent 100%
+  );
+  background-size: 300% 100%;
+  animation: shimmer-rtl 8s ease-in-out infinite;
+}
+
+.btn-gradient-border {
+  display: inline-flex;
+  border-radius: 10px;
+}
+.btn-gradient-border-inner {
+  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.card-shimmer-border {
+  display: block;
+  border-radius: 18px;
+  height: 100%;
+}
+.card-shimmer-inner {
+  border-radius: 16px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.tag-shimmer-border {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 1px;
+}
+.tag-shimmer-inner {
+  border-radius: 999px;
+  position: relative;
+  z-index: 1;
+}

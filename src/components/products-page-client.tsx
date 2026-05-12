@@ -5,9 +5,11 @@ import Image from "next/image";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
+import CartDrawer from "@/components/cart-drawer";
 import { CATEGORIES, tx } from "@/components/products-section";
 import { PRODUCT_IMAGES, DETAIL_IMAGES } from "@/assets/productImages";
 import { useTheme, DARK_C, LIGHT_C, type ColorPalette } from "@/contexts/theme-context";
+import { useCart } from "@/contexts/cart-context";
 import productsHeroDesktop from "@/assets/Source/products HERO desktopsize.png";
 import productsHeroMobile from "@/assets/Source/products HERO mobilesize.png";
 import type { Locale } from "@/i18n/config";
@@ -42,6 +44,8 @@ const MODAL_ACCENT = "#7CFF00";
 function SpecModal({ num, locale, onClose }: { num: number; locale: string; onClose: () => void }) {
   const img = DETAIL_IMAGES[num] ?? null;
   const isRTL = locale === "fa";
+  const { isDark } = useTheme();
+  const C = isDark ? DARK_C : LIGHT_C;
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -57,10 +61,10 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
       exit={{ opacity: 0 }}
       transition={{ duration: 0.22 }}
       className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8"
-      style={{ background: "rgba(0,0,0,0.93)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)" }}
+      style={{ background: isDark ? "rgba(0,0,0,0.93)" : "rgba(0,0,0,0.65)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)" }}
       onClick={onClose}
     >
-      <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(124,255,0,0.06) 0%, transparent 65%)" }} />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse at 50% 50%, ${C.accentGlow} 0%, transparent 65%)` }} />
 
       <motion.div
         initial={{ opacity: 0, scale: 0.94, y: 24 }}
@@ -68,39 +72,39 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
         exit={{ opacity: 0, scale: 0.96, y: 10 }}
         transition={{ duration: 0.28, ease: easeOut }}
         className="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-3xl overflow-hidden"
-        style={{ background: "#0a0a0a", border: "1px solid rgba(124,255,0,0.14)" }}
+        style={{ background: C.card, border: `1px solid ${C.accentBorder}`, transition: "background 0.35s ease" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }} dir={isRTL ? "rtl" : "ltr"}>
-          <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.15em] uppercase" style={{ background: "rgba(124,255,0,0.07)", border: "1px solid rgba(124,255,0,0.18)", color: MODAL_ACCENT }}>
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: MODAL_ACCENT }} />
+        <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderBottom: `1px solid ${C.divider}` }} dir={isRTL ? "rtl" : "ltr"}>
+          <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.15em] uppercase" style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: C.accent }} />
             {isRTL ? `مشخصات فنی — محصول ${num}` : `Technical Specifications — Product ${num}`}
           </div>
           <button
             onClick={onClose}
             className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200"
-            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(124,255,0,0.1)"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)"; }}
+            style={{ background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)", border: `1px solid ${C.cardBorder}` }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = C.accentBg; (e.currentTarget as HTMLButtonElement).style.borderColor = C.accentBorder; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)"; (e.currentTarget as HTMLButtonElement).style.borderColor = C.cardBorder; }}
           >
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <path d="M1.5 1.5l10 10M11.5 1.5l-10 10" stroke="white" strokeWidth="1.6" strokeLinecap="round" />
+              <path d="M1.5 1.5l10 10M11.5 1.5l-10 10" stroke={C.text1} strokeWidth="1.6" strokeLinecap="round" />
             </svg>
           </button>
         </div>
 
         {/* Image */}
-        <div className="flex-1 overflow-auto flex items-center justify-center p-6 min-h-0">
+        <div className="flex-1 overflow-auto flex items-center justify-center p-6 min-h-0" style={{ background: isDark ? C.card : "#ffffff" }}>
           {img ? (
             <Image src={img} alt={`Product ${num} specifications`} className="w-full h-auto object-contain rounded-xl" style={{ maxHeight: "75vh" }} sizes="(max-width:768px) 95vw, 900px" />
           ) : (
             <div className="flex flex-col items-center gap-3 py-20">
               <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="opacity-25">
-                <rect x="6" y="6" width="28" height="28" rx="4" stroke={MODAL_ACCENT} strokeWidth="1.5" strokeDasharray="4 3" />
-                <path d="M14 20h12M20 14v12" stroke={MODAL_ACCENT} strokeWidth="1.5" strokeLinecap="round" />
+                <rect x="6" y="6" width="28" height="28" rx="4" stroke={C.accent} strokeWidth="1.5" strokeDasharray="4 3" />
+                <path d="M14 20h12M20 14v12" stroke={C.accent} strokeWidth="1.5" strokeLinecap="round" />
               </svg>
-              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "14px" }}>
+              <p style={{ color: C.text3, fontSize: "14px" }}>
                 {isRTL ? "مشخصات فنی در دسترس نیست" : "Technical specifications not available"}
               </p>
             </div>
@@ -108,16 +112,16 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }} dir={isRTL ? "rtl" : "ltr"}>
-          <span style={{ color: "rgba(255,255,255,0.18)", fontSize: "11px" }}>
+        <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderTop: `1px solid ${C.divider}` }} dir={isRTL ? "rtl" : "ltr"}>
+          <span style={{ color: C.text4, fontSize: "11px" }}>
             {isRTL ? "لیان صدر ملل | نماینده رسمی UBETTER در ایران" : "Lian Sadr Mellal | Official UBETTER Representative in Iran"}
           </span>
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-xl text-[12px] font-medium transition-all duration-200"
-            style={{ border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = MODAL_ACCENT; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(124,255,0,0.3)"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.4)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.1)"; }}
+            style={{ border: `1px solid ${C.cardBorder}`, color: C.text3 }}
+            onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.color = C.accent; b.style.borderColor = C.accentBorder; }}
+            onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.color = C.text3; b.style.borderColor = C.cardBorder; }}
           >
             {isRTL ? "بستن" : "Close"}
           </button>
@@ -127,13 +131,64 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
   );
 }
 
+// ─── Add-to-Cart Button ───────────────────────────────────────────────────────
+
+function AddToCartButton({ onAdd, isInCart, locale, C, isDark }: {
+  onAdd: () => void;
+  isInCart: boolean;
+  locale: string;
+  C: ColorPalette;
+  isDark: boolean;
+}) {
+  const [added, setAdded] = useState(false);
+  const isRTL = locale === "fa";
+
+  const handleClick = () => {
+    onAdd();
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1400);
+  };
+
+  return (
+    <motion.button
+      onClick={handleClick}
+      whileTap={{ scale: 0.93 }}
+      className="flex-1 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5"
+      style={{
+        background: added ? C.accent : (isInCart ? C.accentBg : C.accent),
+        color: added ? (isDark ? "#000" : "#fff") : (isInCart ? C.accent : (isDark ? "#000" : "#fff")),
+        border: isInCart && !added ? `1px solid ${C.accentBorder}` : "1px solid transparent",
+        fontFamily: YK,
+      }}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        {added ? (
+          <motion.svg key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ duration: 0.18 }}
+            width="11" height="11" viewBox="0 0 12 12" fill="none">
+            <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </motion.svg>
+        ) : (
+          <motion.svg key="cart" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ duration: 0.18 }}
+            width="11" height="11" viewBox="0 0 12 12" fill="none">
+            <path d="M1 1h1.5l1.6 5h5.5l1.4-4H4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="5.5" cy="9.5" r="0.8" fill="currentColor" />
+            <circle cx="9" cy="9.5" r="0.8" fill="currentColor" />
+          </motion.svg>
+        )}
+      </AnimatePresence>
+      {added ? (isRTL ? "اضافه شد" : "Added!") : (isRTL ? "افزودن" : "Add")}
+    </motion.button>
+  );
+}
+
 // ─── Product Card ─────────────────────────────────────────────────────────────
 
-function ProductCard({ productNum, product, locale, onOpenSpecs }: {
+function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: {
   productNum: number;
   product: { name: { fa: string; en: string }; category: { fa: string; en: string }; description: { fa: string; en: string }; features: { fa: string; en: string }[]; applications: { fa: string; en: string }[] };
   locale: string;
   onOpenSpecs: () => void;
+  onAddToCart: () => void;
 }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
@@ -141,21 +196,24 @@ function ProductCard({ productNum, product, locale, onOpenSpecs }: {
   const img = PRODUCT_IMAGES[productNum] ?? null;
 
   return (
-    <Reveal>
+    <Reveal className="h-full">
+      <div className="card-shimmer-border" style={{ color: isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.14)" }}>
       <motion.div
         whileHover={{ y: -3 }}
         transition={{ duration: 0.25 }}
-        className="flex flex-col h-full rounded-2xl overflow-hidden"
-        style={{ background: C.card, border: `1px solid ${C.cardBorder}`, transition: "border-color 0.3s ease, background 0.35s ease" }}
-        onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = C.cardBorderHv; }}
-        onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = C.cardBorder; }}
+        className="card-shimmer-inner flex flex-col"
+        style={{
+          background: isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.72)",
+          backdropFilter: "blur(6px) saturate(140%)",
+          WebkitBackdropFilter: "blur(6px) saturate(140%)",
+          boxShadow: isDark ? "inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 24px rgba(0,0,0,0.22)" : "inset 0 1px 0 rgba(255,255,255,0.9), 0 4px 20px rgba(0,0,0,0.06)",
+        }}
       >
         {/* Image area */}
-        <div className="flex items-center justify-center" style={{ height: "200px", background: C.imgAreaBg, position: "relative" }}>
+        <div className="flex items-center justify-center" style={{ height: "200px", background: "#ffffff", position: "relative", borderBottom: `1px solid rgba(0,0,0,0.06)` }}>
           {img ? (
             <div className="relative h-full" style={{ width: "160px" }}>
-              <Image src={img} alt={tx(product.name, locale)} fill sizes="160px" className="object-contain"
-                style={{ filter: isDark ? "drop-shadow(0 8px 24px rgba(0,0,0,0.55)) drop-shadow(0 0 12px rgba(124,255,0,0.06))" : "drop-shadow(0 8px 20px rgba(0,0,0,0.15))" }} />
+              <Image src={img} alt={tx(product.name, locale)} fill sizes="160px" className="object-contain" />
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2 opacity-25">
@@ -194,28 +252,34 @@ function ProductCard({ productNum, product, locale, onOpenSpecs }: {
             ))}
           </div>
 
-          <div className={`flex flex-wrap gap-1.5 mb-4 ${isRTL ? "justify-end" : ""}`}>
+          <div className="flex flex-wrap gap-1.5 mb-4">
             {product.applications.slice(0, 3).map((app, i) => (
-              <span key={i} className="px-2 py-0.5 rounded-full text-[10px]"
-                style={{ background: C.tagBg, border: `1px solid ${C.tagBorder}`, color: C.tagText }}>
-                {tx(app, locale)}
-              </span>
+              <div key={i} className="tag-shimmer-border" style={{ color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.25)" }}>
+                <span className="tag-shimmer-inner px-2 py-0.5 text-[10px] block"
+                  style={{ background: C.tagBg, color: C.tagText }}>
+                  {tx(app, locale)}
+                </span>
+              </div>
             ))}
           </div>
 
-          <button onClick={onOpenSpecs}
-            className="w-full py-2.5 rounded-xl text-[12px] font-semibold transition-all duration-250 flex items-center justify-center gap-2"
-            style={{ border: `1px solid ${C.accentBorder}`, color: C.accent, background: "transparent", fontFamily: YK }}
-            onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = C.accent; b.style.color = "#000"; b.style.boxShadow = `0 0 20px ${C.accentGlow}`; }}
-            onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "transparent"; b.style.color = C.accent; b.style.boxShadow = "none"; }}>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <rect x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.2" />
-              <path d="M4 6h4M6 4v4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
-            </svg>
-            {isRTL ? "مشخصات فنی" : "Technical Specs"}
-          </button>
+          <div className="flex gap-2">
+            <button onClick={onOpenSpecs}
+              className="flex-1 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5"
+              style={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.12)"}`, color: C.text2, background: "transparent", fontFamily: YK }}
+              onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)"; b.style.color = C.text1; }}
+              onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "transparent"; b.style.color = C.text2; }}>
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <rect x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.2" />
+                <path d="M4 6h4M6 4v4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+              </svg>
+              {isRTL ? "مشخصات" : "Specs"}
+            </button>
+            <AddToCartButton onAdd={onAddToCart} isInCart={false} locale={locale} C={C} isDark={isDark} />
+          </div>
         </div>
       </motion.div>
+      </div>
     </Reveal>
   );
 }
@@ -245,9 +309,10 @@ function CategoryTabs({ locale, activeId, onSelect }: { locale: string; activeId
   const isRTL = locale === "fa";
   return (
     <div className="fixed top-[80px] left-0 right-0 z-40 overflow-x-auto"
+      dir={isRTL ? "rtl" : "ltr"}
       style={{ background: C.tabBg, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderBottom: `1px solid ${C.tabBorder}`, transition: "background 0.35s ease" }}>
       <div className="max-w-[1280px] mx-auto px-3 sm:px-10">
-        <div className={`flex items-stretch gap-0 min-w-max sm:min-w-0 ${isRTL ? "flex-row-reverse" : ""}`}>
+        <div className="flex items-stretch gap-0 min-w-max sm:min-w-0">
           {CATEGORIES.map((cat, i) => {
             const isActive = cat.id === activeId;
             return (
@@ -277,6 +342,7 @@ function CategoryTabs({ locale, activeId, onSelect }: { locale: string; activeId
 function CategorySection({ cat, catIndex, startIndex, locale, onOpenSpecs }: {
   cat: typeof CATEGORIES[0]; catIndex: number; startIndex: number; locale: string; onOpenSpecs: (num: number) => void;
 }) {
+  const { addItem, openCart } = useCart();
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
   const isRTL = locale === "fa";
@@ -291,8 +357,8 @@ function CategorySection({ cat, catIndex, startIndex, locale, onOpenSpecs }: {
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
               <div style={{ maxWidth: "600px" }}>
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-[9px] font-bold tracking-[0.2em] uppercase"
-                  style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
-                  <span className="w-1 h-1 rounded-full" style={{ background: C.accent }} />
+                  style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}>
+                  <span className="w-1 h-1 rounded-full animate-pulse" style={{ background: C.accent }} />
                   {tx(cat.pill, locale)}
                 </div>
                 <h2 className="font-black mb-3 leading-tight" style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(20px, 2.5vw, 32px)" }}>
@@ -315,7 +381,19 @@ function CategorySection({ cat, catIndex, startIndex, locale, onOpenSpecs }: {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {cat.products.map((product, pi) => {
               const productNum = startIndex + pi + 1;
-              return <ProductCard key={pi} productNum={productNum} product={product} locale={locale} onOpenSpecs={() => onOpenSpecs(productNum)} />;
+              return (
+                <ProductCard
+                  key={pi}
+                  productNum={productNum}
+                  product={product}
+                  locale={locale}
+                  onOpenSpecs={() => onOpenSpecs(productNum)}
+                  onAddToCart={() => {
+                    addItem({ productNum, name: product.name, category: product.category });
+                    openCart();
+                  }}
+                />
+              );
             })}
           </div>
         </div>
@@ -339,9 +417,8 @@ function PageHeader({ locale }: { locale: string }) {
         <Image src={productsHeroDesktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority />
         <Image src={productsHeroMobile} alt="" fill className="object-cover object-top sm:hidden" sizes="100vw" priority />
         {/* Gradient overlay */}
-        <div className="absolute inset-0" style={{ background: isDark
-          ? "linear-gradient(to bottom, rgba(3,3,3,0.55) 0%, rgba(3,3,3,0.38) 50%, rgba(3,3,3,0.58) 100%)"
-          : "linear-gradient(to bottom, rgba(240,240,240,0.52) 0%, rgba(240,240,240,0.32) 50%, rgba(240,240,240,0.55) 100%)"
+        <div className="absolute inset-0" style={{ background:
+          "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.32) 50%, rgba(0,0,0,0.52) 100%)"
         }} />
       </div>
       {/* Accent line at top */}
@@ -350,29 +427,28 @@ function PageHeader({ locale }: { locale: string }) {
       <div className="relative z-10 max-w-[1280px] mx-auto px-6 sm:px-10 py-16 lg:py-24" dir={isRTL ? "rtl" : "ltr"}>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: easeOut }}>
           {/* Breadcrumb */}
-          <div className={`flex items-center gap-2 mb-6 text-[12px] ${isRTL ? "flex-row-reverse" : ""}`} style={{ color: C.breadcrumb }}>
-            <a href={`/${locale}`} className="transition-colors duration-200" style={{ color: C.text3 }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.accent; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.text3; }}>
+          <div className="flex items-center gap-2 mb-8 text-[12px]" style={{ color: "rgba(255,255,255,0.5)" }}>
+            <a href={`/${locale}`} className="transition-colors duration-200" style={{ color: "rgba(255,255,255,0.5)" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#ffffff"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.5)"; }}>
               {isRTL ? "صفحه اصلی" : "Home"}
             </a>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={isRTL ? "rotate-180" : ""}><path d="M4.5 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            <span style={{ color: C.accent }}>{isRTL ? "محصولات" : "Products"}</span>
+            <span style={{ color: "#ffffff" }}>{isRTL ? "محصولات" : "Products"}</span>
           </div>
 
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
-            <div>
-              <h1 className="font-black leading-none mb-4"
-                style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(28px, 4vw, 56px)", letterSpacing: isRTL ? "0" : "-0.03em" }}>
-                {isRTL ? (<>راهکارهای ذخیره{" "}<span style={{ color: C.accent }}>انرژی</span></>) : (<>Energy Storage{" "}<span style={{ color: C.accent }}>Solutions</span></>)}
-              </h1>
-            </div>
+          <div className="flex flex-col items-center gap-6 text-center">
+            <h1 className="font-black leading-none"
+              style={{ color: "#ffffff", fontFamily: YK, fontSize: "clamp(28px, 4vw, 56px)", letterSpacing: isRTL ? "0" : "-0.03em", textShadow: "0 2px 24px rgba(0,0,0,0.65)" }}>
+              {isRTL ? (<>راهکارهای ذخیره{" "}<span style={{ color: "#ffffff", opacity: 0.7 }}>انرژی</span></>) : (<>Energy Storage{" "}<span style={{ color: "#ffffff", opacity: 0.7 }}>Solutions</span></>)}
+            </h1>
 
-            <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
-              {[{ val: String(totalProducts), label: isRTL ? "محصول" : "Products" }, { val: "3", label: isRTL ? "دسته" : "Categories" }, { val: "MW+", label: isRTL ? "مقیاس" : "Capacity" }].map((s, i) => (
-                <div key={i} className="flex flex-col items-center px-5 py-3 rounded-2xl" style={{ background: isDark ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.55)", backdropFilter: "blur(12px)", border: `1px solid ${C.statBorder}` }}>
-                  <span className="font-black leading-none mb-0.5" style={{ fontSize: "22px", color: C.accent, fontFamily: "'Inter', system-ui" }}>{s.val}</span>
-                  <span style={{ fontSize: "10px", color: C.text4, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>{s.label}</span>
+            <div className="flex items-center gap-4">
+              {[{ val: String(totalProducts), label: isRTL ? "محصول" : "Products" }, { val: String(CATEGORIES.length), label: isRTL ? "دسته" : "Categories" }].map((s, i) => (
+                <div key={i} className="flex flex-col items-center px-5 py-3 rounded-2xl"
+                  style={{ background: "rgba(255,255,255,0.08)", backdropFilter: "blur(12px) saturate(140%)", WebkitBackdropFilter: "blur(12px) saturate(140%)", border: "1px solid rgba(255,255,255,0.18)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)" }}>
+                  <span className="font-black leading-none mb-0.5" style={{ fontSize: "22px", color: "#ffffff", fontFamily: "'Inter', system-ui" }}>{s.val}</span>
+                  <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.55)", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>{s.label}</span>
                 </div>
               ))}
             </div>
@@ -441,6 +517,7 @@ export default function ProductsPageClient({ locale }: { locale: Locale }) {
       style={{ background: C.pageBg, color: C.text1, transition: "background 0.35s ease, color 0.35s ease" }}
     >
       <SharedNavbar locale={locale} activePage="products" />
+      <CartDrawer locale={locale} />
 
       <PageHeader locale={locale} />
       <CategoryTabs locale={locale} activeId={activeTab} onSelect={handleTabSelect} />
@@ -471,14 +548,18 @@ export default function ProductsPageClient({ locale }: { locale: Locale }) {
             <h3 className="font-bold mb-6" style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(18px, 2vw, 28px)" }}>
               {locale === "fa" ? "برای مشاوره رایگان با ما تماس بگیرید" : "Get a Free Engineering Consultation"}
             </h3>
-            <a href={`/${locale}#contact`}
-              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-bold text-black text-[14px] transition-all duration-300 hover:scale-105"
-              style={{ background: C.accent, boxShadow: `0 0 24px ${C.accentGlow}`, fontFamily: YK }}>
-              {locale === "fa" ? "تماس با ما" : "Contact Us"}
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d={locale === "fa" ? "M9 7H3M6 4L3 7l3 3" : "M3 7h8M8 4l3 3-3 3"} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
+            <div className="btn-gradient-border" style={{ color: C.text1 }}>
+              <a href={`/${locale}#contact`}
+                className="btn-gradient-border-inner inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-[14px] transition-all duration-300 hover:scale-105"
+                style={{ background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)", color: C.text1, fontFamily: YK, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+                onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = C.text1; el.style.color = isDark ? "#000" : "#fff"; }}
+                onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)"; el.style.color = C.text1; }}>
+                {locale === "fa" ? "تماس با ما" : "Contact Us"}
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d={locale === "fa" ? "M9 7H3M6 4L3 7l3 3" : "M3 7h8M8 4l3 3-3 3"} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </a>
+            </div>
           </Reveal>
         </div>
       </div>

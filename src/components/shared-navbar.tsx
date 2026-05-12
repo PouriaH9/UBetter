@@ -1,10 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
+import { useCart } from "@/contexts/cart-context";
 import type { Locale } from "@/i18n/config";
+
+const PRODUCT_CATS = [
+  { id: "residential",  fa: "خانگی و ویلایی",              en: "Residential & Villa" },
+  { id: "commercial",   fa: "تجاری و اداری",               en: "Commercial & Office" },
+  { id: "industrial",   fa: "صنعتی",                        en: "Industrial" },
+  { id: "solar",        fa: "خورشیدی و هیبریدی",            en: "Solar & Hybrid" },
+  { id: "large-scale",  fa: "پروژه‌های بزرگ و میکروگرید",   en: "Large Projects & Microgrid" },
+  { id: "ups",          fa: "برق اضطراری و UPS",            en: "Emergency Power & UPS" },
+];
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
@@ -18,17 +28,17 @@ function ThemeToggle() {
       whileTap={{ scale: 0.9 }}
       className="relative w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 shrink-0"
       style={{
-        border: isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(0,0,0,0.14)",
+        border: isDark ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(0,0,0,0.12)",
         background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
       }}
       onMouseEnter={(e) => {
         const b = e.currentTarget as HTMLButtonElement;
-        b.style.borderColor = isDark ? DARK_C.accent : LIGHT_C.accent;
-        b.style.boxShadow = `0 0 12px ${isDark ? "rgba(124,255,0,0.18)" : "rgba(74,156,0,0.15)"}`;
+        b.style.borderColor = isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.25)";
+        b.style.boxShadow = isDark ? "0 0 10px rgba(255,255,255,0.1)" : "0 0 10px rgba(0,0,0,0.08)";
       }}
       onMouseLeave={(e) => {
         const b = e.currentTarget as HTMLButtonElement;
-        b.style.borderColor = isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.14)";
+        b.style.borderColor = isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)";
         b.style.boxShadow = "none";
       }}
     >
@@ -42,7 +52,7 @@ function ThemeToggle() {
             exit={{ opacity: 0, rotate: 60, scale: 0.7 }}
             transition={{ duration: 0.22 }}
             width="16" height="16" viewBox="0 0 20 20" fill="none"
-            style={{ color: "#7CFF00" }}
+            style={{ color: "rgba(255,255,255,0.85)" }}
           >
             <circle cx="10" cy="10" r="3.5" stroke="currentColor" strokeWidth="1.5" />
             <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.34 4.34l1.42 1.42M14.24 14.24l1.42 1.42M4.34 15.66l1.42-1.42M14.24 5.76l1.42-1.42" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -56,7 +66,7 @@ function ThemeToggle() {
             exit={{ opacity: 0, rotate: -60, scale: 0.7 }}
             transition={{ duration: 0.22 }}
             width="15" height="15" viewBox="0 0 20 20" fill="none"
-            style={{ color: "#4a9c00" }}
+            style={{ color: "rgba(0,0,0,0.65)" }}
           >
             <path d="M17.5 12.5A8 8 0 018 3a7.5 7.5 0 100 15 8 8 0 009.5-5.5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </motion.svg>
@@ -74,7 +84,17 @@ export default function SharedNavbar({
   activePage?: "home" | "products";
 }) {
   const [open, setOpen] = useState(false);
+  const [productsOpen, setProductsOpen] = useState(false);
+  const [desktopDropdown, setDesktopDropdown] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { isDark } = useTheme();
+  const { totalQty, openCart } = useCart();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   const C = isDark ? DARK_C : LIGHT_C;
 
   const other: Locale = locale === "en" ? "fa" : "en";
@@ -106,16 +126,18 @@ export default function SharedNavbar({
       className="fixed inset-x-0 top-0 z-50"
       style={{
         height: "80px",
-        background: C.navBg,
+        background: scrolled
+          ? (isDark ? "rgba(0,0,0,0.95)" : "rgba(255,255,255,0.97)")
+          : C.navBg,
         backdropFilter: "blur(28px) saturate(180%)",
         WebkitBackdropFilter: "blur(28px) saturate(180%)",
         borderBottom: isDark
-          ? `1px solid ${C.navBorder}`
-          : "1px solid rgba(255,255,255,0.7)",
-        boxShadow: isDark
-          ? "none"
-          : "0 4px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
-        transition: "background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease",
+          ? `1px solid ${scrolled ? "rgba(255,255,255,0.08)" : C.navBorder}`
+          : `1px solid ${scrolled ? "rgba(0,0,0,0.1)" : "rgba(0,0,0,0.07)"}`,
+        boxShadow: scrolled
+          ? (isDark ? "0 4px 32px rgba(0,0,0,0.5)" : "0 4px 32px rgba(0,0,0,0.1)")
+          : (isDark ? "none" : "0 4px 24px rgba(0,0,0,0.06)"),
+        transition: "background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
       }}
     >
       <div className="h-full px-4 sm:px-12 flex items-center justify-between gap-6" dir="ltr">
@@ -129,18 +151,88 @@ export default function SharedNavbar({
         <nav className="hidden md:flex items-center gap-8 ml-auto mr-6" dir={isRTL ? "rtl" : "ltr"}>
           {navLinks.map((l) => {
             const isActive = (l.page === "products" && activePage === "products") || (l.page === "home" && l.label === (isRTL ? "صفحه اصلی" : "Home") && activePage === "home");
+            const isProducts = l.href === `/${locale}/products`;
+
+            if (isProducts) {
+              return (
+                <div
+                  key={l.label}
+                  className="relative"
+                  onMouseEnter={() => setDesktopDropdown(true)}
+                  onMouseLeave={() => setDesktopDropdown(false)}
+                >
+                  <Link
+                    href={l.href}
+                    className="flex items-center gap-1 relative transition-colors duration-300"
+                    style={{ fontFamily: YK, fontSize: "14px", fontWeight: 500, color: isActive ? C.accent : C.text2, textDecoration: "none" }}
+                  >
+                    {l.label}
+                    <motion.svg
+                      animate={{ rotate: desktopDropdown ? 180 : 0 }}
+                      transition={{ duration: 0.18 }}
+                      width="11" height="11" viewBox="0 0 12 12" fill="none"
+                      style={{ color: isActive ? C.accent : C.text3 }}
+                    >
+                      <path d="M3 4.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </motion.svg>
+                    {isActive && <span className="absolute -bottom-1 left-0 right-0 h-[2px] rounded-full" style={{ background: C.accent }} />}
+                  </Link>
+
+                  <AnimatePresence>
+                    {desktopDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                        transition={{ duration: 0.18 }}
+                        className="absolute top-full mt-3 min-w-[220px] rounded-2xl overflow-hidden z-50"
+                        style={{
+                          background: isDark ? "rgba(10,10,10,0.96)" : "rgba(255,255,255,0.98)",
+                          backdropFilter: "blur(20px)",
+                          border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+                          boxShadow: isDark ? "0 16px 48px rgba(0,0,0,0.6)" : "0 16px 48px rgba(0,0,0,0.12)",
+                          ...(isRTL ? { right: 0 } : { left: 0 }),
+                        }}
+                        dir={isRTL ? "rtl" : "ltr"}
+                      >
+                        <div className="py-2">
+                          {PRODUCT_CATS.map((cat) => (
+                            <Link
+                              key={cat.id}
+                              href={`/${locale}/products#cat-${cat.id}`}
+                              className="flex items-center gap-3 px-4 py-2.5 transition-colors duration-150 group"
+                              style={{ fontFamily: YK, fontSize: "13px", color: C.text2 }}
+                              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.accent; }}
+                              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.text2; }}
+                              onClick={() => setDesktopDropdown(false)}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full shrink-0 opacity-40 group-hover:opacity-100 transition-opacity" style={{ background: C.accent }} />
+                              {isRTL ? cat.fa : cat.en}
+                            </Link>
+                          ))}
+                          <div style={{ height: "1px", margin: "6px 16px", background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }} />
+                          <Link
+                            href={`/${locale}/products`}
+                            className="flex items-center gap-2 px-4 py-2.5 text-[12px] font-semibold transition-colors duration-150"
+                            style={{ fontFamily: YK, color: C.accent }}
+                            onClick={() => setDesktopDropdown(false)}
+                          >
+                            {isRTL ? "← مشاهده همه" : "View All →"}
+                          </Link>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={l.label}
                 href={l.href}
                 className="relative transition-colors duration-300"
-                style={{
-                  fontFamily: YK,
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: isActive ? C.accent : C.text2,
-                  textDecoration: "none",
-                }}
+                style={{ fontFamily: YK, fontSize: "14px", fontWeight: 500, color: isActive ? C.accent : C.text2, textDecoration: "none" }}
                 onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = C.accent; }}
                 onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = C.text2; }}
               >
@@ -163,6 +255,37 @@ export default function SharedNavbar({
           >
             {other === "fa" ? "فا" : "EN"}
           </Link>
+
+          {/* Cart icon */}
+          <button
+            onClick={openCart}
+            aria-label="Open cart"
+            className="relative p-2 flex items-center justify-center rounded-full transition-all duration-200"
+            style={{ color: C.text2 }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = C.text1; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = C.text2; }}
+          >
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+              <path d="M2.5 2.5h1.667l2.666 8.333h8.334l2-6.666H6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="8.5" cy="14.5" r="1.2" fill="currentColor" />
+              <circle cx="13.5" cy="14.5" r="1.2" fill="currentColor" />
+            </svg>
+            <AnimatePresence>
+              {totalQty > 0 && (
+                <motion.span
+                  key="badge"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                  className="absolute top-0.5 right-0.5 min-w-[16px] h-4 rounded-full flex items-center justify-center text-[9px] font-black px-1"
+                  style={{ background: C.accent, color: isDark ? "#000" : "#fff" }}
+                >
+                  {totalQty > 9 ? "9+" : totalQty}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
 
           {/* Theme toggle */}
           <ThemeToggle />
@@ -201,33 +324,91 @@ export default function SharedNavbar({
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden px-6 py-5 flex flex-col gap-3"
+            className="md:hidden flex flex-col"
             style={{
-              background: isDark ? "rgba(0,0,0,0.92)" : "rgba(255,255,255,0.72)",
+              background: isDark ? "rgba(0,0,0,0.95)" : "rgba(255,255,255,0.97)",
               backdropFilter: "blur(20px)",
-              borderTop: `1px solid ${C.navBorder}`,
+              borderTop: `1px solid ${C.divider}`,
             }}
             dir={isRTL ? "rtl" : "ltr"}
           >
-            {navLinks.map((l) => (
-              <Link
-                key={l.label}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="py-3 transition-colors duration-200"
-                style={{
-                  fontFamily: YK,
-                  fontSize: "16px",
-                  color: C.text2,
-                  borderBottom: `1px solid ${C.divider}`,
-                }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.accent; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.text2; }}
-              >
-                {l.label}
-              </Link>
-            ))}
-            <div className="flex items-center justify-between mt-2 pt-3">
+            {navLinks.map((l) => {
+              const isProducts = l.href === `/${locale}/products`;
+              return (
+                <div key={l.label} style={{ borderBottom: `1px solid ${C.divider}` }}>
+                  {isProducts ? (
+                    <>
+                      {/* Expandable Products row */}
+                      <button
+                        onClick={() => setProductsOpen((v) => !v)}
+                        className="w-full flex items-center justify-between px-6 py-4 transition-colors duration-200"
+                        style={{ fontFamily: YK, fontSize: "15px", color: activePage === "products" ? C.accent : C.text2, background: "transparent" }}
+                      >
+                        <span>{l.label}</span>
+                        <motion.svg
+                          animate={{ rotate: productsOpen ? 180 : 0 }}
+                          transition={{ duration: 0.2 }}
+                          width="14" height="14" viewBox="0 0 14 14" fill="none"
+                          style={{ color: C.text3 }}
+                        >
+                          <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </motion.svg>
+                      </button>
+
+                      {/* Sub-categories */}
+                      <AnimatePresence>
+                        {productsOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="flex flex-col"
+                            style={{ background: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)" }}
+                          >
+                            {PRODUCT_CATS.map((cat) => (
+                              <Link
+                                key={cat.id}
+                                href={`/${locale}/products#cat-${cat.id}`}
+                                onClick={() => { setOpen(false); setProductsOpen(false); }}
+                                className="flex items-center gap-3 px-8 py-3 transition-colors duration-200"
+                                style={{ fontFamily: YK, fontSize: "13px", color: C.text3 }}
+                                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.accent; }}
+                                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.text3; }}
+                              >
+                                <span className="w-1 h-1 rounded-full shrink-0" style={{ background: C.accent }} />
+                                {isRTL ? cat.fa : cat.en}
+                              </Link>
+                            ))}
+                            <Link
+                              href={`/${locale}/products`}
+                              onClick={() => { setOpen(false); setProductsOpen(false); }}
+                              className="flex items-center gap-2 px-8 py-3 text-[12px] font-semibold transition-colors duration-200"
+                              style={{ fontFamily: YK, color: C.accent }}
+                            >
+                              {isRTL ? "← مشاهده همه محصولات" : "View All Products →"}
+                            </Link>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  ) : (
+                    <Link
+                      href={l.href}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center px-6 py-4 transition-colors duration-200"
+                      style={{ fontFamily: YK, fontSize: "15px", color: C.text2 }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.accent; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.text2; }}
+                    >
+                      {l.label}
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
+
+            <div className="flex items-center justify-between px-6 py-4">
               <Link
                 href={`/${other}`}
                 className="py-2 px-4 rounded-xl text-sm font-semibold transition-colors duration-200"

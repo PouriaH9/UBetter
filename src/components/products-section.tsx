@@ -40,15 +40,16 @@ export interface ProductCategory {
 // ─── Bilingual Product Data ────────────────────────────────────────────────────
 
 export const CATEGORIES: ProductCategory[] = [
+  // ── 1. Residential & Villa ────────────────────────────────────────────────
   {
     id: "residential",
     pill: { fa: "دسته ۰۱", en: "Category 01" },
-    title: { fa: "باتری ذخیره انرژی خانگی", en: "Residential Energy Storage Systems" },
+    title: { fa: "خانگی و ویلایی", en: "Residential & Villa" },
     description: {
-      fa: "سیستم‌های ذخیره انرژی هوشمند و قابل اعتماد برای منازل، آپارتمان‌ها، ویلاها، دفاتر، مطب‌ها، کارگاه‌ها و کسب‌وکارهای کوچک. طراحی شده برای برق پشتیبان، ادغام با انرژی خورشیدی، بهینه‌سازی مصرف انرژی و تأمین برق بدون وقفه.",
-      en: "Smart and reliable energy storage systems for homes, apartments, villas, offices, clinics, workshops, and small businesses. Designed for backup power, solar integration, energy optimization, and uninterrupted electricity supply.",
+      fa: "سیستم‌های ذخیره انرژی هوشمند برای منازل، آپارتمان‌ها و ویلاها. طراحی شده برای برق پشتیبان، ادغام با انرژی خورشیدی و تأمین برق بدون وقفه در فضاهای مسکونی.",
+      en: "Smart energy storage systems for homes, apartments, and villas. Designed for backup power, solar integration, and uninterrupted electricity supply in residential spaces.",
     },
-    featuredCount: 2,
+    featuredCount: 1,
     products: [
       {
         name: { fa: "باتری ذخیره انرژی مدل ایستاده و دیواری", en: "Wall-Mounted & Floor-Standing ESS Battery" },
@@ -162,6 +163,20 @@ export const CATEGORIES: ProductCategory[] = [
           { fa: "مدیریت هوشمند انرژی", en: "Smart energy management" },
         ],
       },
+    ],
+  },
+
+  // ── 2. Commercial & Office ────────────────────────────────────────────────
+  {
+    id: "commercial",
+    pill: { fa: "دسته ۰۲", en: "Category 02" },
+    title: { fa: "تجاری و اداری", en: "Commercial & Office" },
+    description: {
+      fa: "سیستم‌های ذخیره انرژی مقیاس‌پذیر برای ساختمان‌های تجاری، دفاتر، مراکز خرید و کسب‌وکارهای متوسط. با قابلیت ادغام با شبکه و انرژی‌های تجدیدپذیر.",
+      en: "Scalable energy storage for commercial buildings, offices, shopping centers, and medium-scale businesses. With grid integration and renewable energy compatibility.",
+    },
+    featuredCount: 1,
+    products: [
       {
         name: { fa: "سیستم ذخیره انرژی ولتاژ بالا ماژولار (Stacked)", en: "High-Voltage Modular All-in-One ESS" },
         category: { fa: "ذخیره انرژی ولتاژ بالا", en: "High-Voltage Energy Storage" },
@@ -207,18 +222,6 @@ export const CATEGORIES: ProductCategory[] = [
           { fa: "سیستم‌های پشتیبان تجاری", en: "Commercial backup systems" },
         ],
       },
-    ],
-  },
-  {
-    id: "commercial",
-    pill: { fa: "دسته ۰۲", en: "Category 02" },
-    title: { fa: "سیستم‌های ذخیره انرژی صنعتی و تجاری", en: "Commercial & Industrial Energy Storage Systems" },
-    description: {
-      fa: "سیستم‌های ذخیره انرژی با ظرفیت بالا و مقیاس‌پذیر برای تأسیسات تجاری، کارخانه‌ها، شهرک‌های صنعتی، میکروگریدها، بهینه‌سازی انرژی‌های تجدیدپذیر و پروژه‌های زیرساختی.",
-      en: "Scalable high-capacity energy storage systems for commercial facilities, factories, industrial parks, microgrids, renewable energy optimization, and infrastructure projects.",
-    },
-    featuredCount: 2,
-    products: [
       {
         name: { fa: "سیستم ذخیره انرژی ولتاژ بالا ماژولار 1C (از ۲۰ تا ۸۷ کیلووات ساعت)", en: "C1 High-Voltage Modular ESS (20–87 kWh)" },
         category: { fa: "سیستم ذخیره انرژی ولتاژ بالا تجاری", en: "Commercial High-Voltage ESS" },
@@ -267,6 +270,20 @@ export const CATEGORIES: ProductCategory[] = [
           { fa: "زیرساخت‌های تجاری", en: "Commercial infrastructure" },
         ],
       },
+    ],
+  },
+
+  // ── 3. Industrial ─────────────────────────────────────────────────────────
+  {
+    id: "industrial",
+    pill: { fa: "دسته ۰۳", en: "Category 03" },
+    title: { fa: "صنعتی", en: "Industrial" },
+    description: {
+      fa: "سیستم‌های ذخیره انرژی با ظرفیت بالا برای کارخانه‌ها، شهرک‌های صنعتی و تأسیسات سنگین. مجهز به سیستم‌های حفاظتی پیشرفته و مدیریت حرارتی هوشمند.",
+      en: "High-capacity energy storage for factories, industrial parks, and heavy facilities. Equipped with advanced protection systems and intelligent thermal management.",
+    },
+    featuredCount: 1,
+    products: [
       {
         name: { fa: "سیستم ذخیره انرژی ولتاژ بالا، مدل قفسه‌ای", en: "High-Voltage Rack ESS" },
         category: { fa: "ذخیره انرژی صنعتی قفسه‌ای", en: "Industrial Rack Energy Storage" },
@@ -442,6 +459,20 @@ export const CATEGORIES: ProductCategory[] = [
           { fa: "تأسیسات صنعتی هوشمند", en: "Smart industrial facilities" },
         ],
       },
+    ],
+  },
+
+  // ── 4. Solar & Hybrid ─────────────────────────────────────────────────────
+  {
+    id: "solar",
+    pill: { fa: "دسته ۰۴", en: "Category 04" },
+    title: { fa: "خورشیدی و هیبریدی", en: "Solar & Hybrid" },
+    description: {
+      fa: "سیستم‌های ذخیره انرژی فضای باز هیبریدی طراحی شده برای ادغام با نیروگاه‌های خورشیدی و منابع انرژی تجدیدپذیر. مناسب برای محیط‌های فضای باز با مقاومت محیطی بالا.",
+      en: "Outdoor hybrid energy storage systems designed for integration with solar farms and renewable energy sources. Suitable for outdoor environments with high environmental resistance.",
+    },
+    featuredCount: 1,
+    products: [
       {
         name: { fa: "کابینت فضای باز هیبریدی ذخیره انرژی صنعتی و تجاری با خنک‌کاری هوایی 120kWh", en: "120 kWh Outdoor Hybrid ESS" },
         category: { fa: "سیستم ذخیره انرژی تجاری فضای باز", en: "Outdoor Commercial ESS" },
@@ -486,6 +517,20 @@ export const CATEGORIES: ProductCategory[] = [
           { fa: "بهینه‌سازی شبکه", en: "Grid optimization" },
         ],
       },
+    ],
+  },
+
+  // ── 5. Large Projects & Microgrid ─────────────────────────────────────────
+  {
+    id: "large-scale",
+    pill: { fa: "دسته ۰۵", en: "Category 05" },
+    title: { fa: "پروژه‌های بزرگ و میکروگرید", en: "Large Projects & Microgrid" },
+    description: {
+      fa: "سیستم‌های ذخیره انرژی کانتینری در مقیاس شبکه برای پروژه‌های زیرساختی بزرگ، میکروگریدها و نیروگاه‌های تجدیدپذیر. با قابلیت Plug & Play و استقرار سریع.",
+      en: "Container-scale grid-level energy storage for large infrastructure projects, microgrids, and renewable power plants. Plug & Play capable with rapid deployment.",
+    },
+    featuredCount: 1,
+    products: [
       {
         name: { fa: "سیستم ذخیره انرژی ESS صنعتی و تجاری کانتینری ۲۰ فوتی", en: "20-Foot Containerized ESS" },
         category: { fa: "سیستم ذخیره انرژی کانتینری", en: "Container Energy Storage System" },
@@ -531,15 +576,16 @@ export const CATEGORIES: ProductCategory[] = [
       },
     ],
   },
+  // ── 6. Emergency Power & UPS ──────────────────────────────────────────────
   {
-    id: "ems",
-    pill: { fa: "دسته ۰۳", en: "Category 03" },
-    title: { fa: "پلتفرم مدیریت انرژی و اینورترها", en: "Energy Management & Inverters" },
+    id: "ups",
+    pill: { fa: "دسته ۰۶", en: "Category 06" },
+    title: { fa: "برق اضطراری و UPS", en: "Emergency Power & UPS" },
     description: {
-      fa: "پلتفرم‌های نرم‌افزاری هوشمند و سیستم‌های اینورتر با کارایی بالا برای کنترل یکپارچه انرژی، مدیریت شبکه و بهینه‌سازی میکروگرید.",
-      en: "Intelligent software platforms and high-performance inverter systems for seamless energy control, grid management, and microgrid optimization.",
+      fa: "پلتفرم‌های مدیریت انرژی و اینورترهای هیبریدی با کارایی بالا برای تأمین برق اضطراری، سوئیچینگ بی‌وقفه و مدیریت هوشمند میکروگرید.",
+      en: "High-performance energy management platforms and hybrid inverters for emergency power supply, seamless switching, and intelligent microgrid management.",
     },
-    featuredCount: 2,
+    featuredCount: 1,
     products: [
       {
         name: { fa: "پلتفرم مدیریت انرژی (EMS)", en: "Energy Management System (EMS)" },
@@ -1173,7 +1219,7 @@ function SectionHeader({ locale }: { locale: string }) {
           >
             {[
               { value: String(totalProducts), label: isRTL ? "محصول" : "Products" },
-              { value: "3", label: isRTL ? "دسته‌بندی" : "Categories" },
+              { value: String(CATEGORIES.length), label: isRTL ? "دسته‌بندی" : "Categories" },
               { value: "MW+", label: isRTL ? "مقیاس" : "Scale" },
             ].map((s, i) => (
               <div key={i} className="flex flex-col items-center justify-center py-5 px-4" style={{ background: "rgba(255,255,255,0.02)" }}>
