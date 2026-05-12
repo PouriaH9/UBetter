@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/contexts/cart-context";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
@@ -182,15 +183,18 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
                     {isRTL ? "پاک کردن همه" : "Clear all"}
                   </button>
                 </div>
-                <button className="w-full py-3.5 rounded-2xl font-bold text-[14px] transition-all duration-200 flex items-center justify-center gap-2"
+                <Link
+                  href={`/${locale}/enquiry`}
+                  onClick={closeCart}
+                  className="w-full py-3.5 rounded-2xl font-bold text-[14px] transition-all duration-200 flex items-center justify-center gap-2"
                   style={{ background: C.accent, color: isDark ? "#000" : "#fff", fontFamily: YK }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.88"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}>
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.88"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; }}>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M1 8h14M9 2l6 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   {isRTL ? "ادامه و ثبت درخواست" : "Proceed to Enquiry"}
-                </button>
+                </Link>
               </div>
             )}
           </motion.div>
