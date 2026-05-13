@@ -1164,11 +1164,7 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
       <div className="relative z-10 max-w-[1200px] mx-auto px-6 sm:px-10">
 
         {/* Section header — same glass treatment as products portfolio strip */}
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.75, ease: easeOut }}
+        <div
           className="text-center mb-8 sm:mb-9 max-w-3xl mx-auto w-full -mt-6 sm:-mt-6 md:-mt-1 lg:mt-4 xl:mt-6"
           style={{
             background: M.glassBg,
@@ -1228,14 +1224,10 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
               {u.section.subtitle}
             </p>
           </div>
-        </motion.div>
+        </div>
 
         {/* Content — glass panel */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.15, ease: easeOut }}
+        <div
           className="rounded-3xl p-6 sm:p-8 md:p-10"
           style={{
             background: M.glassBg,
@@ -1266,7 +1258,7 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
               </span>
             </a>
           </div>
-        </motion.div>
+        </div>
 
       </div>
     </section>

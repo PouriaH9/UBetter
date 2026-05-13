@@ -40,6 +40,12 @@ type Translation = {
   };
   brandTagline: string;
   upsCalculator: UpsCalculatorDict;
+  globe: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    ariaLabel: string;
+  };
 };
 
 export const translations: Record<Locale, Translation> = {
@@ -128,6 +134,14 @@ export const translations: Record<Locale, Translation> = {
     },
     brandTagline: "🔋 Reliable LiFePO4 Battery & Solar Storage Manufacturer",
     upsCalculator: upsCalculatorEn,
+    globe: {
+      badge: "Global brand · Official Iran partnership",
+      title: "UBETTER worldwide — represented in Iran",
+      subtitle:
+        "Lian Sadar Mellal is the official exclusive representative of UBETTER in Iran.",
+      ariaLabel:
+        "Globe map with Iran emphasized; wide screens drag to orbit. Wheel and trackpad scroll the page, not zoom the globe.",
+    },
   },
   fa: {
     dir: "rtl",
@@ -213,5 +227,12 @@ export const translations: Record<Locale, Translation> = {
     },
     brandTagline: "🔋 تولیدکننده مطمئن باتری LiFePO4 و ذخیره‌سازی خورشیدی",
     upsCalculator: upsCalculatorFa,
+    globe: {
+      badge: "برند جهانی · نمای رسمی در ایران",
+      title: "UBETTER در نقشه جهان و پل به ایران",
+      subtitle: "لیان صدر ملل نمایندهٔ رسمی و انحصاری UBETTER در ایران",
+      ariaLabel:
+        "نقشهٔ کره‌ای با ایران برجسته؛ در صفحهٔ پهن با کشیدن می‌توانید بچرخانید؛ اسکرول معمولی صفحه است.",
+    },
   },
 };

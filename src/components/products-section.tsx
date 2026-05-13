@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { PRODUCT_IMAGES, DETAIL_IMAGES, LIFEPO4_BG } from "@/assets/productImages";
 
@@ -641,20 +641,8 @@ export const CATEGORIES: ProductCategory[] = [
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-50px" });
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 32 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, ease: easeOut, delay }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string; delay?: number }) {
+  return <div className={className}>{children}</div>;
 }
 
 // ─── Product Image (real or placeholder fallback) ─────────────────────────────

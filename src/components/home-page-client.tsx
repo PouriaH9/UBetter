@@ -1,15 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useInView,
-  AnimatePresence,
-} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 import logoImg from "@/assets/LOGO.jpg";
 import productsHeroDesktop from "@/assets/Source/products HERO desktopsize.png";
@@ -26,6 +20,7 @@ import type { Locale } from "@/i18n/config";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
 import { UsageCalculatorSection } from "@/components/usage-calculator-section";
+import { GlobePresenceSection } from "@/components/globe-presence-section";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -41,26 +36,12 @@ function stripLeadingEmoji(s: string) {
 function Reveal({
   children,
   className = "",
-  delay = 0,
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 44 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.75, ease: easeOut, delay }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 // ─── Section label pill ───────────────────────────────────────────────────────
@@ -90,10 +71,6 @@ const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) {
   // Hero has full-screen photo background, always uses dark/neon accent
   const ACCENT = "#7CFF00";
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "28%"]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
 
   const isRTL = locale === "fa";
 
@@ -109,9 +86,9 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
   }, [heroImages.length]);
 
   return (
-    <section ref={sectionRef} className="relative h-screen min-h-[640px] flex items-center justify-center overflow-hidden">
-      {/* Parallax background with crossfading images */}
-      <motion.div style={{ y: bgY }} className="absolute inset-0 scale-110 will-change-transform">
+    <section className="relative h-screen min-h-[640px] flex items-center justify-center overflow-hidden">
+      {/* Background — crossfading images */}
+      <div className="absolute inset-0 scale-110">
         <AnimatePresence mode="sync">
           {/* Desktop images — hidden on mobile */}
           <motion.div
@@ -155,7 +132,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
         </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/75" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/15 via-transparent to-black/15" />
-      </motion.div>
+      </div>
 
       {/* Noise overlay for cinematic texture */}
       <div
@@ -168,10 +145,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
       />
 
       {/* ── Hero overlay content ─────────────────────────────────────────────── */}
-      <motion.div
-        style={{ opacity: contentOpacity }}
-        className="absolute inset-0 z-10 flex flex-col"
-      >
+      <div className="absolute inset-0 z-10 flex flex-col">
         {/* Text block — vertically centered, responsive horizontal padding */}
         <div className={`flex-1 flex items-center ${isRTL ? "justify-end pr-8 sm:pr-12 md:pr-16 lg:pr-[6vw] xl:pr-24 2xl:pr-32 ml-8 sm:ml-12 md:ml-16 lg:ml-[6vw] xl:ml-24" : "justify-start pl-8 sm:pl-12 md:pl-16 lg:pl-[6vw] xl:pl-24 2xl:pl-32"}`}>
           <div
@@ -385,7 +359,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
             ))}
           </div>
         </motion.div>
-      </motion.div>
+      </div>
 
     </section>
   );
@@ -493,8 +467,7 @@ function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) 
       style={{ background: isDark ? "#050505" : "#f0f0f0", transition: "background 0.35s ease" }}>
       <div className="max-w-7xl mx-auto px-6">
         {/* Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 48 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.85, ease: easeOut }}
+        <div
           className="relative rounded-3xl overflow-hidden p-12 md:p-20 text-center mb-12"
           style={{ background: isDark ? `linear-gradient(135deg,${C.accentBg} 0%,#0a0a0a 50%,#111 100%)` : `linear-gradient(135deg,${C.accentBg} 0%,#ffffff 50%,#f8f8f8 100%)`, border: `1px solid ${C.accentBorder}` }}
         >
@@ -516,11 +489,10 @@ function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) 
               </svg>
             </a>
           </div>
-        </motion.div>
+        </div>
 
         {/* Contact form */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2, ease: easeOut }}
+        <div
           className="rounded-3xl p-8 md:p-12"
           style={{ background: C.card, border: `1px solid ${C.cardBorder}`, transition: "background 0.35s ease" }}>
           <h3 className="text-[22px] font-bold mb-8 text-center" style={{ color: C.text1 }}>
@@ -553,7 +525,7 @@ function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) 
               </button>
             </div>
           </form>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -596,11 +568,7 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
         <div className="relative z-10 flex flex-col justify-between min-h-[calc(100vh-0px)]" dir={isRTL ? "rtl" : "ltr"}>
           {/* Top: title + CTA */}
           <div className="flex-1 flex flex-col items-center justify-start max-w-[1200px] mx-auto px-6 sm:px-10 pt-10 pb-8 text-center w-full">
-            <motion.div
-              initial={{ opacity: 0, y: 36 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+            <div
               style={{
                 background: "rgba(255,255,255,0.06)",
                 backdropFilter: "blur(4px) saturate(120%)",
@@ -632,7 +600,7 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
                   </svg>
                 </Link>
               </div>
-            </motion.div>
+            </div>
           </div>
 
           {/* Bottom: glass feature strip */}
@@ -640,6 +608,7 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
       </div>
 
       <UsageCalculatorSection locale={locale} />
+      <GlobePresenceSection locale={locale} />
       <Testimonials locale={locale} />
       <CTA locale={locale} t={t} />
       <SharedFooter locale={locale} />
