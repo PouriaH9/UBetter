@@ -8,17 +8,15 @@ import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 
 import { Atmosphere } from "./Atmosphere";
 import { Globe } from "./Globe";
+import { IRAN_CENTROID } from "./constants";
 import { GlobeLights } from "./GlobeLights";
 import type { CountryFeature } from "./globe-types";
 
 /** Default framing for pointer orbit (zoom disabled — wheel must scroll the page, not dolly the camera). */
-const CAM_Y = 26;
-const CAM_Z = 312;
+const CAM_Y = 29;
+const CAM_Z = 348;
 const CAM_FOV = 40;
 const ORBIT_DIST = Math.hypot(CAM_Z, CAM_Y);
-
-/** Approximate centroid of Iran (°N / °E) — lines up initial view before user orbits */
-const IRAN_CENTROID = { lat: 32.43, lng: 53.68 };
 
 type GlobeExperienceProps = {
   polygons: CountryFeature[];
