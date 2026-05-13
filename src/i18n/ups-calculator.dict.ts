@@ -76,12 +76,10 @@ export type UpsCalculatorDict = {
     rowWh: string;
     deviceList: string;
     downloadPng: string;
-    contactTitle: string;
-    contactBody: string;
-    emailCta: string;
-    formCta: string;
     restart: string;
   };
+  /** CTA row under the wizard (tel: dial) */
+  panelCall: { hint: string; button: string };
   time: { halfHour: string; hourSuffix: string };
   upsTypes: Record<UpsTypeId, { title: string; desc: string; suitable: string }>;
   categories: Record<UpsCategoryId, string>;
@@ -280,12 +278,11 @@ export const upsCalculatorEn: UpsCalculatorDict = {
     rowWh: "Total battery energy",
     deviceList: "Load list:",
     downloadPng: "Download report image",
-    contactTitle: "Talk to sales engineering for a quote",
-    contactBody:
-      "Our team can refine this rough sizing with install conditions, load profile, and budget.",
-    emailCta: "Email sales",
-    formCta: "Contact form",
     restart: "Start over",
+  },
+  panelCall: {
+    hint: "Or simply call us — our team can help you choose the right UPS.",
+    button: "Call now",
   },
   time: { halfHour: "30 min", hourSuffix: "hours" },
   upsTypes: {
@@ -408,12 +405,11 @@ export const upsCalculatorFa: UpsCalculatorDict = {
     rowWh: "ظرفیت کل باتری",
     deviceList: "لیست تجهیزات:",
     downloadPng: "دانلود تصویر گزارش",
-    contactTitle: "برای دریافت مشاوره تخصصی و پیش‌فاکتور با مهندسی فروش تماس بگیرید",
-    contactBody:
-      "تیم یوبتر انرژی بر اساس شرایط نصب، نوع بار و بودجه، پیکربندی دقیق‌تری نسبت به این پیشنهاد اولیه ارائه می‌کند.",
-    emailCta: "ایمیل به واحد فروش",
-    formCta: "فرم تماس",
     restart: "شروع مجدد محاسبه",
+  },
+  panelCall: {
+    hint: "یا به‌سادگی با ما تماس بگیرید؛ برای انتخاب یوپی‌اس راهنمایی‌تان می‌کنیم.",
+    button: "تماس تلفنی",
   },
   time: { halfHour: "نیم ساعت", hourSuffix: "ساعت" },
   upsTypes: {

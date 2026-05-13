@@ -23,6 +23,10 @@ import type { ComponentType, SVGProps } from "react";
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
+/** Sales line — `href` must be E.164 digits only after `tel:` */
+const UPS_CALC_SALES_PHONE_TEL = "tel:+989120000000";
+const UPS_CALC_SALES_PHONE_DISPLAY = "+98 912 000 0000";
+
 type UPSType = "online" | "line-interactive" | "offline";
 
 const UPS_TYPE_ORDER = ["online", "line-interactive", "offline"] as const;
@@ -133,19 +137,16 @@ function IconCertificate(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-function IconMail(props: SVGProps<SVGSVGElement>) {
+function IconPhone(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden {...props}>
-      <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M3 7l9 6 9-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function IconChat(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden {...props}>
-      <path d="M4 5h16v10H9l-4 4v-4H4V5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-      <path d="M8 9h8M8 12h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity="0.55" />
+      <path
+        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.63 2.63a2 2 0 0 1-.45 2.11L8.09 9.9a16 16 0 0 0 6 6l1.45-1.45a2 2 0 0 1 2.11-.45c.85.3 1.73.51 2.63.63A2 2 0 0 1 22 16.92z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -1024,37 +1025,6 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
         {u.step4.downloadPng}
       </button>
 
-      {/* Contact CTA */}
-      <div className="rounded-2xl p-6" style={{ background: M.promoBg, border: `1px solid ${M.promoBorder}` }}>
-        <div className="flex items-start gap-3 mb-2">
-          <IconChat className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: M.fg }} aria-hidden />
-          <h4 className="text-[15px] font-bold leading-snug text-start" style={{ color: M.fg }}>
-            {u.step4.contactTitle}
-          </h4>
-        </div>
-        <p className="text-[13px] mb-4 leading-relaxed text-start" style={{ color: M.fgMuted }}>
-          {u.step4.contactBody}
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <a
-            href="mailto:info@ubetterenergy.com"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-[13px] transition-all hover:scale-105"
-            style={{ background: M.btnBg, color: M.btnFg }}
-          >
-            <IconMail className="w-4 h-4" aria-hidden />
-            {u.step4.emailCta}
-          </a>
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-[13px] transition-all hover:scale-105"
-            style={{ background: M.ghostBg, color: M.fg, border: `1px solid ${M.ghostBorder}` }}
-          >
-            <IconChat className="w-4 h-4 opacity-90" aria-hidden />
-            {u.step4.formCta}
-          </a>
-        </div>
-      </div>
-
       {/* Restart */}
       <button
         type="button"
@@ -1276,6 +1246,26 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
           }}
         >
           <UPSSelector M={M} locale={locale} />
+          <div
+            className="mt-8 sm:mt-10 pt-6 sm:pt-7 flex flex-col items-center gap-3 text-center"
+            style={{ borderTop: `1px solid ${M.divider}` }}
+          >
+            <p className="text-[13px] sm:text-[14px] max-w-md leading-relaxed px-1" style={{ color: M.fgMuted }}>
+              {u.panelCall.hint}
+            </p>
+            <a
+              href={UPS_CALC_SALES_PHONE_TEL}
+              className="inline-flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 px-6 py-3 rounded-xl font-bold text-[13px] sm:text-[14px] transition-all duration-200 hover:scale-[1.02]"
+              style={{ background: M.btnBg, color: M.btnFg }}
+              dir="ltr"
+            >
+              <IconPhone className="w-[18px] h-[18px] shrink-0" />
+              <span style={{ fontFamily: locale === "fa" ? YK : "inherit" }}>{u.panelCall.button}</span>
+              <span className="font-semibold tabular-nums text-[12px] sm:text-[13px] opacity-90">
+                {UPS_CALC_SALES_PHONE_DISPLAY}
+              </span>
+            </a>
+          </div>
         </motion.div>
 
       </div>

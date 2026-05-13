@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
@@ -87,6 +88,7 @@ export default function SharedNavbar({
   const [productsOpen, setProductsOpen] = useState(false);
   const [desktopDropdown, setDesktopDropdown] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { isDark } = useTheme();
   const { totalQty, openCart } = useCart();
 
@@ -95,7 +97,89 @@ export default function SharedNavbar({
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  const compactMobileBar = isMobile && scrolled;
+  const compactDesktopBar = !isMobile && scrolled;
+
+  /** Same glass recipe as hero “Product Portfolio” card (home-page-client). */
+  const mobileGlassBar = isDark
+    ? {
+        background: "rgba(255,255,255,0.06)",
+        backdropFilter: "blur(4px) saturate(120%)",
+        WebkitBackdropFilter: "blur(4px) saturate(120%)",
+        borderBottom: "1px solid rgba(255,255,255,0.18)",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.06), 0 8px 40px rgba(0,0,0,0.12)",
+      }
+    : {
+        background: "rgba(255,255,255,0.62)",
+        backdropFilter: "blur(10px) saturate(140%)",
+        WebkitBackdropFilter: "blur(10px) saturate(140%)",
+        borderBottom: "1px solid rgba(255,255,255,0.55)",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.05), 0 8px 32px rgba(0,0,0,0.08)",
+      };
+
+  /** Full border + same glass as mobile compact (floating pill on desktop when scrolled). */
+  const desktopFloatingBar: CSSProperties = isDark
+    ? {
+        background: "rgba(255,255,255,0.06)",
+        backdropFilter: "blur(4px) saturate(120%)",
+        WebkitBackdropFilter: "blur(4px) saturate(120%)",
+        border: "1px solid rgba(255,255,255,0.18)",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.06), 0 8px 40px rgba(0,0,0,0.12)",
+      }
+    : {
+        background: "rgba(255,255,255,0.62)",
+        backdropFilter: "blur(10px) saturate(140%)",
+        WebkitBackdropFilter: "blur(10px) saturate(140%)",
+        border: "1px solid rgba(255,255,255,0.55)",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.05), 0 8px 32px rgba(0,0,0,0.08)",
+      };
+
   const C = isDark ? DARK_C : LIGHT_C;
+
+  const shellBackground: CSSProperties =
+    compactMobileBar
+      ? mobileGlassBar
+      : compactDesktopBar
+        ? {
+            background: "transparent",
+            backdropFilter: "none",
+            WebkitBackdropFilter: "none",
+            borderBottom: "none",
+            boxShadow: "none",
+          }
+        : scrolled
+          ? {
+              background: isDark ? "rgba(0,0,0,0.95)" : "rgba(255,255,255,0.97)",
+              backdropFilter: "blur(28px) saturate(180%)",
+              WebkitBackdropFilter: "blur(28px) saturate(180%)",
+              borderBottom: isDark
+                ? `1px solid rgba(255,255,255,0.08)`
+                : `1px solid rgba(0,0,0,0.1)`,
+              boxShadow: isDark ? "0 4px 32px rgba(0,0,0,0.5)" : "0 4px 32px rgba(0,0,0,0.1)",
+            }
+          : {
+              background: C.navBg,
+              backdropFilter: "blur(28px) saturate(180%)",
+              WebkitBackdropFilter: "blur(28px) saturate(180%)",
+              borderBottom: isDark ? `1px solid ${C.navBorder}` : `1px solid rgba(0,0,0,0.07)`,
+              boxShadow: isDark ? "none" : "0 4px 24px rgba(0,0,0,0.06)",
+            };
+
+  /** Row bar fill: only the inner row when desktop is in floating mode. */
+  const rowBarSurface: CSSProperties | undefined = compactDesktopBar ? desktopFloatingBar : undefined;
 
   const other: Locale = locale === "en" ? "fa" : "en";
   const isRTL = locale === "fa";
@@ -118,33 +202,61 @@ export default function SharedNavbar({
   ];
   const navLinks = isRTL ? faLinks : enLinks;
 
+  const desktopBarExpandedH = 70;
+  const desktopBarCompactH = 54;
+  const barHeightPx = compactMobileBar
+    ? 56
+    : isMobile
+      ? 76
+      : compactDesktopBar
+        ? desktopBarCompactH
+        : desktopBarExpandedH;
+
+  const logoFontPx =
+    compactMobileBar ? 15 : compactDesktopBar ? 14 : isMobile ? 17 : 16;
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: easeOut }}
-      className="fixed inset-x-0 top-0 z-50"
+      className={`fixed inset-x-0 top-0 z-50 overflow-visible ${
+        compactDesktopBar ? "md:mx-6 lg:mx-10 xl:mx-14 md:pt-3" : ""
+      }`}
       style={{
-        height: "80px",
-        background: scrolled
-          ? (isDark ? "rgba(0,0,0,0.95)" : "rgba(255,255,255,0.97)")
-          : C.navBg,
-        backdropFilter: "blur(28px) saturate(180%)",
-        WebkitBackdropFilter: "blur(28px) saturate(180%)",
-        borderBottom: isDark
-          ? `1px solid ${scrolled ? "rgba(255,255,255,0.08)" : C.navBorder}`
-          : `1px solid ${scrolled ? "rgba(0,0,0,0.1)" : "rgba(0,0,0,0.07)"}`,
-        boxShadow: scrolled
-          ? (isDark ? "0 4px 32px rgba(0,0,0,0.5)" : "0 4px 32px rgba(0,0,0,0.1)")
-          : (isDark ? "none" : "0 4px 24px rgba(0,0,0,0.06)"),
-        transition: "background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
+        ...shellBackground,
+        transition:
+          "background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease",
       }}
     >
-      <div className="h-full px-4 sm:px-12 flex items-center justify-between gap-6" dir="ltr">
+      <motion.div
+        className={`flex items-center justify-between gap-6 px-4 sm:px-12 ${
+          compactDesktopBar ? "md:rounded-2xl md:overflow-visible md:max-w-[1200px] md:mx-auto" : ""
+        }`}
+        dir="ltr"
+        initial={false}
+        animate={{ height: barHeightPx }}
+        style={rowBarSurface}
+        transition={{ duration: 0.35, ease: easeOut }}
+      >
         {/* Logo */}
         <Link href={`/${locale}`} className="shrink-0 flex items-center gap-1.5 select-none" dir="ltr">
-          <span className="text-[18px] font-black tracking-tight leading-none" style={{ color: C.accent, fontFamily: "'Inter', system-ui, sans-serif" }}>ALL</span>
-          <span className="text-[18px] font-black tracking-tight leading-none" style={{ color: C.text1, fontFamily: "'Inter', system-ui, sans-serif" }}>IN ONE</span>
+          <motion.span
+            className="font-black tracking-tight leading-none block"
+            animate={{ fontSize: logoFontPx }}
+            transition={{ duration: 0.35, ease: easeOut }}
+            style={{ color: C.accent, fontFamily: "'Inter', system-ui, sans-serif" }}
+          >
+            ALL
+          </motion.span>
+          <motion.span
+            className="font-black tracking-tight leading-none block"
+            animate={{ fontSize: logoFontPx }}
+            transition={{ duration: 0.35, ease: easeOut }}
+            style={{ color: C.text1, fontFamily: "'Inter', system-ui, sans-serif" }}
+          >
+            IN ONE
+          </motion.span>
         </Link>
 
         {/* Desktop nav */}
@@ -314,7 +426,7 @@ export default function SharedNavbar({
             ))}
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Mobile drawer */}
       <AnimatePresence>
