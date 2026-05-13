@@ -7,6 +7,7 @@ import { useCart } from "@/contexts/cart-context";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import { PRODUCT_IMAGES } from "@/assets/productImages";
 import type { Locale } from "@/i18n/config";
+import { localeDir, ui3 } from "@/i18n/locale-ui";
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 
@@ -15,8 +16,13 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
   const isRTL = locale === "fa";
+  const dir = localeDir(locale);
 
-  const tx = (s: { fa: string; en: string }) => (isRTL ? s.fa : s.en);
+  const tx = (s: { fa: string; en: string; zh?: string }) => {
+    if (locale === "fa") return s.fa;
+    if (locale === "zh") return s.zh ?? s.en;
+    return s.en;
+  };
 
   return (
     <AnimatePresence>
@@ -49,7 +55,7 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
               borderLeft: isRTL ? "none" : `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)"}`,
               borderRight: isRTL ? `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)"}` : "none",
             }}
-            dir={isRTL ? "rtl" : "ltr"}
+            dir={dir}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)"}` }}>
@@ -60,7 +66,7 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
                   <circle cx="13.5" cy="14.5" r="1" fill="currentColor" />
                 </svg>
                 <span style={{ fontFamily: YK, fontSize: "16px", fontWeight: 700, color: C.text1 }}>
-                  {isRTL ? "سبد خرید" : "Shopping Cart"}
+                  {ui3(locale, "سبد خرید", "Shopping Cart", "购物车")}
                 </span>
                 {totalQty > 0 && (
                   <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-black"
@@ -89,7 +95,7 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
                     <circle cx="32" cy="38" r="2.5" fill="currentColor" />
                   </svg>
                   <span style={{ fontFamily: YK, fontSize: "14px", color: C.text3 }}>
-                    {isRTL ? "سبد خرید خالی است" : "Your cart is empty"}
+                    {ui3(locale, "سبد خرید خالی است", "Your cart is empty", "购物车是空的")}
                   </span>
                 </div>
               ) : (
@@ -175,12 +181,16 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
               <div className="px-6 py-5 space-y-3" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)"}` }}>
                 <div className="flex items-center justify-between">
                   <span style={{ fontFamily: YK, fontSize: "13px", color: C.text3 }}>
-                    {isRTL ? `${totalQty} محصول انتخاب شده` : `${totalQty} item${totalQty !== 1 ? "s" : ""} selected`}
+                    {locale === "fa"
+                      ? `${totalQty} محصول انتخاب شده`
+                      : locale === "zh"
+                        ? `已选 ${totalQty} 件商品`
+                        : `${totalQty} item${totalQty !== 1 ? "s" : ""} selected`}
                   </span>
                   <button onClick={clearCart} className="text-[11px] transition-colors duration-150" style={{ color: C.text3, fontFamily: YK }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#ef4444"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = C.text3; }}>
-                    {isRTL ? "پاک کردن همه" : "Clear all"}
+                    {ui3(locale, "پاک کردن همه", "Clear all", "清空")}
                   </button>
                 </div>
                 <Link
@@ -193,7 +203,7 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M1 8h14M9 2l6 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  {isRTL ? "ادامه و ثبت درخواست" : "Proceed to Enquiry"}
+                  {ui3(locale, "ادامه و ثبت درخواست", "Proceed to Enquiry", "前往询价")}
                 </Link>
               </div>
             )}

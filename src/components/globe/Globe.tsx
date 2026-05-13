@@ -118,7 +118,7 @@ function irChinaConnectionPathData(): ConnectorPathDatum[] {
   const spline = [...smoothIranChinaPathPoints(0, endAlt, midAlt)].reverse();
 
   /** Larger value = slower marquee along the path (ms loop hint for `three-globe`). */
-  const dashTravelMs = 9800;
+  const dashTravelMs = 16500;
 
   /** Dash / gap as fractions of path length (`three-globe`); larger gap ⇒ more air between dots. */
   const dashPiece = 0.024;

@@ -1,14 +1,21 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
 import { translations } from "@/i18n/translations";
+import { globePresenceCopy } from "@/i18n/globe-presence.dict";
 
-import { GEOJSON_URL } from "./globe/constants";
-import type { CountryFeature } from "./globe/globe-types";
+import {
+  GEOJSON_URL,
+  GLOBE_PRESENCE_EASE_CSS,
+  GLOBE_PRESENCE_EASE_FRAMER,
+  GLOBE_PRESENCE_TRANSITION_SEC,
+} from "./globe/constants";
+import type { CountryFeature, GlobePresencePhase } from "./globe/globe-types";
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 
@@ -37,13 +44,52 @@ function normalizeFeatures(raw: CountryFeature[]): CountryFeature[] {
   });
 }
 
+const BRAND_MARK = "UBETTER";
+const TITLE_SEP = " — ";
+
+function globeChinaHeading(title: string): ReactNode {
+  if (title === BRAND_MARK) {
+    return (
+      <span dir="ltr" className="inline-block align-baseline">
+        {BRAND_MARK}
+      </span>
+    );
+  }
+  const prefix = BRAND_MARK + TITLE_SEP;
+  if (title.startsWith(prefix)) {
+    const after = title.slice(prefix.length);
+    return (
+      <>
+        <span dir="ltr" className="inline-block align-baseline">
+          {BRAND_MARK}
+        </span>
+        {TITLE_SEP}
+        {after}
+      </>
+    );
+  }
+  return title;
+}
+
 export function GlobePresenceSection({ locale }: { locale: Locale }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
   const t = translations[locale];
-  const copy = t.globe;
+  const presenceCopy = globePresenceCopy[locale];
+  const globeAriaLabel = t.globe.ariaLabel;
 
+  const [phase, setPhase] = useState<GlobePresencePhase>("china");
   const [polygons, setPolygons] = useState<CountryFeature[] | null>(null);
+
+  useEffect(() => {
+    const reduce =
+      typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const intervalMs = reduce ? 14000 : 7000;
+    const id = window.setInterval(() => {
+      setPhase((p) => (p === "china" ? "iran" : "china"));
+    }, intervalMs);
+    return () => window.clearInterval(id);
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -82,11 +128,40 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
     };
   }, [isDark]);
 
+  const cardSkin = useMemo(() => {
+    if (phase === "china") {
+      return {
+        glassBg: isDark ? "rgba(36,10,10,0.5)" : "rgba(255,246,246,0.9)",
+        glassBorder: isDark ? "rgba(255,100,100,0.45)" : "rgba(210,70,70,0.32)",
+        glassShadow: isDark
+          ? "inset 0 1px 0 rgba(255,130,130,0.14), inset 0 -1px 0 rgba(0,0,0,0.38), 0 12px 48px rgba(60,0,0,0.42)"
+          : "inset 0 1px 0 rgba(255,210,210,0.55), inset 0 -1px 0 rgba(0,0,0,0.07), 0 12px 44px rgba(180,50,50,0.14)",
+        badgeBg: isDark ? "rgba(70,18,18,0.5)" : "rgba(255,210,210,0.45)",
+        badgeBorder: isDark ? "rgba(255,130,130,0.42)" : "rgba(200,80,80,0.3)",
+        pulse: isDark ? "#ff6b6b" : "#e03131",
+        pulseGlow: isDark ? "0 0 14px rgba(255,90,90,0.9)" : "0 0 12px rgba(224,49,49,0.55)",
+        statNum: isDark ? "#ff8787" : "#c92a2a",
+      };
+    }
+    return {
+      glassBg: M.glassBg,
+      glassBorder: M.glassBorder,
+      glassShadow: M.glassShadow,
+      badgeBg: isDark ? "rgba(0,0,0,0.35)" : "rgba(124,255,0,0.1)",
+      badgeBorder: isDark ? "rgba(124,255,0,0.28)" : "rgba(124,255,0,0.25)",
+      pulse: C.accent,
+      pulseGlow: isDark ? "0 0 12px rgba(124,255,0,0.75)" : "0 0 12px rgba(74,156,0,0.45)",
+      statNum: C.accent,
+    };
+  }, [phase, isDark, M.glassBg, M.glassBorder, M.glassShadow, C.accent]);
+
+  const slide = phase === "china" ? presenceCopy.china : presenceCopy.iran;
+
   return (
     <section
       dir={t.dir}
-      lang={locale === "en" ? "en" : "fa"}
-      className={`relative overflow-hidden min-h-[100svh] w-full ${locale === "en" ? "font-sans" : ""}`}
+      lang={locale === "fa" ? "fa" : locale === "zh" ? "zh" : "en"}
+      className={`relative overflow-hidden min-h-[100svh] w-full ${locale !== "fa" ? "font-sans" : ""}`}
       style={{
         borderTop: `1px solid ${M.sectionTopBorder}`,
         fontFamily: locale === "fa" ? YK : undefined,
@@ -97,10 +172,11 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
       <div
         className="absolute inset-0 z-0 w-full min-h-[100svh]"
         role="img"
-        aria-label={copy.ariaLabel}
+        aria-label={globeAriaLabel}
       >
         {polygons && polygons.length ? (
           <GlobeInteractiveCanvas
+            presencePhase={phase}
             polygons={polygons}
             className="absolute inset-0 block h-full w-full min-h-[100svh] [&>canvas]:absolute [&>canvas]:inset-0 [&>canvas]:h-full [&>canvas]:min-h-[100svh] [&>canvas]:w-full [&>canvas]:outline-none [&>canvas]:block"
             style={{
@@ -130,51 +206,97 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
       <div className="relative z-10 w-full max-w-[1340px] mx-auto px-4 sm:px-8 lg:px-12 pt-10 pb-10 sm:pt-14 sm:pb-14 pointer-events-none">
         <div
           className="text-center mx-auto max-w-3xl w-full pointer-events-auto"
+          aria-live="polite"
           style={{
-            background: M.glassBg,
+            background: cardSkin.glassBg,
             backdropFilter: "blur(10px) saturate(120%)",
             WebkitBackdropFilter: "blur(10px) saturate(120%)",
             borderRadius: "22px",
-            border: `1px solid ${M.glassBorder}`,
-            boxShadow: M.glassShadow,
+            border: `1px solid ${cardSkin.glassBorder}`,
+            boxShadow: cardSkin.glassShadow,
             padding: "20px 24px 22px",
+            transition: `background ${GLOBE_PRESENCE_TRANSITION_SEC}s ${GLOBE_PRESENCE_EASE_CSS}, border-color ${GLOBE_PRESENCE_TRANSITION_SEC}s ${GLOBE_PRESENCE_EASE_CSS}, box-shadow ${GLOBE_PRESENCE_TRANSITION_SEC}s ${GLOBE_PRESENCE_EASE_CSS}`,
           }}
         >
-          <div className="flex flex-col items-center gap-3 sm:gap-4">
-            <div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold tracking-[0.22em] uppercase"
-              style={{
-                background: isDark ? "rgba(0,0,0,0.35)" : "rgba(124,255,0,0.1)",
-                border: `1px solid ${isDark ? "rgba(124,255,0,0.28)" : "rgba(124,255,0,0.25)"}`,
-                color: C.text1,
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={phase}
+              className="flex flex-col items-center gap-3 sm:gap-4"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{
+                /* Exit + enter = one full `GLOBE_PRESENCE_TRANSITION_SEC`, same as globe blend */
+                duration: GLOBE_PRESENCE_TRANSITION_SEC * 0.5,
+                ease: GLOBE_PRESENCE_EASE_FRAMER,
               }}
             >
-              <span
-                className="w-1.5 h-1.5 rounded-full flex-shrink-0 animate-pulse"
+              <div
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold tracking-[0.22em] ${locale === "en" ? "uppercase" : ""}`}
                 style={{
-                  background: C.accent,
-                  boxShadow: "0 0 12px rgba(124,255,0,0.75)",
+                  background: cardSkin.badgeBg,
+                  border: `1px solid ${cardSkin.badgeBorder}`,
+                  color: C.text1,
+                  transition: `background ${GLOBE_PRESENCE_TRANSITION_SEC}s ${GLOBE_PRESENCE_EASE_CSS}, border-color ${GLOBE_PRESENCE_TRANSITION_SEC}s ${GLOBE_PRESENCE_EASE_CSS}`,
                 }}
-              />
-              {copy.badge}
-            </div>
-            <h2
-              className="font-black leading-[1.08]"
-              style={{
-                color: C.text1,
-                fontSize: "clamp(1.35rem, 3vw, 2.35rem)",
-                letterSpacing: locale === "fa" ? "0" : "-0.02em",
-              }}
-            >
-              {copy.title}
-            </h2>
-            <p
-              className="text-[14px] sm:text-[15px] leading-relaxed max-w-2xl mx-auto"
-              style={{ color: C.text2 }}
-            >
-              {copy.subtitle}
-            </p>
-          </div>
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0 animate-pulse"
+                  style={{
+                    background: cardSkin.pulse,
+                    boxShadow: cardSkin.pulseGlow,
+                    transition: `background ${GLOBE_PRESENCE_TRANSITION_SEC}s ${GLOBE_PRESENCE_EASE_CSS}, box-shadow ${GLOBE_PRESENCE_TRANSITION_SEC}s ${GLOBE_PRESENCE_EASE_CSS}`,
+                  }}
+                />
+                {slide.badge}
+              </div>
+              <h2
+                className="font-black leading-[1.08]"
+                style={{
+                  color: C.text1,
+                  fontSize: "clamp(1.35rem, 3vw, 2.35rem)",
+                  letterSpacing: locale === "fa" ? "0" : locale === "zh" ? "0" : "-0.02em",
+                }}
+              >
+                {phase === "china" ? globeChinaHeading(slide.title) : slide.title}
+              </h2>
+              {phase === "china" ? (
+                <div
+                  className="grid grid-cols-3 gap-3 sm:gap-5 w-full max-w-xl mx-auto pt-1"
+                  dir="ltr"
+                >
+                  {presenceCopy.china.stats.map((row) => (
+                    <div key={row.label} className="flex flex-col items-center gap-1">
+                      <div
+                        className="font-black tabular-nums leading-none flex flex-wrap items-baseline justify-center gap-0.5"
+                        style={{
+                          color: cardSkin.statNum,
+                          fontSize: "clamp(1.65rem, 4.2vw, 2.35rem)",
+                          transition: `color ${GLOBE_PRESENCE_TRANSITION_SEC}s ${GLOBE_PRESENCE_EASE_CSS}`,
+                        }}
+                      >
+                        <span>{row.value}</span>
+                        {row.unit ? (
+                          <span
+                            className="text-[11px] sm:text-xs font-bold opacity-90"
+                            style={{ color: C.text2 }}
+                          >
+                            {row.unit}
+                          </span>
+                        ) : null}
+                      </div>
+                      <p
+                        className="text-[11px] sm:text-[12px] leading-snug px-0.5"
+                        style={{ color: C.text2 }}
+                      >
+                        {row.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </section>

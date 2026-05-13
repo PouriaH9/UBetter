@@ -7,6 +7,7 @@ import Link from "next/link";
 import { toPng } from "html-to-image";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
+import { UPS_CALCULATOR_SECTION_ID } from "@/lib/scroll-to-anchor";
 import { translations } from "@/i18n/translations";
 import {
   UPS_DEVICE_CATEGORY_ORDER,
@@ -328,7 +329,7 @@ function StepIntro({
 
 function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
   const u = translations[locale].upsCalculator;
-  const nLoc = locale === "fa" ? "fa-IR" : "en-US";
+  const nLoc = locale === "fa" ? "fa-IR" : locale === "zh" ? "zh-CN" : "en-US";
   const [step, setStep]             = useState(1);
   const [knowLoad, setKnowLoad]     = useState<boolean | null>(null);
   const [directWatt, setDirectWatt] = useState(1000);
@@ -667,7 +668,7 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
             style={{ background: M.btnBg, color: M.btnFg }}
           >
             {u.step1.nextStep}
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className={locale === "en" ? "scale-x-[-1]" : undefined} aria-hidden>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className={locale !== "fa" ? "scale-x-[-1]" : undefined} aria-hidden>
               <path d="M10 8H4M7 5L4 8l3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
@@ -780,7 +781,7 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
           style={{ background: M.btnBg, color: M.btnFg }}
         >
           {u.step2.calcUps}
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className={locale === "en" ? "scale-x-[-1]" : undefined} aria-hidden>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className={locale !== "fa" ? "scale-x-[-1]" : undefined} aria-hidden>
             <path d="M10 8H4M7 5L4 8l3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
@@ -900,7 +901,7 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
           style={{ background: M.btnBg, color: M.btnFg }}
         >
           {u.step3.viewProducts}
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className={locale === "en" ? "scale-x-[-1]" : undefined} aria-hidden>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className={locale !== "fa" ? "scale-x-[-1]" : undefined} aria-hidden>
             <path d="M10 8H4M7 5L4 8l3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
@@ -922,7 +923,7 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
           style={{ background: M.btnBg, color: M.btnFg }}
         >
           {u.step3.viewReport}
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className={locale === "en" ? "scale-x-[-1]" : undefined} aria-hidden>
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className={locale !== "fa" ? "scale-x-[-1]" : undefined} aria-hidden>
             <path d="M10 3v9M7 9l3 3 3-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M4 14v1.5A1.5 1.5 0 0 0 5.5 17h9a1.5 1.5 0 0 0 1.5-1.5V14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
@@ -1123,9 +1124,10 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
 
   return (
     <section
+      id={UPS_CALCULATOR_SECTION_ID}
       dir={t.dir}
-      lang={locale === "en" ? "en" : "fa"}
-      className={`relative pt-8 pb-16 sm:pt-10 sm:pb-24 overflow-hidden ${locale === "en" ? "font-sans" : ""}`}
+      lang={locale === "fa" ? "fa" : locale === "zh" ? "zh" : "en"}
+      className={`relative scroll-mt-[88px] sm:scroll-mt-[96px] pt-8 pb-16 sm:pt-10 sm:pb-24 overflow-hidden ${locale !== "fa" ? "font-sans" : ""}`}
       style={{
         borderTop: `1px solid ${M.sectionTopBorder}`,
         fontFamily: locale === "fa" ? YK : undefined,

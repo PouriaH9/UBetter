@@ -1,24 +1,41 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, MouseEvent } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import { useCart } from "@/contexts/cart-context";
 import type { Locale } from "@/i18n/config";
+import { locales, localizedPath } from "@/i18n/config";
+import {
+  LocaleFlagMark,
+  localeNavLabel,
+  localeSwitchAria,
+} from "@/components/locale-flag-mark";
+import {
+  UPS_CALCULATOR_SECTION_ID,
+  scrollToSectionBelowStickyHeader,
+} from "@/lib/scroll-to-anchor";
 
 const PRODUCT_CATS = [
-  { id: "residential",  fa: "خانگی و ویلایی",              en: "Residential & Villa" },
-  { id: "commercial",   fa: "تجاری و اداری",               en: "Commercial & Office" },
-  { id: "industrial",   fa: "صنعتی",                        en: "Industrial" },
-  { id: "solar",        fa: "خورشیدی و هیبریدی",            en: "Solar & Hybrid" },
-  { id: "large-scale",  fa: "پروژه‌های بزرگ و میکروگرید",   en: "Large Projects & Microgrid" },
-  { id: "ups",          fa: "برق اضطراری و UPS",            en: "Emergency Power & UPS" },
-];
+  { id: "residential", fa: "خانگی و ویلایی", en: "Residential & Villa", zh: "住宅与别墅" },
+  { id: "commercial", fa: "تجاری و اداری", en: "Commercial & Office", zh: "商业与办公" },
+  { id: "industrial", fa: "صنعتی", en: "Industrial", zh: "工业" },
+  { id: "solar", fa: "خورشیدی و هیبریدی", en: "Solar & Hybrid", zh: "光伏与混合系统" },
+  { id: "large-scale", fa: "پروژه‌های بزرگ و میکروگرید", en: "Large Projects & Microgrid", zh: "大型项目与微电网" },
+  { id: "ups", fa: "برق اضطراری و UPS", en: "Emergency Power & UPS", zh: "应急电源与 UPS" },
+] as const;
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
+
+function catLabel(locale: Locale, cat: (typeof PRODUCT_CATS)[number]): string {
+  if (locale === "fa") return cat.fa;
+  if (locale === "zh") return cat.zh;
+  return cat.en;
+}
 
 function ThemeToggle() {
   const { isDark, toggleTheme } = useTheme();
@@ -91,6 +108,7 @@ export default function SharedNavbar({
   const [isMobile, setIsMobile] = useState(false);
   const { isDark } = useTheme();
   const { totalQty, openCart } = useCart();
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -181,26 +199,70 @@ export default function SharedNavbar({
   /** Row bar fill: only the inner row when desktop is in floating mode. */
   const rowBarSurface: CSSProperties | undefined = compactDesktopBar ? desktopFloatingBar : undefined;
 
-  const other: Locale = locale === "en" ? "fa" : "en";
   const isRTL = locale === "fa";
+  const pathForLocale = pathname ?? "/";
+  const alternateLocales = locales.filter((l) => l !== locale);
+
+  const homePath = `/${locale}`;
+  const upsCalculatorHref = `${homePath}#${UPS_CALCULATOR_SECTION_ID}`;
 
   const faLinks = [
-    { href: `/${locale}`,          label: "صفحه اصلی",   page: "home" },
-    { href: `/${locale}/products`, label: "محصولات",      page: "products" },
-    { href: `/${locale}#solutions`,label: "ویژگی‌ها",    page: "home" },
-    { href: `/${locale}#about`,    label: "تکنولوژی",    page: "home" },
-    { href: `/${locale}#about`,    label: "درباره ما",   page: "home" },
-    { href: `/${locale}#contact`,  label: "تماس با ما",  page: "home" },
+    { href: homePath, label: "خانه", page: "home" },
+    { href: `/${locale}/products`, label: "محصولات", page: "products" },
+    {
+      href: upsCalculatorHref,
+      label: "ماشین حساب",
+      page: "home",
+      scrollTargetId: UPS_CALCULATOR_SECTION_ID,
+    },
+    { href: `${homePath}#about`, label: "تکنولوژی", page: "home" },
+    { href: `${homePath}#about`, label: "درباره ما", page: "home" },
+    { href: `${homePath}#contact`, label: "تماس با ما", page: "home" },
   ];
   const enLinks = [
-    { href: `/${locale}`,          label: "Home",       page: "home" },
-    { href: `/${locale}/products`, label: "Products",   page: "products" },
-    { href: `/${locale}#solutions`,label: "Features",   page: "home" },
-    { href: `/${locale}#about`,    label: "Technology", page: "home" },
-    { href: `/${locale}#about`,    label: "About",      page: "home" },
-    { href: `/${locale}#contact`,  label: "Contact",    page: "home" },
+    { href: homePath, label: "Home", page: "home" },
+    { href: `/${locale}/products`, label: "Products", page: "products" },
+    {
+      href: upsCalculatorHref,
+      label: "Calculator",
+      page: "home",
+      scrollTargetId: UPS_CALCULATOR_SECTION_ID,
+    },
+    { href: `${homePath}#about`, label: "Technology", page: "home" },
+    { href: `${homePath}#about`, label: "About", page: "home" },
+    { href: `${homePath}#contact`, label: "Contact", page: "home" },
   ];
-  const navLinks = isRTL ? faLinks : enLinks;
+  const zhLinks = [
+    { href: homePath, label: "首页", page: "home" },
+    { href: `/${locale}/products`, label: "产品", page: "products" },
+    {
+      href: upsCalculatorHref,
+      label: "计算器",
+      page: "home",
+      scrollTargetId: UPS_CALCULATOR_SECTION_ID,
+    },
+    { href: `${homePath}#about`, label: "技术", page: "home" },
+    { href: `${homePath}#about`, label: "关于我们", page: "home" },
+    { href: `${homePath}#contact`, label: "联系我们", page: "home" },
+  ];
+  const navLinks = locale === "fa" ? faLinks : locale === "zh" ? zhLinks : enLinks;
+
+  const homeNavLabel = locale === "fa" ? "خانه" : locale === "zh" ? "首页" : "Home";
+  const productsViewAllShort =
+    locale === "fa" ? "← مشاهده همه" : locale === "zh" ? "查看全部 →" : "View All →";
+  const productsViewAllLong =
+    locale === "fa"
+      ? "← مشاهده همه محصولات"
+      : locale === "zh"
+        ? "← 查看全部产品"
+        : "View All Products →";
+
+  function handleHomeAnchoredNav(e: MouseEvent<HTMLAnchorElement>, scrollTargetId?: string) {
+    if (!scrollTargetId || !pathname || pathname !== homePath) return;
+    e.preventDefault();
+    scrollToSectionBelowStickyHeader(scrollTargetId, { behavior: "smooth" });
+    window.history.replaceState(null, "", `${homePath}#${scrollTargetId}`);
+  }
 
   const desktopBarExpandedH = 70;
   const desktopBarCompactH = 54;
@@ -262,7 +324,9 @@ export default function SharedNavbar({
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8 ml-auto mr-6" dir={isRTL ? "rtl" : "ltr"}>
           {navLinks.map((l) => {
-            const isActive = (l.page === "products" && activePage === "products") || (l.page === "home" && l.label === (isRTL ? "صفحه اصلی" : "Home") && activePage === "home");
+            const isActive =
+              (l.page === "products" && activePage === "products") ||
+              (l.page === "home" && l.label === homeNavLabel && activePage === "home");
             const isProducts = l.href === `/${locale}/products`;
 
             if (isProducts) {
@@ -276,7 +340,7 @@ export default function SharedNavbar({
                   <Link
                     href={l.href}
                     className="flex items-center gap-1 relative transition-colors duration-300"
-                    style={{ fontFamily: YK, fontSize: "14px", fontWeight: 500, color: isActive ? C.accent : C.text2, textDecoration: "none" }}
+                    style={{ fontFamily: YK, fontSize: "12px", fontWeight: 500, color: isActive ? C.accent : C.text2, textDecoration: "none" }}
                   >
                     {l.label}
                     <motion.svg
@@ -319,7 +383,7 @@ export default function SharedNavbar({
                               onClick={() => setDesktopDropdown(false)}
                             >
                               <span className="w-1.5 h-1.5 rounded-full shrink-0 opacity-40 group-hover:opacity-100 transition-opacity" style={{ background: C.accent }} />
-                              {isRTL ? cat.fa : cat.en}
+                              {catLabel(locale, cat)}
                             </Link>
                           ))}
                           <div style={{ height: "1px", margin: "6px 16px", background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }} />
@@ -329,7 +393,7 @@ export default function SharedNavbar({
                             style={{ fontFamily: YK, color: C.accent }}
                             onClick={() => setDesktopDropdown(false)}
                           >
-                            {isRTL ? "← مشاهده همه" : "View All →"}
+                            {productsViewAllShort}
                           </Link>
                         </div>
                       </motion.div>
@@ -344,7 +408,10 @@ export default function SharedNavbar({
                 key={l.label}
                 href={l.href}
                 className="relative transition-colors duration-300"
-                style={{ fontFamily: YK, fontSize: "14px", fontWeight: 500, color: isActive ? C.accent : C.text2, textDecoration: "none" }}
+                style={{ fontFamily: YK, fontSize: "12px", fontWeight: 500, color: isActive ? C.accent : C.text2, textDecoration: "none" }}
+                onClick={(e) =>
+                  handleHomeAnchoredNav(e, "scrollTargetId" in l ? l.scrollTargetId : undefined)
+                }
                 onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = C.accent; }}
                 onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = C.text2; }}
               >
@@ -358,15 +425,28 @@ export default function SharedNavbar({
         {/* Right actions */}
         <div className="flex items-center gap-2.5 shrink-0">
           {/* Language switcher */}
-          <Link
-            href={`/${other}`}
-            className="hidden sm:flex items-center text-[12px] font-bold tracking-widest uppercase transition-colors duration-200"
-            style={{ color: C.text3 }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.accent; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.text3; }}
-          >
-            {other === "fa" ? "فا" : "EN"}
-          </Link>
+          <div className="hidden sm:flex items-center gap-3 shrink-0">
+            {alternateLocales.map((loc) => (
+              <Link
+                key={loc}
+                href={localizedPath(loc, pathForLocale)}
+                className="flex items-center gap-2 text-[12px] font-bold tracking-wide transition-colors duration-200"
+                style={{ color: C.text3 }}
+                aria-label={localeSwitchAria(loc)}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.color = C.accent;
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.color = C.text3;
+                }}
+              >
+                <LocaleFlagMark locale={loc} />
+                <span className={loc === "en" ? "tracking-widest uppercase" : undefined}>
+                  {localeNavLabel(loc, "short")}
+                </span>
+              </Link>
+            ))}
+          </div>
 
           {/* Cart icon */}
           <button
@@ -489,7 +569,7 @@ export default function SharedNavbar({
                                 onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.text3; }}
                               >
                                 <span className="w-1 h-1 rounded-full shrink-0" style={{ background: C.accent }} />
-                                {isRTL ? cat.fa : cat.en}
+                                {catLabel(locale, cat)}
                               </Link>
                             ))}
                             <Link
@@ -498,7 +578,7 @@ export default function SharedNavbar({
                               className="flex items-center gap-2 px-8 py-3 text-[12px] font-semibold transition-colors duration-200"
                               style={{ fontFamily: YK, color: C.accent }}
                             >
-                              {isRTL ? "← مشاهده همه محصولات" : "View All Products →"}
+                              {productsViewAllLong}
                             </Link>
                           </motion.div>
                         )}
@@ -507,7 +587,10 @@ export default function SharedNavbar({
                   ) : (
                     <Link
                       href={l.href}
-                      onClick={() => setOpen(false)}
+                      onClick={(e) => {
+                        handleHomeAnchoredNav(e, "scrollTargetId" in l ? l.scrollTargetId : undefined);
+                        setOpen(false);
+                      }}
                       className="flex items-center px-6 py-4 transition-colors duration-200"
                       style={{ fontFamily: YK, fontSize: "15px", color: C.text2 }}
                       onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.accent; }}
@@ -520,14 +603,21 @@ export default function SharedNavbar({
               );
             })}
 
-            <div className="flex items-center justify-between px-6 py-4">
-              <Link
-                href={`/${other}`}
-                className="py-2 px-4 rounded-xl text-sm font-semibold transition-colors duration-200"
-                style={{ border: `1px solid ${C.navBorder}`, color: C.text3 }}
-              >
-                {other === "fa" ? "فارسی" : "English"}
-              </Link>
+            <div className="flex items-center justify-between px-6 py-4 gap-3 flex-wrap">
+              <div className="flex flex-wrap items-center gap-2">
+                {alternateLocales.map((loc) => (
+                  <Link
+                    key={loc}
+                    href={localizedPath(loc, pathForLocale)}
+                    className="flex items-center gap-2 py-2 px-3 rounded-xl text-sm font-semibold transition-colors duration-200"
+                    style={{ border: `1px solid ${C.navBorder}`, color: C.text3 }}
+                    aria-label={localeSwitchAria(loc)}
+                  >
+                    <LocaleFlagMark locale={loc} />
+                    {localeNavLabel(loc, "long")}
+                  </Link>
+                ))}
+              </div>
               <ThemeToggle />
             </div>
           </motion.div>

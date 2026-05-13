@@ -1,5 +1,8 @@
 "use client";
 
+import type { Locale } from "@/i18n/config";
+import { ui3 } from "@/i18n/locale-ui";
+
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -16,9 +19,12 @@ const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 export interface T {
   fa: string;
   en: string;
+  zh?: string;
 }
-export function tx(text: T, locale: string): string {
-  return locale === "fa" ? text.fa : text.en;
+export function tx(text: T, locale: Locale): string {
+  if (locale === "fa") return text.fa;
+  if (locale === "zh") return text.zh ?? text.en;
+  return text.en;
 }
 
 export interface Product {
@@ -713,7 +719,7 @@ function ProductImg({ num, size = "lg" }: { num: number; size?: "lg" | "sm" }) {
 
 // ─── Spec Modal ───────────────────────────────────────────────────────────────
 
-function SpecModal({ num, locale, onClose }: { num: number; locale: string; onClose: () => void }) {
+function SpecModal({ num, locale, onClose }: { num: number; locale: Locale; onClose: () => void }) {
   const img = DETAIL_IMAGES[num] ?? null;
   const isRTL = locale === "fa";
 
@@ -758,7 +764,7 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
               style={{ background: "rgba(124,255,0,0.07)", border: "1px solid rgba(124,255,0,0.18)", color: ACCENT }}
             >
               <span className="w-1 h-1 rounded-full" style={{ background: ACCENT }} />
-              {isRTL ? `مشخصات فنی — محصول ${num}` : `Technical Specifications — Product ${num}`}
+              {ui3(locale, `مشخصات فنی — محصول ${num}`, `Technical Specifications — Product ${num}`, `技术规格 — 产品 ${num}`)}
             </div>
           </div>
           <button
@@ -793,7 +799,7 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
                 <path d="M18 24h12M24 18v12" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" />
               </svg>
               <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "14px" }}>
-                {isRTL ? "مشخصات فنی در دسترس نیست" : "Technical specifications not available"}
+                {ui3(locale, "مشخصات فنی در دسترس نیست", "Technical specifications not available", "暂无技术规格图")}
               </p>
             </div>
           )}
@@ -806,7 +812,7 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
           dir={isRTL ? "rtl" : "ltr"}
         >
           <span style={{ color: "rgba(255,255,255,0.2)", fontSize: "11px" }}>
-            {isRTL ? "لیان صدر ملل | نماینده رسمی UBETTER در ایران" : "Lian Sadr Mellal | Official UBETTER Representative in Iran"}
+            {ui3(locale, "لیان صدر ملل | نماینده رسمی UBETTER در ایران", "Lian Sadr Mellal | Official UBETTER Representative in Iran", "联森梅兰 | UBETTER 伊朗官方合作伙伴")}
           </span>
           <button
             onClick={onClose}
@@ -815,7 +821,7 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
             onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(124,255,0,0.3)"; (e.currentTarget as HTMLButtonElement).style.color = ACCENT; }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.1)"; (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.4)"; }}
           >
-            {isRTL ? "بستن" : "Close"}
+            {ui3(locale, "بستن", "Close", "关闭")}
           </button>
         </div>
       </motion.div>
@@ -825,7 +831,7 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
 
 // ─── Featured Product Block (cinematic alternating) ───────────────────────────
 
-function FeaturedProductBlock({ product, globalIndex, imageLeft, locale, onOpenSpecs }: { product: Product; globalIndex: number; imageLeft: boolean; locale: string; onOpenSpecs: () => void }) {
+function FeaturedProductBlock({ product, globalIndex, imageLeft, locale, onOpenSpecs }: { product: Product; globalIndex: number; imageLeft: boolean; locale: Locale; onOpenSpecs: () => void }) {
   const isRTL = locale === "fa";
   const isDark = globalIndex % 2 === 0;
   const productNum = globalIndex + 1; // 1-indexed
@@ -900,7 +906,7 @@ function FeaturedProductBlock({ product, globalIndex, imageLeft, locale, onOpenS
             <Reveal delay={0.25}>
               <div className="mb-8">
                 <div className="mb-4 font-semibold tracking-[0.18em] uppercase" style={{ color: "rgba(255,255,255,0.2)", fontSize: "9px" }}>
-                  {isRTL ? "ویژگی‌های کلیدی" : "Key Features"}
+                  {ui3(locale, "ویژگی‌های کلیدی", "Key Features", "核心特性")}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
                   {product.features.map((feat, i) => (
@@ -917,7 +923,7 @@ function FeaturedProductBlock({ product, globalIndex, imageLeft, locale, onOpenS
             <Reveal delay={0.3}>
               <div className="mb-10">
                 <div className="mb-3 font-semibold tracking-[0.18em] uppercase" style={{ color: "rgba(255,255,255,0.2)", fontSize: "9px" }}>
-                  {isRTL ? "کاربردها" : "Applications"}
+                  {ui3(locale, "کاربردها", "Applications", "应用场景")}
                 </div>
                 <div className={`flex flex-wrap gap-2 ${isRTL ? "justify-end" : ""}`}>
                   {product.applications.map((app, i) => (
@@ -952,7 +958,7 @@ function FeaturedProductBlock({ product, globalIndex, imageLeft, locale, onOpenS
                   (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
                 }}
               >
-                {isRTL ? "مشخصات فنی" : "Technical Specs"}
+                {ui3(locale, "مشخصات فنی", "Technical Specs", "技术规格")}
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <rect x="2" y="2" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.4" />
                   <path d="M5 7h4M7 5v4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
@@ -968,7 +974,7 @@ function FeaturedProductBlock({ product, globalIndex, imageLeft, locale, onOpenS
 
 // ─── Compact Product Card ─────────────────────────────────────────────────────
 
-function CompactProductCard({ product, globalIndex, locale, onOpenSpecs }: { product: Product; globalIndex: number; locale: string; onOpenSpecs: () => void }) {
+function CompactProductCard({ product, globalIndex, locale, onOpenSpecs }: { product: Product; globalIndex: number; locale: Locale; onOpenSpecs: () => void }) {
   const isRTL = locale === "fa";
   const productNum = globalIndex + 1;
   return (
@@ -1071,7 +1077,7 @@ function CompactProductCard({ product, globalIndex, locale, onOpenSpecs }: { pro
               <rect x="1.5" y="1.5" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.3" />
               <path d="M4.5 6.5h4M6.5 4.5v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
-            {isRTL ? "مشخصات فنی" : "Technical Specs"}
+            {ui3(locale, "مشخصات فنی", "Technical Specs", "技术规格")}
           </button>
         </div>
       </motion.div>
@@ -1081,7 +1087,7 @@ function CompactProductCard({ product, globalIndex, locale, onOpenSpecs }: { pro
 
 // ─── Category Header ──────────────────────────────────────────────────────────
 
-function CategoryHeader({ cat, catIndex, locale }: { cat: ProductCategory; catIndex: number; locale: string }) {
+function CategoryHeader({ cat, catIndex, locale }: { cat: ProductCategory; catIndex: number; locale: Locale }) {
   const isRTL = locale === "fa";
   return (
     <div
@@ -1130,8 +1136,11 @@ function CategoryHeader({ cat, catIndex, locale }: { cat: ProductCategory; catIn
               <span className="font-black leading-none" style={{ fontSize: "34px", color: ACCENT, fontFamily: "'Inter', system-ui, sans-serif" }}>
                 {cat.products.length}
               </span>
-              <span className="font-semibold tracking-[0.12em] uppercase mt-1" style={{ fontSize: "8px", color: "rgba(255,255,255,0.28)" }}>
-                {isRTL ? "محصول" : "Products"}
+              <span
+                className={`font-semibold tracking-[0.12em] mt-1 ${locale === "en" ? "uppercase" : ""}`}
+                style={{ fontSize: "8px", color: "rgba(255,255,255,0.28)" }}
+              >
+                {ui3(locale, "محصول", "Products", "款产品")}
               </span>
             </div>
           </div>
@@ -1147,7 +1156,7 @@ function CategoryHeader({ cat, catIndex, locale }: { cat: ProductCategory; catIn
 
 // ─── Section Header ────────────────────────────────────────────────────────────
 
-function SectionHeader({ locale }: { locale: string }) {
+function SectionHeader({ locale }: { locale: Locale }) {
   const isRTL = locale === "fa";
   const totalProducts = CATEGORIES.reduce((sum, c) => sum + c.products.length, 0);
 
@@ -1172,7 +1181,7 @@ function SectionHeader({ locale }: { locale: string }) {
             style={{ background: "rgba(124,255,0,0.07)", border: "1px solid rgba(124,255,0,0.2)", color: ACCENT }}
           >
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: ACCENT }} />
-            {isRTL ? "پورتفولیو محصولات" : "Product Portfolio"}
+            {ui3(locale, "پورتفولیو محصولات", "Product Portfolio", "产品矩阵")}
           </div>
 
           {/* Main title */}
@@ -1180,10 +1189,15 @@ function SectionHeader({ locale }: { locale: string }) {
             className="text-white font-black mb-6 leading-none mx-auto"
             style={{ fontFamily: YK, fontSize: "clamp(32px, 5vw, 80px)", letterSpacing: isRTL ? "0" : "-0.03em", lineHeight: 1.0, maxWidth: "900px" }}
           >
-            {isRTL ? (
+            {locale === "fa" ? (
               <>
                 راهکارهای ذخیره{" "}
                 <span style={{ color: ACCENT, textShadow: "0 0 40px rgba(124,255,0,0.35), 0 0 80px rgba(124,255,0,0.12)" }}>انرژی</span>
+              </>
+            ) : locale === "zh" ? (
+              <>
+                <span style={{ color: ACCENT, textShadow: "0 0 40px rgba(124,255,0,0.35), 0 0 80px rgba(124,255,0,0.12)" }}>储能</span>
+                {" "}解决方案
               </>
             ) : (
               <>
@@ -1195,9 +1209,11 @@ function SectionHeader({ locale }: { locale: string }) {
 
           {/* Subtitle */}
           <p className="mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.4)", fontSize: "clamp(14px, 1.2vw, 17px)", maxWidth: "680px", lineHeight: 1.9 }}>
-            {isRTL
+            {locale === "fa"
               ? "سیستم‌های پیشرفته ذخیره انرژی مسکونی، تجاری و صنعتی؛ طراحی شده برای مدیریت قابل اعتماد توان، ادغام با انرژی‌های تجدیدپذیر و بهینه‌سازی هوشمند مصرف انرژی."
-              : "Advanced residential, commercial, and industrial energy storage systems designed for reliable power management, renewable energy integration, and intelligent energy optimization."}
+              : locale === "zh"
+                ? "面向住宅、工商业的先进储能系统，为可靠用电管理、可再生能源接入与智能能效优化而设计。"
+                : "Advanced residential, commercial, and industrial energy storage systems designed for reliable power management, renewable energy integration, and intelligent energy optimization."}
           </p>
 
           {/* Stats row */}
@@ -1206,9 +1222,9 @@ function SectionHeader({ locale }: { locale: string }) {
             style={{ border: "1px solid rgba(255,255,255,0.06)" }}
           >
             {[
-              { value: String(totalProducts), label: isRTL ? "محصول" : "Products" },
-              { value: String(CATEGORIES.length), label: isRTL ? "دسته‌بندی" : "Categories" },
-              { value: "MW+", label: isRTL ? "مقیاس" : "Scale" },
+              { value: String(totalProducts), label: ui3(locale, "محصول", "Products", "款产品") },
+              { value: String(CATEGORIES.length), label: ui3(locale, "دسته‌بندی", "Categories", "品类") },
+              { value: "MW+", label: ui3(locale, "مقیاس", "Scale", "规模") },
             ].map((s, i) => (
               <div key={i} className="flex flex-col items-center justify-center py-5 px-4" style={{ background: "rgba(255,255,255,0.02)" }}>
                 <span className="font-black leading-none mb-1" style={{ fontSize: "clamp(18px, 2.2vw, 28px)", color: ACCENT, fontFamily: "'Inter', system-ui, sans-serif" }}>
@@ -1229,7 +1245,7 @@ function SectionHeader({ locale }: { locale: string }) {
 
 // ─── Final CTA ─────────────────────────────────────────────────────────────────
 
-function ProductsCTA({ locale }: { locale: string }) {
+function ProductsCTA({ locale }: { locale: Locale }) {
   const isRTL = locale === "fa";
   return (
     <div className="relative py-32 lg:py-48 overflow-hidden" style={{ background: "#030303" }}>
@@ -1245,17 +1261,22 @@ function ProductsCTA({ locale }: { locale: string }) {
             style={{ background: "rgba(124,255,0,0.06)", border: "1px solid rgba(124,255,0,0.18)", color: "rgba(124,255,0,0.75)" }}
           >
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: ACCENT }} />
-            {isRTL ? "تماس با ما" : "Get in Touch"}
+            {ui3(locale, "تماس با ما", "Get in Touch", "联系我们")}
           </div>
 
           <h2
             className="text-white font-black mb-6 mx-auto leading-none"
             style={{ fontFamily: YK, fontSize: "clamp(28px, 4.2vw, 68px)", letterSpacing: isRTL ? "0" : "-0.03em", lineHeight: 1.05, maxWidth: "900px" }}
           >
-            {isRTL ? (
+            {locale === "fa" ? (
               <>
                 آینده‌ای روشن با{" "}
                 <span style={{ color: ACCENT, textShadow: "0 0 40px rgba(124,255,0,0.4), 0 0 80px rgba(124,255,0,0.15)" }}>انرژی هوشمند</span>
+              </>
+            ) : locale === "zh" ? (
+              <>
+                以<span style={{ color: ACCENT, textShadow: "0 0 40px rgba(124,255,0,0.4), 0 0 80px rgba(124,255,0,0.15)" }}>智慧能源</span>
+                点亮未来
               </>
             ) : (
               <>
@@ -1269,9 +1290,11 @@ function ProductsCTA({ locale }: { locale: string }) {
             className="mx-auto mb-14 leading-relaxed"
             style={{ color: "rgba(255,255,255,0.38)", fontSize: "clamp(14px, 1.15vw, 17px)", maxWidth: "580px", lineHeight: 1.95 }}
           >
-            {isRTL
+            {locale === "fa"
               ? "از سیستم‌های مسکونی تا زیرساخت‌های مقیاس شبکه، پلتفرم‌های پیشرفته ذخیره انرژی ما برای بازتعریف روش ذخیره‌سازی، مدیریت و توزیع انرژی طراحی شده‌اند. با تیم مهندسی ما ارتباط بگیرید."
-              : "From residential systems to utility-scale infrastructure, our advanced energy storage platforms are engineered to redefine how the world stores, manages, and deploys power. Connect with our engineering team to discuss your project."}
+              : locale === "zh"
+                ? "从家庭系统到电网级基础设施，我们的先进储能平台致力于重新定义电能的存储、调度与部署方式。欢迎与我们的工程团队沟通项目需求。"
+                : "From residential systems to utility-scale infrastructure, our advanced energy storage platforms are engineered to redefine how the world stores, manages, and deploys power. Connect with our engineering team to discuss your project."}
           </p>
 
           <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 ${isRTL ? "sm:flex-row-reverse" : ""}`}>
@@ -1284,7 +1307,7 @@ function ProductsCTA({ locale }: { locale: string }) {
               onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "#90ff1a"; (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 60px rgba(124,255,0,0.5), 0 4px 24px rgba(0,0,0,0.3)"; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = ACCENT; (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 32px rgba(124,255,0,0.3), 0 4px 20px rgba(0,0,0,0.3)"; }}
             >
-              {isRTL ? "درخواست مشاوره رایگان" : "Request a Consultation"}
+              {ui3(locale, "درخواست مشاوره رایگان", "Request a Consultation", "预约免费咨询")}
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className={isRTL ? "rotate-180" : ""}>
                 <path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -1298,7 +1321,7 @@ function ProductsCTA({ locale }: { locale: string }) {
               onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(124,255,0,0.4)"; (e.currentTarget as HTMLAnchorElement).style.color = ACCENT; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.13)"; (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.65)"; }}
             >
-              {isRTL ? "ارسال ایمیل" : "Email Our Team"}
+              {ui3(locale, "ارسال ایمیل", "Email Our Team", "发送邮件")}
             </motion.a>
           </div>
         </Reveal>
@@ -1311,7 +1334,7 @@ function ProductsCTA({ locale }: { locale: string }) {
 // ROOT EXPORT
 // ══════════════════════════════════════════════════════════════════════════════
 
-export default function ProductsSection({ locale = "en" }: { locale?: string }) {
+export default function ProductsSection({ locale = "en" }: { locale?: Locale }) {
   const [specModal, setSpecModal] = useState<number | null>(null);
   const closeModal = useCallback(() => setSpecModal(null), []);
 

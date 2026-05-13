@@ -2,10 +2,12 @@
 
 import { createContext, useContext, useReducer, useEffect, useCallback } from "react";
 
+export type LocalizedLabel = { fa: string; en: string; zh?: string };
+
 export interface CartItem {
   productNum: number;
-  name: { fa: string; en: string };
-  category: { fa: string; en: string };
+  name: LocalizedLabel;
+  category: LocalizedLabel;
   qty: number;
 }
 

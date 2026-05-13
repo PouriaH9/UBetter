@@ -1,16 +1,16 @@
 "use client";
 
-import { Suspense, useEffect, useLayoutEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 
 import { Atmosphere } from "./Atmosphere";
 import { Globe } from "./Globe";
-import { IRAN_CENTROID } from "./constants";
+import { CHINA_CENTROID, GLOBE_PRESENCE_TRANSITION_SEC, IRAN_CENTROID } from "./constants";
 import { GlobeLights } from "./GlobeLights";
-import type { CountryFeature } from "./globe-types";
+import type { CountryFeature, GlobePresencePhase } from "./globe-types";
 
 /** Default framing for pointer orbit (zoom disabled — wheel must scroll the page, not dolly the camera). */
 const CAM_Y = 29;
@@ -20,6 +20,7 @@ const ORBIT_DIST = Math.hypot(CAM_Z, CAM_Y);
 
 type GlobeExperienceProps = {
   polygons: CountryFeature[];
+  presencePhase: GlobePresencePhase;
 };
 
 /** Matches `three-globe` internal `polar2Cartesian(lat, lng)` (unit direction from globe center). */
@@ -32,6 +33,84 @@ function globeLatLngDir(lat: number, lng: number): THREE.Vector3 {
     Math.cos(phi),
     sinPhi * Math.sin(theta),
   ).normalize();
+}
+
+/** Softer than cubic — use for globe blend to match “ease” feel of the UI */
+function easeInOutQuint(t: number): number {
+  return t < 0.5 ? 16 * t * t * t * t * t : 1 - (-2 * t + 2) ** 5 / 2;
+}
+
+/**
+ * Rotates the globe toward China or back to Iran-forward based on the same phase as the presence card.
+ * Transition length matches the card’s Framer Motion duration (`GLOBE_PRESENCE_TRANSITION_SEC`).
+ */
+function GlobePresencePhaseMotion({
+  phase,
+  children,
+}: {
+  phase: GlobePresencePhase;
+  children: ReactNode;
+}) {
+  const groupRef = useRef<THREE.Group>(null);
+  const identityQuat = useMemo(() => new THREE.Quaternion(), []);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduceMotion(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const peekQuat = useMemo(() => {
+    const iranDir = globeLatLngDir(IRAN_CENTROID.lat, IRAN_CENTROID.lng);
+    const chinaDir = globeLatLngDir(CHINA_CENTROID.lat, CHINA_CENTROID.lng);
+    const axis = new THREE.Vector3().crossVectors(iranDir, chinaDir);
+    if (axis.lengthSq() < 1e-10) return new THREE.Quaternion();
+    axis.normalize();
+    const gap = iranDir.angleTo(chinaDir);
+    const angle = -gap * 0.88;
+    return new THREE.Quaternion().setFromAxisAngle(axis, angle);
+  }, []);
+
+  const phaseRef = useRef(phase);
+  const transStartRef = useRef<number | null>(null);
+  const startBlendRef = useRef(0);
+  const blendRef = useRef(0);
+
+  useFrame(({ clock }) => {
+    const g = groupRef.current;
+    if (!g) return;
+    if (reduceMotion) {
+      g.quaternion.identity();
+      return;
+    }
+
+    if (phaseRef.current !== phase) {
+      phaseRef.current = phase;
+      transStartRef.current = clock.elapsedTime;
+      startBlendRef.current = blendRef.current;
+    }
+
+    if (transStartRef.current === null) {
+      transStartRef.current = clock.elapsedTime;
+      startBlendRef.current = 0;
+    }
+
+    const target = phase === "china" ? 1 : 0;
+    const elapsed = clock.elapsedTime - transStartRef.current;
+    const u = Math.min(1, elapsed / GLOBE_PRESENCE_TRANSITION_SEC);
+    blendRef.current = THREE.MathUtils.lerp(
+      startBlendRef.current,
+      target,
+      easeInOutQuint(u),
+    );
+
+    g.quaternion.slerpQuaternions(identityQuat, peekQuat, blendRef.current);
+  });
+
+  return <group ref={groupRef}>{children}</group>;
 }
 
 /**
@@ -91,7 +170,7 @@ function CanvasScrollPassthrough() {
   return null;
 }
 
-function GlobeExperience({ polygons }: GlobeExperienceProps) {
+function GlobeExperience({ polygons, presencePhase }: GlobeExperienceProps) {
   const [narrowViewport, setNarrowViewport] = useState(() =>
     typeof window !== "undefined" && typeof window.matchMedia === "function"
       ? window.matchMedia(NARROW_MAX).matches
@@ -113,8 +192,10 @@ function GlobeExperience({ polygons }: GlobeExperienceProps) {
       <GlobeLights />
 
       <GlobeLockedOnIran>
-        <Globe polygons={polygons} />
-        <Atmosphere />
+        <GlobePresencePhaseMotion phase={presencePhase}>
+          <Globe polygons={polygons} />
+          <Atmosphere />
+        </GlobePresencePhaseMotion>
       </GlobeLockedOnIran>
 
       <OrbitControls
@@ -146,6 +227,7 @@ function GlobeExperience({ polygons }: GlobeExperienceProps) {
 
 export type GlobeCanvasProps = {
   polygons: CountryFeature[];
+  presencePhase: GlobePresencePhase;
   className?: string;
   style?: CSSProperties;
 };
@@ -154,7 +236,7 @@ export type GlobeCanvasProps = {
  * react-three-fiber Canvas + drei controls + country polygons on three-globe.
  * Consume only from a Next.js `dynamic(..., { ssr: false })` boundary.
  */
-export function GlobeCanvas({ polygons, className, style }: GlobeCanvasProps) {
+export function GlobeCanvas({ polygons, presencePhase, className, style }: GlobeCanvasProps) {
   return (
     <Canvas
       className={className}
@@ -176,7 +258,7 @@ export function GlobeCanvas({ polygons, className, style }: GlobeCanvasProps) {
       onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
     >
       <Suspense fallback={null}>
-        <GlobeExperience polygons={polygons} />
+        <GlobeExperience polygons={polygons} presencePhase={presencePhase} />
       </Suspense>
     </Canvas>
   );

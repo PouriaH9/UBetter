@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { UpsCalculatorDict } from "@/i18n/ups-calculator.dict";
-import { upsCalculatorEn, upsCalculatorFa } from "@/i18n/ups-calculator.dict";
+import { upsCalculatorEn, upsCalculatorFa, upsCalculatorZh } from "@/i18n/ups-calculator.dict";
 
 type Translation = {
   dir: "ltr" | "rtl";
@@ -41,9 +41,6 @@ type Translation = {
   brandTagline: string;
   upsCalculator: UpsCalculatorDict;
   globe: {
-    badge: string;
-    title: string;
-    subtitle: string;
     ariaLabel: string;
   };
 };
@@ -135,10 +132,6 @@ export const translations: Record<Locale, Translation> = {
     brandTagline: "🔋 Reliable LiFePO4 Battery & Solar Storage Manufacturer",
     upsCalculator: upsCalculatorEn,
     globe: {
-      badge: "Global brand · Official Iran partnership",
-      title: "UBETTER worldwide — represented in Iran",
-      subtitle:
-        "Lian Sadar Mellal is the official exclusive representative of UBETTER in Iran.",
       ariaLabel:
         "Globe map with Iran emphasized; wide screens drag to orbit. Wheel and trackpad scroll the page, not zoom the globe.",
     },
@@ -228,11 +221,98 @@ export const translations: Record<Locale, Translation> = {
     brandTagline: "🔋 تولیدکننده مطمئن باتری LiFePO4 و ذخیره‌سازی خورشیدی",
     upsCalculator: upsCalculatorFa,
     globe: {
-      badge: "برند جهانی · نمای رسمی در ایران",
-      title: "UBETTER در نقشه جهان و پل به ایران",
-      subtitle: "لیان صدر ملل نمایندهٔ رسمی و انحصاری UBETTER در ایران",
       ariaLabel:
         "نقشهٔ کره‌ای با ایران برجسته؛ در صفحهٔ پهن با کشیدن می‌توانید بچرخانید؛ اسکرول معمولی صفحه است.",
+    },
+  },
+  zh: {
+    dir: "ltr",
+    nav: {
+      home: "首页",
+      products: "产品",
+      features: "功能",
+      technology: "技术",
+      about: "关于我们",
+      contact: "联系我们",
+      quote: "💬 免费咨询",
+    },
+    hero: {
+      badge: "⚡ 迈向更绿色的未来",
+      title: "家用、商用与工业级智能锂电储能 🔋",
+      p1: "UBETTER 提供先进的磷酸铁锂电池系统，从 2.5kWh 家用储能到 1–2MWh 集装箱方案，帮助企业降低峰值电费并提升备用供电可靠性。",
+      p2: "定制化方案、专业工程支持与全球交付服务，助力长期能源独立。🌍",
+      ctaProducts: "🚀 浏览产品",
+      ctaConsultation: "📩 预约咨询",
+      stats: [
+        { label: "厂区面积", value: "10848m²", icon: "🏭" },
+        { label: "设备资产", value: "6000万元", icon: "💰" },
+        { label: "工程团队", value: "30+ 专家", icon: "👷" },
+      ],
+    },
+    products: {
+      title: "UBETTER 产品矩阵 🧰",
+      subtitle:
+        "官方产品线涵盖壁挂式、立式、机架式、堆叠式一体机及家用 / 工商业储能系统，单机容量从 60kWh 到 261kWh 及以上。",
+    },
+    about: {
+      title: "关于 UBETTER 🧠",
+      p1: "Ubetter Technology Co., Ltd. 是国家高新技术企业，专注于先进定制研发、专业制造与稳健供应链。",
+      p2: "公司通过 ISO 9001 与 ISO 14001 体系管理，依托磷酸铁锂电芯强调安全、长循环寿命与可持续。🌱",
+      kpis: [
+        "💼 注册资本：1000万元",
+        "🏗️ 设备资产：6000万元",
+        "🏭 厂房面积：10848m²",
+        "👨‍🔬 团队：教授领衔 + 30+ 工程师",
+      ],
+    },
+    projects: {
+      title1: "印尼、江西、度假村及工厂等项目落地",
+      p1: "官网展示的实景案例体现了工商业场景下光储一体化方案的集成能力。",
+      title2: "🏆 UBETTER 亮相第138届广交会",
+      p2: "国际化展会阵容助力全球合作，巩固 OEM/ODM 制造的信任基础。",
+    },
+    gallery: {
+      title: "影像画廊与生产亮点 📸",
+      subtitle: "滚动动画展示",
+      exportReady: "🚢 出口就绪 / 工厂直供",
+      slide: "幻灯片",
+    },
+    applications: {
+      title: "工商业应用场景 🏢",
+      items: [
+        "🏭 工厂与制造园区",
+        "📦 仓储与物流中心",
+        "🏢 写字楼与购物中心",
+        "🌾 农场与灌溉系统",
+        "☀️ 光储一体化项目",
+        "🏥 医院、通信基站与机房",
+      ],
+    },
+    services: {
+      title: "我们的服务承诺 🤝",
+      items: [
+        "🛠️ 定制化储能系统设计",
+        "👩‍💻 专业技术支持与布线指导",
+        "🚀 快速交付与海外仓储协同",
+        "✅ 严苛质检、长质保与敏捷售后",
+      ],
+    },
+    contact: {
+      title: "免费咨询 📬",
+      subtitle:
+        "无论是住宅、工商业还是大型储能项目，请留下需求信息，我们将为您匹配专属电池方案与报价。",
+      name: "姓名",
+      email: "电子邮箱",
+      phone: "电话号码",
+      company: "公司名称",
+      message: "请填写期望容量、应用场景与时间节点……",
+      send: "✉️ 发送询价",
+    },
+    brandTagline: "🔋 可靠的磷酸铁锂电池与光伏储能制造商",
+    upsCalculator: upsCalculatorZh,
+    globe: {
+      ariaLabel:
+        "地球示意图突出伊朗；宽屏可拖拽旋转；滚轮与触控板滚动页面而非缩放地球。",
     },
   },
 };

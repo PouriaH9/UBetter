@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
 
 import logoImg from "@/assets/LOGO.jpg";
 import productsHeroDesktop from "@/assets/Source/products HERO desktopsize.png";
@@ -17,11 +17,17 @@ import hero3MImg from "@/assets/HERO3M.png";
 
 import { translations } from "@/i18n/translations";
 import type { Locale } from "@/i18n/config";
+import { ui3 } from "@/i18n/locale-ui";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
+import { ScrollStackLayer } from "@/components/scroll-stack-layers";
 import { UsageCalculatorSection } from "@/components/usage-calculator-section";
 import { GlobePresenceSection } from "@/components/globe-presence-section";
-import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
+import { useTheme, DARK_C, LIGHT_C, type ColorPalette } from "@/contexts/theme-context";
+import {
+  UPS_CALCULATOR_SECTION_ID,
+  scrollToSectionBelowStickyHeader,
+} from "@/lib/scroll-to-anchor";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -86,7 +92,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
   }, [heroImages.length]);
 
   return (
-    <section className="relative h-screen min-h-[640px] flex items-center justify-center overflow-hidden">
+    <section className="relative z-0 h-screen min-h-[640px] flex items-center justify-center overflow-hidden">
       {/* Background — crossfading images */}
       <div className="absolute inset-0 scale-110">
         <AnimatePresence mode="sync">
@@ -167,7 +173,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                 textShadow: "0 2px 40px rgba(0,0,0,0.5)",
               }}
             >
-              {isRTL ? "پاور استیشن" : "Power Station"}
+              {ui3(locale, "پاور استیشن", "Power Station", "储能电源")}
             </motion.h1>
 
             {/* "ALL IN ONE" — neon green with glow */}
@@ -204,9 +210,11 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                 color: "rgba(255,255,255,0.88)",
               }}
             >
-              {isRTL
+              {locale === "fa"
                 ? <>تمام انرژی مورد نیاز شما،<br />هر زمان، هر مکان</>
-                : <>All the energy you need,<br />anytime, anywhere</>}
+                : locale === "zh"
+                  ? <>随时随地<br />满足您的用电需求</>
+                  : <>All the energy you need,<br />anytime, anywhere</>}
             </motion.p>
 
             {/* CTA button */}
@@ -237,9 +245,9 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                 (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 24px rgba(124,255,0,0.32), 0 4px 16px rgba(0,0,0,0.28)";
               }}
             >
-              {isRTL ? "مشاهده محصولات" : "Explore Products"}
+              {ui3(locale, "مشاهده محصولات", "Explore Products", "浏览产品")}
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                <path d={isRTL ? "M14 10H6M9 6l-4 4 4 4" : "M6 10h8M11 6l4 4-4 4"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d={locale === "fa" ? "M14 10H6M9 6l-4 4 4 4" : "M6 10h8M11 6l4 4-4 4"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </motion.a>
           </div>
@@ -273,8 +281,8 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                     <path d="M21 19v8M17 23h8" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" />
                   </svg>
                 ),
-                title: isRTL ? "ظرفیت بالا" : "High Capacity",
-                desc: isRTL ? "توان بالا برای\nتمام دستگاه‌های شما" : "High power for\nall your devices",
+                title: ui3(locale, "ظرفیت بالا", "High Capacity", "大容量"),
+                desc: ui3(locale, "توان بالا برای\nتمام دستگاه‌های شما", "High power for\nall your devices", "为高功耗设备\n提供充沛电力"),
               },
               {
                 icon: (
@@ -282,8 +290,8 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                     <path d="M23 8l-8 13h8l-2 13L29 21h-8l2-13z" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ),
-                title: isRTL ? "شارژ سریع" : "Fast Charging",
-                desc: isRTL ? "شارژ سریع در\nهر شرایطی" : "Fast charging in\nany condition",
+                title: ui3(locale, "شارژ سریع", "Fast Charging", "快速充电"),
+                desc: ui3(locale, "شارژ سریع در\nهر شرایطی", "Fast charging in\nany condition", "多种场景下\n均可快充"),
               },
               {
                 icon: (
@@ -293,8 +301,8 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                     <circle cx="21" cy="21" r="2.5" fill={ACCENT} />
                   </svg>
                 ),
-                title: isRTL ? "باتری با عمر طولانی" : "Long Life Battery",
-                desc: isRTL ? "ساخته شده با سلول‌های\nباکیفیت و بادوام" : "Built with premium\nhigh-durability cells",
+                title: ui3(locale, "باتری با عمر طولانی", "Long Life Battery", "长寿命电池"),
+                desc: ui3(locale, "ساخته شده با سلول‌های\nباکیفیت و بادوام", "Built with premium\nhigh-durability cells", "采用高品质\n耐久电芯"),
               },
               {
                 icon: (
@@ -303,8 +311,8 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                     <path d="M16 21l3.5 3.5L26 18" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ),
-                title: isRTL ? "ایمن و قابل اعتماد" : "Safe & Reliable",
-                desc: isRTL ? "مجهز به سیستم‌های\nحفاظتی پیشرفته" : "Equipped with advanced\nprotection systems",
+                title: ui3(locale, "ایمن و قابل اعتماد", "Safe & Reliable", "安全可靠"),
+                desc: ui3(locale, "مجهز به سیستم‌های\nحفاظتی پیشرفته", "Equipped with advanced\nprotection systems", "多重保护\n安心运行"),
               },
             ].map((feat, i) => (
               <div
@@ -375,32 +383,44 @@ function Testimonials({ locale }: { locale: Locale }) {
   const [active, setActive] = useState(0);
   const isRTL = locale === "fa";
 
-  const items = [
-    {
-      quote: isRTL
-        ? "سیستم ESS صنعتی 500kWh یوبتر در اولین سال هزینه برق اوج مصرف ما را ۳۸٪ کاهش داد. نصب بی‌دردسر بود و تیم مهندسی کاملاً حرفه‌ای عمل کرد."
-        : "UBETTER's 500 kWh industrial ESS reduced our peak electricity costs by 38% in the first year. The installation was seamless and the engineering team was exceptional.",
-      author: "Zhang Wei",
-      role: isRTL ? "مدیر عملیات، گوانگژو" : "Operations Director",
-      company: isRTL ? "شرکت تولیدی گوانگژو" : "Guangzhou Manufacturing Co.",
-    },
-    {
-      quote: isRTL
-        ? "سیستم‌های UBETTER را در سه ملک تجاری خود نصب کردیم. بازگشت سرمایه در ۱۸ ماه کاملاً مشهود بود. کیفیت محصول و پشتیبانی پس از فروش عالی است."
-        : "We deployed UBETTER systems across three commercial properties. The ROI was clear within 18 months. Outstanding product quality and after-sales support.",
-      author: "Ahmad Hassan",
-      role: "CEO",
-      company: isRTL ? "النور ملک، امارات" : "Al Noor Real Estate, UAE",
-    },
-    {
-      quote: isRTL
-        ? "همکاری OEM با UBETTER برای خط محصولات خورشیدی ما تحول‌آفرین بود. سلول‌های LiFePO4 آن‌ها بالاترین گواهینامه‌های بین‌المللی را دارند."
-        : "The OEM partnership with UBETTER has been transformative for our solar product line. Their LiFePO4 cells meet the highest international certifications.",
-      author: "Thomas Müller",
-      role: "Product Director",
-      company: "SolarTech Europe GmbH",
-    },
-  ];
+  const items = useMemo(
+    () => [
+      {
+        quote: ui3(
+          locale,
+          "سیستم ESS صنعتی 500kWh یوبتر در اولین سال هزینه برق اوج مصرف ما را ۳۸٪ کاهش داد. نصب بی‌دردسر بود و تیم مهندسی کاملاً حرفه‌ای عمل کرد.",
+          "UBETTER's 500 kWh industrial ESS reduced our peak electricity costs by 38% in the first year. The installation was seamless and the engineering team was exceptional.",
+          "UBETTER 500 kWh 工商业储能系统在首年将我们的峰值电费降低了约 38%。安装顺畅，工程团队非常专业。",
+        ),
+        author: "Zhang Wei",
+        role: ui3(locale, "مدیر عملیات، گوانگژو", "Operations Director", "运营总监"),
+        company: ui3(locale, "شرکت تولیدی گوانگژو", "Guangzhou Manufacturing Co.", "广州某制造企业"),
+      },
+      {
+        quote: ui3(
+          locale,
+          "سیستم‌های UBETTER را در سه ملک تجاری خود نصب کردیم. بازگشت سرمایه در ۱۸ ماه کاملاً مشهود بود. کیفیت محصول و پشتیبانی پس از فروش عالی است.",
+          "We deployed UBETTER systems across three commercial properties. The ROI was clear within 18 months. Outstanding product quality and after-sales support.",
+          "我们在三处商业地产部署了 UBETTER 系统，约 18 个月内投资回报清晰可见，产品质量与售后支持出色。",
+        ),
+        author: "Ahmad Hassan",
+        role: ui3(locale, "مدیر عامل", "CEO", "首席执行官"),
+        company: ui3(locale, "النور ملک، امارات", "Al Noor Real Estate, UAE", "阿联酋 Al Noor 地产"),
+      },
+      {
+        quote: ui3(
+          locale,
+          "همکاری OEM با UBETTER برای خط محصولات خورشیدی ما تحول‌آفرین بود. سلول‌های LiFePO4 آن‌ها بالاترین گواهینامه‌های بین‌المللی را دارند.",
+          "The OEM partnership with UBETTER has been transformative for our solar product line. Their LiFePO4 cells meet the highest international certifications.",
+          "与 UBETTER 的 OEM 合作让我们的光伏产品线焕然一新，其磷酸铁锂电芯具备顶尖国际认证。",
+        ),
+        author: "Thomas Müller",
+        role: ui3(locale, "مدیر محصول", "Product Director", "产品总监"),
+        company: "SolarTech Europe GmbH",
+      },
+    ],
+    [locale],
+  );
 
   useEffect(() => {
     const t = setInterval(() => setActive((a) => (a + 1) % items.length), 6000);
@@ -412,9 +432,9 @@ function Testimonials({ locale }: { locale: Locale }) {
       style={{ background: isDark ? "#050505" : "#f0f0f0", transition: "background 0.35s ease" }}>
       <div className="max-w-4xl mx-auto px-6">
         <Reveal className="text-center mb-16">
-          <Pill label={isRTL ? "نظرات مشتریان" : "Testimonials"} />
+          <Pill label={ui3(locale, "نظرات مشتریان", "Testimonials", "客户评价")} />
           <h2 className="text-4xl md:text-5xl font-bold" style={{ color: C.text1 }}>
-            {isRTL ? "اعتماد رهبران صنعت" : "Trusted by Industry Leaders"}
+            {ui3(locale, "اعتماد رهبران صنعت", "Trusted by Industry Leaders", "深受行业领导者信赖")}
           </h2>
         </Reveal>
 
@@ -473,17 +493,22 @@ function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) 
         >
           <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl pointer-events-none" style={{ background: C.accentGlow }} />
           <div className="relative z-10">
-            <Pill label={isRTL ? "شروع کنید" : "Get Started Today"} />
+            <Pill label={ui3(locale, "شروع کنید", "Get Started Today", "立即开始")} />
             <h2 className="text-4xl md:text-[60px] font-bold leading-tight mb-5" style={{ color: C.text1 }}>
-              {isRTL ? "آماده‌اید آینده انرژی\nخود را بسازید؟" : "Ready to Power\nYour Future?"}
+              {ui3(locale, "آماده‌اید آینده انرژی\nخود را بسازید؟", "Ready to Power\nYour Future?", "准备好打造\n您的能源未来了吗？")}
             </h2>
             <p className="text-[17px] max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: C.text2 }}>
-              {isRTL ? "با تیم مهندسی ما تماس بگیرید تا مشاوره رایگان و پیش‌فاکتور اختصاصی برای پروژه ذخیره‌سازی انرژی شما دریافت کنید." : "Contact our engineering team for a free consultation and tailored quotation for your residential, commercial, or industrial energy storage project."}
+              {ui3(
+                locale,
+                "با تیم مهندسی ما تماس بگیرید تا مشاوره رایگان و پیش‌فاکتور اختصاصی برای پروژه ذخیره‌سازی انرژی شما دریافت کنید.",
+                "Contact our engineering team for a free consultation and tailored quotation for your residential, commercial, or industrial energy storage project.",
+                "联系我们的工程团队，获取免费咨询以及面向住宅、工商业储能项目的专属报价方案。",
+              )}
             </p>
             <a href="mailto:info@ubetterenergy.com"
               className="inline-flex items-center gap-3 px-10 py-5 text-black font-bold rounded-full text-[16px] transition-all duration-300 hover:scale-105"
               style={{ background: C.accent, boxShadow: `0 0 40px ${C.accentGlow}` }}>
-              {isRTL ? "دریافت پیش‌فاکتور رایگان" : "Get Free Quote"}
+              {ui3(locale, "دریافت پیش‌فاکتور رایگان", "Get Free Quote", "获取免费报价")}
               <svg className="w-5 h-5" fill="none" viewBox="0 0 20 20">
                 <path d="M4 10h12M12 5l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -496,14 +521,14 @@ function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) 
           className="rounded-3xl p-8 md:p-12"
           style={{ background: C.card, border: `1px solid ${C.cardBorder}`, transition: "background 0.35s ease" }}>
           <h3 className="text-[22px] font-bold mb-8 text-center" style={{ color: C.text1 }}>
-            {isRTL ? "ارسال درخواست" : "Send an Inquiry"}
+            {ui3(locale, "ارسال درخواست", "Send an Inquiry", "发送询价")}
           </h3>
           <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={(e) => e.preventDefault()}>
             {[
-              { label: t.contact.name, type: "text", ph: isRTL ? "نام شما" : "Your full name" },
+              { label: t.contact.name, type: "text", ph: ui3(locale, "نام شما", "Your full name", "您的姓名") },
               { label: t.contact.email, type: "email", ph: "email@company.com" },
               { label: t.contact.phone, type: "tel", ph: "+1 234 567 890" },
-              { label: t.contact.company, type: "text", ph: isRTL ? "نام شرکت" : "Your company" },
+              { label: t.contact.company, type: "text", ph: ui3(locale, "نام شرکت", "Your company", "公司名称") },
             ].map((f) => (
               <div key={f.label}>
                 <label className="block text-[13px] mb-2 font-medium" style={{ color: C.text3 }}>{f.label}</label>
@@ -536,37 +561,56 @@ function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) 
 // ══════════════════════════════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════════════════════════════
-// ROOT EXPORT
+// SCROLL LAYERS — stacked sheets (each block scrolls up over the one below)
 // ══════════════════════════════════════════════════════════════════════════════
 
-export default function HomePageClient({ locale }: { locale: Locale }) {
-  const { isDark } = useTheme();
-  const C = isDark ? DARK_C : LIGHT_C;
-  const t = translations[locale];
-  const isRTL = locale === "fa";
+function ProductPortfolioScrollStack({
+  locale,
+  isRTL,
+  isDark,
+  C,
+}: {
+  locale: Locale;
+  isRTL: boolean;
+  isDark: boolean;
+  C: ColorPalette;
+}) {
+  const shellRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: shellRef,
+    // Longer range = motion plays across more scroll
+    offset: ["start end", "start 0.28"],
+  });
+  const lift = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [340, 0]);
+  const shellScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [0.84, 1]);
+  const bgScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [1.32, 1]);
 
   return (
-    <div className="overflow-x-hidden" dir={t.dir}
-      style={{ background: C.pageBg, color: C.text1, transition: "background 0.35s ease, color 0.35s ease" }}>
-      <SharedNavbar locale={locale} activePage="home" />
-      <Hero locale={locale} t={t} />
-
-      {/* Products teaser — links to the dedicated products page */}
-      <div className="relative min-h-screen flex flex-col justify-center" style={{ borderTop: `1px solid ${C.divider}`, overflow: "clip" }}>
-        {/* Background images — desktop / mobile */}
-        <div className="absolute inset-0">
+    <div className="relative z-10 -mt-[100vh] pt-[100vh] pointer-events-none">
+      <div ref={shellRef} className="relative">
+        <motion.div
+          style={{ y: lift, scale: shellScale }}
+          className="pointer-events-auto relative min-h-screen flex flex-col justify-center overflow-hidden origin-top rounded-t-[2.25rem] sm:rounded-t-[3.5rem] shadow-[0_-24px_60px_rgba(0,0,0,0.45),0_-72px_180px_rgba(0,0,0,0.72),0_-120px_240px_rgba(0,0,0,0.35)] ring-1 ring-white/[0.14] sm:ring-2"
+        >
+        <motion.div
+          className="absolute inset-0 origin-center"
+          style={{ scale: bgScale }}
+          aria-hidden
+        >
           <Image src={productsHeroDesktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority={false} />
           <Image src={productsHeroMobile} alt="" fill className="object-cover object-top sm:hidden" sizes="100vw" priority={false} />
-          {/* Very subtle vignette — just enough for text shadows to pop */}
-          <div className="absolute inset-0" style={{ background: isDark
-            ? "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.32) 50%, rgba(0,0,0,0.50) 100%)"
-            : "linear-gradient(to bottom, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.18) 50%, rgba(0,0,0,0.32) 100%)"
-          }} />
-        </div>
+          <div
+            className="absolute inset-0"
+            style={{
+              background: isDark
+                ? "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.32) 50%, rgba(0,0,0,0.50) 100%)"
+                : "linear-gradient(to bottom, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.18) 50%, rgba(0,0,0,0.32) 100%)",
+            }}
+          />
+        </motion.div>
 
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-between min-h-[calc(100vh-0px)]" dir={isRTL ? "rtl" : "ltr"}>
-          {/* Top: title + CTA */}
+        <div className="relative z-10 flex flex-col justify-between min-h-screen" dir={isRTL ? "rtl" : "ltr"}>
           <div className="flex-1 flex flex-col items-center justify-start max-w-[1200px] mx-auto px-6 sm:px-10 pt-10 pb-8 text-center w-full">
             <div
               style={{
@@ -579,38 +623,123 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
                 padding: "28px 40px 32px",
               }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-5 text-[10px] font-bold tracking-[0.2em] uppercase"
-                style={{ background: "rgba(0,0,0,0.22)", border: "1px solid rgba(255,255,255,0.25)", color: C.text1, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
+              <div
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-5 text-[10px] font-bold tracking-[0.2em] uppercase"
+                style={{
+                  background: "rgba(0,0,0,0.22)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  color: C.text1,
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                }}
+              >
                 <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.text1 }} />
-                {isRTL ? "پورتفولیو محصولات" : "Product Portfolio"}
+                {ui3(locale, "پورتفولیو محصولات", "Product Portfolio", "产品矩阵")}
               </div>
-              <h2 className="font-black mb-6 leading-none" style={{ color: "#ffffff", fontFamily: YK, fontSize: "clamp(22px, 3.2vw, 48px)", letterSpacing: isRTL ? "0" : "-0.03em", textShadow: "0 2px 24px rgba(0,0,0,0.65), 0 4px 48px rgba(0,0,0,0.45)" }}>
-                {isRTL ? (<>۲۳ محصول در <span style={{ color: C.text1 }}>۶ دسته‌بندی</span></>) : (<>23 Products across <span style={{ color: C.text1 }}>6 Categories</span></>)}
+              <h2
+                className="font-black mb-6 leading-none"
+                style={{
+                  color: "#ffffff",
+                  fontFamily: YK,
+                  fontSize: "clamp(22px, 3.2vw, 48px)",
+                  letterSpacing: isRTL ? "0" : "-0.03em",
+                  textShadow: "0 2px 24px rgba(0,0,0,0.65), 0 4px 48px rgba(0,0,0,0.45)",
+                }}
+              >
+                {locale === "fa" ? (
+                  <>
+                    ۲۳ محصول در <span style={{ color: C.text1 }}>۶ دسته‌بندی</span>
+                  </>
+                ) : locale === "zh" ? (
+                  <>
+                    <span style={{ color: C.text1 }}>6 大类</span> 共 23 款产品
+                  </>
+                ) : (
+                  <>
+                    23 Products across <span style={{ color: C.text1 }}>6 Categories</span>
+                  </>
+                )}
               </h2>
               <div className="btn-gradient-border" style={{ color: C.text1 }}>
-                <Link href={`/${locale}/products`}
+                <Link
+                  href={`/${locale}/products`}
                   className="btn-gradient-border-inner inline-flex items-center gap-2 px-5 py-2 font-semibold text-[13px] transition-all duration-300 hover:scale-105"
-                  style={{ background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)", color: C.text1, fontFamily: YK, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
-                  onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = C.text1; el.style.color = isDark ? "#000" : "#fff"; }}
-                  onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)"; el.style.color = C.text1; }}
+                  style={{
+                    background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)",
+                    color: C.text1,
+                    fontFamily: YK,
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
+                  }}
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget as HTMLAnchorElement;
+                    el.style.background = C.text1;
+                    el.style.color = isDark ? "#000" : "#fff";
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget as HTMLAnchorElement;
+                    el.style.background = isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)";
+                    el.style.color = C.text1;
+                  }}
                 >
-                  {isRTL ? "مشاهده همه محصولات" : "View All Products"}
+                  {ui3(locale, "مشاهده همه محصولات", "View All Products", "查看全部产品")}
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                    <path d={isRTL ? "M10 8H4M7 5L4 8l3 3" : "M4 8h8M9 5l3 3-3 3"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d={locale === "fa" ? "M10 8H4M7 5L4 8l3 3" : "M4 8h8M9 5l3 3-3 3"}
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </Link>
               </div>
             </div>
           </div>
-
-          {/* Bottom: glass feature strip */}
         </div>
+        </motion.div>
       </div>
+    </div>
+  );
+}
 
-      <UsageCalculatorSection locale={locale} />
-      <GlobePresenceSection locale={locale} />
-      <Testimonials locale={locale} />
-      <CTA locale={locale} t={t} />
+// ══════════════════════════════════════════════════════════════════════════════
+// ROOT EXPORT
+// ══════════════════════════════════════════════════════════════════════════════
+
+export default function HomePageClient({ locale }: { locale: Locale }) {
+  const { isDark } = useTheme();
+  const C = isDark ? DARK_C : LIGHT_C;
+  const t = translations[locale];
+  const isRTL = locale === "fa";
+
+  useLayoutEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash.slice(1) !== UPS_CALCULATOR_SECTION_ID) return;
+    scrollToSectionBelowStickyHeader(UPS_CALCULATOR_SECTION_ID, { behavior: "auto" });
+  }, []);
+
+  return (
+    <div className="overflow-x-hidden" dir={t.dir}
+      style={{ background: C.pageBg, color: C.text1, transition: "background 0.35s ease, color 0.35s ease" }}>
+      <SharedNavbar locale={locale} activePage="home" />
+      <Hero locale={locale} t={t} />
+
+      {/* Products teaser — scrolls up as a sheet over the hero */}
+      <ProductPortfolioScrollStack locale={locale} isRTL={isRTL} isDark={isDark} C={C} />
+
+      <ScrollStackLayer zIndex={20} overlapVh={98}>
+        <UsageCalculatorSection locale={locale} />
+      </ScrollStackLayer>
+      <ScrollStackLayer zIndex={30} overlapVh={99} enterScale={false}>
+        <GlobePresenceSection locale={locale} />
+      </ScrollStackLayer>
+      <ScrollStackLayer zIndex={40} overlapVh={97}>
+        <Testimonials locale={locale} />
+      </ScrollStackLayer>
+      <ScrollStackLayer zIndex={50} overlapVh={97}>
+        <CTA locale={locale} t={t} />
+      </ScrollStackLayer>
       <SharedFooter locale={locale} />
     </div>
   );

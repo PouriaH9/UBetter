@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef, type ReactNode, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
+import { ScrollSheetOverHero, ScrollStackLayer } from "@/components/scroll-stack-layers";
 import CartDrawer from "@/components/cart-drawer";
 import { CATEGORIES, tx } from "@/components/products-section";
 import { PRODUCT_IMAGES, DETAIL_IMAGES } from "@/assets/productImages";
@@ -13,6 +15,7 @@ import { useCart } from "@/contexts/cart-context";
 import productsHeroDesktop from "@/assets/Source/products HERO desktopsize.png";
 import productsHeroMobile from "@/assets/Source/products HERO mobilesize.png";
 import type { Locale } from "@/i18n/config";
+import { localeDir, ui3 } from "@/i18n/locale-ui";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -21,17 +24,16 @@ const easeOut = [0.22, 1, 0.36, 1] as const;
 
 // ─── Reveal animation wrapper ─────────────────────────────────────────────────
 
-function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
   return <div className={className}>{children}</div>;
 }
 
 // ─── Spec Modal ───────────────────────────────────────────────────────────────
 
 // Spec modal stays dark regardless of page theme (standard modal UX)
-const MODAL_ACCENT = "#7CFF00";
-function SpecModal({ num, locale, onClose }: { num: number; locale: string; onClose: () => void }) {
+function SpecModal({ num, locale, onClose }: { num: number; locale: Locale; onClose: () => void }) {
   const img = DETAIL_IMAGES[num] ?? null;
-  const isRTL = locale === "fa";
+  const dir = localeDir(locale);
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
 
@@ -64,10 +66,10 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderBottom: `1px solid ${C.divider}` }} dir={isRTL ? "rtl" : "ltr"}>
-          <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.15em] uppercase" style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
+        <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderBottom: `1px solid ${C.divider}` }} dir={dir}>
+          <div className={`flex items-center gap-2.5 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.15em] ${locale === "en" ? "uppercase" : ""}`} style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: C.accent }} />
-            {isRTL ? `مشخصات فنی — محصول ${num}` : `Technical Specifications — Product ${num}`}
+            {ui3(locale, `مشخصات فنی — محصول ${num}`, `Technical Specifications — Product ${num}`, `技术规格 — 产品 ${num}`)}
           </div>
           <button
             onClick={onClose}
@@ -93,16 +95,21 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
                 <path d="M14 20h12M20 14v12" stroke={C.accent} strokeWidth="1.5" strokeLinecap="round" />
               </svg>
               <p style={{ color: C.text3, fontSize: "14px" }}>
-                {isRTL ? "مشخصات فنی در دسترس نیست" : "Technical specifications not available"}
+                {ui3(locale, "مشخصات فنی در دسترس نیست", "Technical specifications not available", "暂无技术规格")}
               </p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderTop: `1px solid ${C.divider}` }} dir={isRTL ? "rtl" : "ltr"}>
+        <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderTop: `1px solid ${C.divider}` }} dir={dir}>
           <span style={{ color: C.text4, fontSize: "11px" }}>
-            {isRTL ? "لیان صدر ملل | نماینده رسمی UBETTER در ایران" : "Lian Sadr Mellal | Official UBETTER Representative in Iran"}
+            {ui3(
+              locale,
+              "لیان صدر ملل | نماینده رسمی UBETTER در ایران",
+              "Lian Sadr Mellal | Official UBETTER Representative in Iran",
+              "联萨徳梅兰 | UBETTER 伊朗官方合作伙伴",
+            )}
           </span>
           <button
             onClick={onClose}
@@ -111,7 +118,7 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
             onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.color = C.accent; b.style.borderColor = C.accentBorder; }}
             onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.color = C.text3; b.style.borderColor = C.cardBorder; }}
           >
-            {isRTL ? "بستن" : "Close"}
+            {ui3(locale, "بستن", "Close", "关闭")}
           </button>
         </div>
       </motion.div>
@@ -124,12 +131,11 @@ function SpecModal({ num, locale, onClose }: { num: number; locale: string; onCl
 function AddToCartButton({ onAdd, isInCart, locale, C, isDark }: {
   onAdd: () => void;
   isInCart: boolean;
-  locale: string;
+  locale: Locale;
   C: ColorPalette;
   isDark: boolean;
 }) {
   const [added, setAdded] = useState(false);
-  const isRTL = locale === "fa";
 
   const handleClick = () => {
     onAdd();
@@ -164,7 +170,7 @@ function AddToCartButton({ onAdd, isInCart, locale, C, isDark }: {
           </motion.svg>
         )}
       </AnimatePresence>
-      {added ? (isRTL ? "اضافه شد" : "Added!") : (isRTL ? "افزودن" : "Add")}
+      {added ? ui3(locale, "اضافه شد", "Added!", "已添加") : ui3(locale, "افزودن", "Add", "加入")}
     </motion.button>
   );
 }
@@ -174,13 +180,13 @@ function AddToCartButton({ onAdd, isInCart, locale, C, isDark }: {
 function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: {
   productNum: number;
   product: { name: { fa: string; en: string }; category: { fa: string; en: string }; description: { fa: string; en: string }; features: { fa: string; en: string }[]; applications: { fa: string; en: string }[] };
-  locale: string;
+  locale: Locale;
   onOpenSpecs: () => void;
   onAddToCart: () => void;
 }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
-  const isRTL = locale === "fa";
+  const dir = localeDir(locale);
   const img = PRODUCT_IMAGES[productNum] ?? null;
 
   return (
@@ -219,8 +225,8 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: 
         </div>
 
         {/* Content */}
-        <div className="flex flex-col flex-1 p-5" dir={isRTL ? "rtl" : "ltr"}>
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold tracking-[0.14em] uppercase mb-3 self-start"
+        <div className="flex flex-col flex-1 p-5" dir={dir}>
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold tracking-[0.14em] mb-3 self-start ${locale === "en" ? "uppercase" : ""}`}
             style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
             {tx(product.category, locale)}
           </span>
@@ -262,7 +268,7 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: 
                 <rect x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.2" />
                 <path d="M4 6h4M6 4v4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
               </svg>
-              {isRTL ? "مشخصات" : "Specs"}
+              {ui3(locale, "مشخصات", "Specs", "规格")}
             </button>
             <AddToCartButton onAdd={onAddToCart} isInCart={false} locale={locale} C={C} isDark={isDark} />
           </div>
@@ -273,79 +279,246 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: 
   );
 }
 
-// ─── Category Tab Bar ─────────────────────────────────────────────────────────
+// ─── Category nav — shared list (hero glass vs theme floating) ─────────────────
 
-const CATEGORY_ICONS = [
-  // Residential
-  <svg key="res" width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <path d="M2 7.5L8 2l6 5.5V14H10v-4H6v4H2V7.5z" stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round" />
-  </svg>,
-  // Commercial
-  <svg key="com" width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <rect x="2" y="6" width="12" height="9" rx="1" stroke="currentColor" strokeWidth="1.25" />
-    <path d="M5 6V4a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-  </svg>,
-  // EMS
-  <svg key="ems" width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.25" />
-    <path d="M5.5 8l1.5 1.5L10.5 6" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>,
-];
+function heroChipBaseStyle(isActive: boolean, isDark: boolean, C: ColorPalette): CSSProperties {
+  if (isDark) {
+    return isActive
+      ? {
+          color: C.accent,
+          background: "rgba(255,255,255,0.14)",
+          border: `1px solid ${C.accentBorder}`,
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.22)",
+        }
+      : {
+          color: "rgba(255,255,255,0.98)",
+          background: "rgba(0,0,0,0.28)",
+          border: "1px solid rgba(255,255,255,0.22)",
+        };
+  }
+  return isActive
+    ? {
+        color: C.accent,
+        background: C.accentBg,
+        border: `1px solid ${C.accentBorder}`,
+        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.85)`,
+      }
+    : {
+        color: C.text1,
+        background: "rgba(255,255,255,0.72)",
+        border: `1px solid ${C.cardBorder}`,
+      };
+}
 
-function CategoryTabs({ locale, activeId, onSelect }: { locale: string; activeId: string; onSelect: (id: string) => void }) {
+function CategoryNavList({
+  locale,
+  activeId,
+  onSelect,
+  surface,
+  heroLayout = "stack",
+}: {
+  locale: Locale;
+  activeId: string;
+  onSelect: (id: string) => void;
+  surface: "hero" | "theme";
+  /** Only applies when `surface="hero"`: vertical stack vs horizontal chips. */
+  heroLayout?: "stack" | "inline";
+}) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
-  const isRTL = locale === "fa";
+  const isHeroInline = surface === "hero" && heroLayout === "inline";
+
   return (
-    <div className="fixed top-[80px] left-0 right-0 z-40 overflow-x-auto"
-      dir={isRTL ? "rtl" : "ltr"}
-      style={{ background: C.tabBg, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderBottom: `1px solid ${C.tabBorder}`, transition: "background 0.35s ease" }}>
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-10">
-        <div className="flex items-stretch gap-0 min-w-max sm:min-w-0">
-          {CATEGORIES.map((cat, i) => {
-            const isActive = cat.id === activeId;
-            return (
-              <button key={cat.id} onClick={() => onSelect(cat.id)}
-                className="relative flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-5 py-2.5 sm:py-4 text-[11px] sm:text-[13px] font-semibold transition-all duration-200 whitespace-nowrap"
-                style={{ color: isActive ? C.accent : C.text3, fontFamily: YK, borderBottom: isActive ? `2px solid ${C.accent}` : "2px solid transparent", background: "transparent" }}
-                onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = C.text1; }}
-                onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = C.text3; }}>
-                {/* Icon hidden on small mobile to save space */}
-                <span className="hidden xs:inline sm:inline" style={{ color: isActive ? C.accent : C.text4 }}>{CATEGORY_ICONS[i]}</span>
-                <span>{tx(cat.title, locale)}</span>
-                <span className="px-1 sm:px-1.5 py-0.5 rounded-full text-[9px] font-black"
-                  style={{ background: isActive ? C.accentBg : C.tagBg, color: isActive ? C.accent : C.text4 }}>
-                  {cat.products.length}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
+    <>
+      {CATEGORIES.map((cat) => {
+        const isActive = cat.id === activeId;
+        const n = cat.products.length;
+
+        const heroStyle = surface === "hero" ? heroChipBaseStyle(isActive, isDark, C) : {};
+        const themeStyle = {
+          color: isActive ? C.accent : C.text2,
+          background: isActive ? C.accentBg : "transparent",
+          border: `1px solid ${isActive ? C.accentBorder : "transparent"}`,
+          boxShadow: isActive ? `inset 0 0 0 1px ${C.accentBorder}` : undefined,
+        };
+
+        const btnClass = isHeroInline
+          ? "inline-flex items-center gap-1 rounded-full px-2 py-0.5 sm:px-2.5 sm:py-1 shrink-0 transition-colors duration-200 max-w-[min(100%,10.5rem)]"
+          : "flex w-full items-baseline justify-between gap-1 rounded-lg px-1.5 py-1 sm:px-2 sm:py-1.5 text-start transition-colors duration-200";
+
+        return (
+          <button
+            key={cat.id}
+            type="button"
+            onClick={() => onSelect(cat.id)}
+            className={btnClass}
+            style={surface === "hero" ? heroStyle : themeStyle}
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                const b = e.currentTarget;
+                if (surface === "hero") {
+                  if (isDark) {
+                    b.style.background = "rgba(255,255,255,0.14)";
+                    b.style.borderColor = "rgba(255,255,255,0.32)";
+                    b.style.color = "#ffffff";
+                  } else {
+                    b.style.background = "rgba(255,255,255,0.92)";
+                    b.style.borderColor = C.accentBorder;
+                    b.style.color = C.text1;
+                  }
+                } else {
+                  b.style.background = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+                  b.style.color = C.text1;
+                }
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                const b = e.currentTarget;
+                if (surface === "hero") {
+                  const s = heroChipBaseStyle(false, isDark, C);
+                  b.style.background = s.background as string;
+                  b.style.color = s.color as string;
+                  b.style.border = s.border as string;
+                  b.style.boxShadow = s.boxShadow != null ? String(s.boxShadow) : "";
+                } else {
+                  b.style.background = "transparent";
+                  b.style.color = C.text2;
+                  b.style.border = "1px solid transparent";
+                  b.style.boxShadow = "none";
+                }
+              }
+            }}
+          >
+            <span
+              className={`min-w-0 font-semibold leading-tight ${isHeroInline ? "text-[9px] sm:text-[10px] truncate" : "flex-1 text-[9px] sm:text-[10px] line-clamp-2"}`}
+            >
+              {tx(cat.title, locale)}
+            </span>
+            <span
+              className={`shrink-0 font-bold tabular-nums ${isHeroInline ? "text-[9px] sm:text-[10px]" : "text-[9px] sm:text-[10px]"}`}
+              style={{
+                color:
+                  isActive
+                    ? C.accent
+                    : surface === "hero"
+                      ? isDark
+                        ? "rgba(255,255,255,0.85)"
+                        : C.text3
+                      : C.text3,
+              }}
+            >
+              {n}
+            </span>
+          </button>
+        );
+      })}
+    </>
   );
+}
+
+// ─── Category side nav (floating, left edge — after hero) ──────────────────────
+
+function CategorySideNav({
+  locale,
+  activeId,
+  onSelect,
+  floatingActive,
+}: {
+  locale: Locale;
+  activeId: string;
+  onSelect: (id: string) => void;
+  floatingActive: boolean;
+}) {
+  const { isDark } = useTheme();
+  const C = isDark ? DARK_C : LIGHT_C;
+  const labels = { nav: ui3(locale, "دسته‌های محصول", "Product categories", "产品类别") };
+  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!floatingActive) {
+      setVisible(false);
+      return;
+    }
+    lastScrollY.current = window.scrollY;
+  }, [floatingActive]);
+
+  useEffect(() => {
+    if (!mounted || !floatingActive) return;
+    lastScrollY.current = window.scrollY;
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastScrollY.current;
+      lastScrollY.current = y;
+
+      if (delta > 10) setVisible(false);
+      else if (delta < -8) setVisible(true);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [mounted, floatingActive]);
+
+  if (!mounted || !floatingActive) return null;
+
+  const nav = (
+    <nav
+      aria-label={labels.nav}
+      aria-hidden={!visible}
+      dir={localeDir(locale)}
+      className="fixed z-[45] flex flex-col gap-0.5 rounded-2xl p-1 sm:p-1.5 w-[8.25rem] sm:w-36 max-h-[min(26rem,calc(100vh-5.25rem))] overflow-y-auto overflow-x-hidden shadow-lg"
+      style={{
+        top: "calc(5rem + 0.25rem + env(safe-area-inset-top, 0px))",
+        left: "max(0.375rem, env(safe-area-inset-left, 0px))",
+        right: "auto",
+        bottom: "auto",
+        background: C.navBg,
+        backdropFilter: "blur(28px) saturate(180%)",
+        WebkitBackdropFilter: "blur(28px) saturate(180%)",
+        border: `1px solid ${isDark ? C.navBorder : "rgba(0,0,0,0.08)"}`,
+        boxShadow: isDark
+          ? "inset 0 1px 0 rgba(255,255,255,0.06), 0 10px 40px rgba(0,0,0,0.45)"
+          : "inset 0 1px 0 rgba(255,255,255,0.75), 0 10px 36px rgba(0,0,0,0.1)",
+        fontFamily: YK,
+        transform: visible ? "translateX(0)" : "translateX(calc(-100% - 16px))",
+        opacity: visible ? 1 : 0,
+        pointerEvents: visible ? "auto" : "none",
+        transition:
+          "transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease, background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease",
+      }}
+    >
+      <CategoryNavList locale={locale} activeId={activeId} onSelect={onSelect} surface="theme" />
+    </nav>
+  );
+
+  return createPortal(nav, document.body);
 }
 
 // ─── Category Section ─────────────────────────────────────────────────────────
 
 function CategorySection({ cat, catIndex, startIndex, locale, onOpenSpecs }: {
-  cat: typeof CATEGORIES[0]; catIndex: number; startIndex: number; locale: string; onOpenSpecs: (num: number) => void;
+  cat: typeof CATEGORIES[0]; catIndex: number; startIndex: number; locale: Locale; onOpenSpecs: (num: number) => void;
 }) {
   const { addItem, openCart } = useCart();
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
-  const isRTL = locale === "fa";
+  const dir = localeDir(locale);
   const headBg = catIndex % 2 === 0 ? C.sectionHead1 : C.sectionHead2;
   const gridBg = catIndex % 2 === 0 ? C.sectionGrid1 : C.sectionGrid2;
 
   return (
-    <section id={`cat-${cat.id}`} className="scroll-mt-[120px] sm:scroll-mt-[140px]">
+    <section id={`cat-${cat.id}`} className="scroll-mt-[88px] sm:scroll-mt-[96px]">
       <div className="relative overflow-hidden" style={{ background: headBg, borderBottom: `1px solid ${C.divider}`, transition: "background 0.35s ease" }}>
-        <div className="max-w-[1280px] mx-auto px-6 sm:px-10 py-3" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-10 py-3" dir={dir}>
           <Reveal>
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
-                <div dir="ltr" className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold tracking-[0.18em] uppercase shrink-0"
+                <div dir="ltr" className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold tracking-[0.18em] shrink-0 ${locale === "en" ? "uppercase" : ""}`}
                   style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
                   <span className="w-1 h-1 rounded-full animate-pulse" style={{ background: C.accent }} />
                   {tx(cat.pill, locale)}
@@ -387,14 +560,24 @@ function CategorySection({ cat, catIndex, startIndex, locale, onOpenSpecs }: {
 
 // ─── Page Header ──────────────────────────────────────────────────────────────
 
-function PageHeader({ locale }: { locale: string }) {
+function PageHeader({
+  locale,
+  showCategoryNav,
+  activeCategoryId,
+  onCategorySelect,
+}: {
+  locale: Locale;
+  showCategoryNav: boolean;
+  activeCategoryId: string;
+  onCategorySelect: (id: string) => void;
+}) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
-  const isRTL = locale === "fa";
-  const totalProducts = CATEGORIES.reduce((sum, c) => sum + c.products.length, 0);
+  const dir = localeDir(locale);
+  const navLabel = ui3(locale, "دسته‌های محصول", "Product categories", "产品类别");
 
   return (
-    <div className="relative overflow-hidden pt-[80px] min-h-[70vh] flex flex-col justify-center">
+    <div className="relative z-0 overflow-hidden min-h-screen flex flex-col justify-start pt-[92px] sm:pt-[96px]">
       {/* Background images */}
       <div className="absolute inset-0">
         <Image src={productsHeroDesktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority />
@@ -404,37 +587,69 @@ function PageHeader({ locale }: { locale: string }) {
           "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.32) 50%, rgba(0,0,0,0.52) 100%)"
         }} />
       </div>
-      {/* Accent line at top */}
+      {/* Accent line under navbar */}
       <div className="absolute top-[80px] inset-x-0 h-px z-10 pointer-events-none" style={{ background: `linear-gradient(90deg,transparent,${C.accentBorder} 30%,${C.accent}55 50%,${C.accentBorder} 70%,transparent)` }} />
 
-      <div className="relative z-10 max-w-[1280px] mx-auto px-6 sm:px-10 py-16 lg:py-24" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="relative z-10 max-w-[1280px] mx-auto px-6 sm:px-10 pt-2 pb-10 sm:pt-3 sm:pb-14 lg:pb-16" dir={dir}>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: easeOut }}>
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 mb-8 text-[12px]" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <div className="flex items-center gap-2 mb-4 sm:mb-5 text-[12px]" style={{ color: "rgba(255,255,255,0.5)" }}>
             <a href={`/${locale}`} className="transition-colors duration-200" style={{ color: "rgba(255,255,255,0.5)" }}
               onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#ffffff"; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.5)"; }}>
-              {isRTL ? "صفحه اصلی" : "Home"}
+              {ui3(locale, "خانه", "Home", "首页")}
             </a>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={isRTL ? "rotate-180" : ""}><path d="M4.5 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            <span style={{ color: "#ffffff" }}>{isRTL ? "محصولات" : "Products"}</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={locale === "fa" ? "rotate-180" : ""}><path d="M4.5 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <span style={{ color: "#ffffff" }}>{ui3(locale, "محصولات", "Products", "产品")}</span>
           </div>
 
-          <div className="flex flex-col items-center gap-6 text-center">
+          <div className="flex flex-col items-center gap-3 sm:gap-4 text-center">
             <h1 className="font-black leading-none"
-              style={{ color: "#ffffff", fontFamily: YK, fontSize: "clamp(28px, 4vw, 56px)", letterSpacing: isRTL ? "0" : "-0.03em", textShadow: "0 2px 24px rgba(0,0,0,0.65)" }}>
-              {isRTL ? (<>راهکارهای ذخیره{" "}<span style={{ color: "#ffffff", opacity: 0.7 }}>انرژی</span></>) : (<>Energy Storage{" "}<span style={{ color: "#ffffff", opacity: 0.7 }}>Solutions</span></>)}
+              style={{
+                color: "#ffffff",
+                fontFamily: YK,
+                fontSize: "clamp(28px, 4vw, 56px)",
+                letterSpacing: locale === "fa" ? "0" : locale === "zh" ? "-0.02em" : "-0.03em",
+                textShadow: "0 2px 24px rgba(0,0,0,0.65)",
+              }}>
+              {locale === "fa" ? (
+                <>راهکارهای ذخیره{" "}<span style={{ color: "#ffffff", opacity: 0.7 }}>انرژی</span></>
+              ) : locale === "zh" ? (
+                <><span style={{ color: "#ffffff", opacity: 0.7 }}>储能</span>{" "}解决方案</>
+              ) : (
+                <>Energy Storage{" "}<span style={{ color: "#ffffff", opacity: 0.7 }}>Solutions</span></>
+              )}
             </h1>
 
-            <div className="flex items-center gap-4">
-              {[{ val: String(totalProducts), label: isRTL ? "محصول" : "Products" }, { val: String(CATEGORIES.length), label: isRTL ? "دسته" : "Categories" }].map((s, i) => (
-                <div key={i} className="flex flex-col items-center px-5 py-3 rounded-2xl"
-                  style={{ background: "rgba(255,255,255,0.08)", backdropFilter: "blur(12px) saturate(140%)", WebkitBackdropFilter: "blur(12px) saturate(140%)", border: "1px solid rgba(255,255,255,0.18)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)" }}>
-                  <span className="font-black leading-none mb-0.5" style={{ fontSize: "22px", color: "#ffffff", fontFamily: "'Inter', system-ui" }}>{s.val}</span>
-                  <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.55)", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>{s.label}</span>
-                </div>
-              ))}
-            </div>
+            {showCategoryNav && (
+              <nav
+                aria-label={navLabel}
+                dir={dir}
+                className="w-full max-w-xl mx-auto flex flex-row flex-wrap justify-center gap-1.5 sm:gap-2 rounded-2xl py-2 px-2 sm:px-3 shadow-lg"
+                style={{
+                  ...(isDark
+                    ? {
+                        background: "rgba(255,255,255,0.1)",
+                        backdropFilter: "blur(12px) saturate(140%)",
+                        WebkitBackdropFilter: "blur(12px) saturate(140%)",
+                        border: "1px solid rgba(255,255,255,0.22)",
+                        boxShadow:
+                          "inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.06), 0 8px 40px rgba(0,0,0,0.2)",
+                      }
+                    : {
+                        background: "rgba(255,255,255,0.9)",
+                        backdropFilter: "blur(14px) saturate(140%)",
+                        WebkitBackdropFilter: "blur(14px) saturate(140%)",
+                        border: `1px solid ${C.cardBorder}`,
+                        boxShadow:
+                          "inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 32px rgba(0,0,0,0.14)",
+                      }),
+                  fontFamily: YK,
+                }}
+              >
+                <CategoryNavList locale={locale} activeId={activeCategoryId} onSelect={onCategorySelect} surface="hero" heroLayout="inline" />
+              </nav>
+            )}
           </div>
         </motion.div>
       </div>
@@ -450,14 +665,29 @@ export default function ProductsPageClient({ locale }: { locale: Locale }) {
   const [activeTab, setActiveTab] = useState(CATEGORIES[0].id);
   const [specModal, setSpecModal] = useState<number | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [viewHeight, setViewHeight] = useState(800);
   const closeModal = useCallback(() => setSpecModal(null), []);
 
-  // Show scroll-to-top button after scrolling down
   useEffect(() => {
-    const onScroll = () => setShowScrollTop(window.scrollY > 500);
+    const measure = () => setViewHeight(window.innerHeight);
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrollY(y);
+      setShowScrollTop(y > 500);
+    };
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const showHeroCategoryNav = scrollY < viewHeight * 0.9;
 
   // Compute cumulative start indices for product numbering
   const catStartIndices = CATEGORIES.reduce<number[]>((acc, cat, i) => {
@@ -492,60 +722,95 @@ export default function ProductsPageClient({ locale }: { locale: Locale }) {
     return () => observer.disconnect();
   }, []);
 
-  const isRTL = locale === "fa";
   return (
     <div
-      dir={isRTL ? "rtl" : "ltr"}
+      dir={localeDir(locale)}
       className="overflow-x-hidden min-h-screen"
       style={{ background: C.pageBg, color: C.text1, transition: "background 0.35s ease, color 0.35s ease" }}
     >
       <SharedNavbar locale={locale} activePage="products" />
       <CartDrawer locale={locale} />
 
-      <PageHeader locale={locale} />
-      <CategoryTabs locale={locale} activeId={activeTab} onSelect={handleTabSelect} />
-
-      {/* Spacer matching the fixed tab bar height — shorter on mobile */}
-      <div aria-hidden="true" className="h-[40px] sm:h-[54px]" />
+      <PageHeader
+        locale={locale}
+        showCategoryNav={showHeroCategoryNav}
+        activeCategoryId={activeTab}
+        onCategorySelect={handleTabSelect}
+      />
+      <CategorySideNav
+        locale={locale}
+        activeId={activeTab}
+        onSelect={handleTabSelect}
+        floatingActive={!showHeroCategoryNav}
+      />
 
       <main>
-        {CATEGORIES.map((cat, catIndex) => (
+        <ScrollSheetOverHero>
           <CategorySection
-            key={cat.id}
-            cat={cat}
-            catIndex={catIndex}
-            startIndex={catStartIndices[catIndex]}
+            cat={CATEGORIES[0]}
+            catIndex={0}
+            startIndex={catStartIndices[0]}
             locale={locale}
             onOpenSpecs={(num) => setSpecModal(num)}
           />
+        </ScrollSheetOverHero>
+
+        {CATEGORIES.slice(1).map((cat, i) => (
+          <ScrollStackLayer key={cat.id} zIndex={20 + i * 2} overlapVh={97}>
+            <CategorySection
+              cat={cat}
+              catIndex={i + 1}
+              startIndex={catStartIndices[i + 1]}
+              locale={locale}
+              onOpenSpecs={(num) => setSpecModal(num)}
+            />
+          </ScrollStackLayer>
         ))}
       </main>
 
-      {/* Contact CTA strip */}
-      <div style={{ background: isDark ? "#030303" : "#e8e8e8", borderTop: `1px solid ${C.divider}`, transition: "background 0.35s ease" }}>
-        <div className="max-w-[1280px] mx-auto px-6 sm:px-10 py-16 text-center" dir={locale === "fa" ? "rtl" : "ltr"}>
-          <Reveal>
-            <p className="mb-2" style={{ color: C.text4, fontSize: "11px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-              {locale === "fa" ? "نماینده رسمی UBETTER در ایران" : "Official UBETTER Representative in Iran"}
-            </p>
-            <h3 className="font-bold mb-6" style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(18px, 2vw, 28px)" }}>
-              {locale === "fa" ? "برای مشاوره رایگان با ما تماس بگیرید" : "Get a Free Engineering Consultation"}
-            </h3>
-            <div className="btn-gradient-border" style={{ color: C.text1 }}>
-              <a href={`/${locale}#contact`}
-                className="btn-gradient-border-inner inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-[14px] transition-all duration-300 hover:scale-105"
-                style={{ background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)", color: C.text1, fontFamily: YK, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
-                onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = C.text1; el.style.color = isDark ? "#000" : "#fff"; }}
-                onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)"; el.style.color = C.text1; }}>
-                {locale === "fa" ? "تماس با ما" : "Contact Us"}
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d={locale === "fa" ? "M9 7H3M6 4L3 7l3 3" : "M3 7h8M8 4l3 3-3 3"} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </a>
-            </div>
-          </Reveal>
+      <ScrollStackLayer zIndex={40} overlapVh={97}>
+        <div style={{ background: isDark ? "#030303" : "#e8e8e8", borderTop: `1px solid ${C.divider}`, transition: "background 0.35s ease" }}>
+          <div className="max-w-[1280px] mx-auto px-6 sm:px-10 py-16 text-center" dir={localeDir(locale)}>
+            <Reveal>
+              <p
+                className="mb-2"
+                style={{
+                  color: C.text4,
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: locale === "en" ? "0.2em" : "0.08em",
+                  textTransform: locale === "en" ? "uppercase" : "none",
+                }}
+              >
+                {locale === "fa"
+                  ? "نماینده رسمی UBETTER در ایران"
+                  : locale === "zh"
+                    ? "UBETTER 伊朗官方合作伙伴"
+                    : "Official UBETTER Representative in Iran"}
+              </p>
+              <h3 className="font-bold mb-6" style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(18px, 2vw, 28px)" }}>
+                {locale === "fa"
+                  ? "برای مشاوره رایگان با ما تماس بگیرید"
+                  : locale === "zh"
+                    ? "欢迎联系我们获取免费工程咨询"
+                    : "Get a Free Engineering Consultation"}
+              </h3>
+              <div className="btn-gradient-border" style={{ color: C.text1 }}>
+                <a href={`/${locale}#contact`}
+                  className="btn-gradient-border-inner inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-[14px] transition-all duration-300 hover:scale-105"
+                  style={{ background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)", color: C.text1, fontFamily: YK, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+                  onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = C.text1; el.style.color = isDark ? "#000" : "#fff"; }}
+                  onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)"; el.style.color = C.text1; }}>
+                  {ui3(locale, "تماس با ما", "Contact Us", "联系我们")}
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d={locale === "fa" ? "M9 7H3M6 4L3 7l3 3" : "M3 7h8M8 4l3 3-3 3"} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </a>
+              </div>
+            </Reveal>
+          </div>
         </div>
-      </div>
+      </ScrollStackLayer>
 
       <SharedFooter locale={locale} />
 
@@ -566,7 +831,7 @@ export default function ProductsPageClient({ locale }: { locale: Locale }) {
             exit={{ opacity: 0, scale: 0.7, y: 16 }}
             transition={{ duration: 0.25, ease: easeOut }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            aria-label={locale === "fa" ? "بازگشت به بالا" : "Back to top"}
+            aria-label={ui3(locale, "بازگشت به بالا", "Back to top", "返回顶部")}
             className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 group"
             style={{ outline: "none" }}
           >
