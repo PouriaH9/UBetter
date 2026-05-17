@@ -34,11 +34,14 @@ export function ScrollStackLayer({
   overlapVh = 92,
   /** When false, only vertical lift runs — avoids scaling WebGL / full-viewport layers (e.g. globe). */
   enterScale = true,
+  /** No rounded sheet, shadow, or ring — content only (e.g. globe-visible home sections). */
+  plain = false,
 }: {
   children: ReactNode;
   zIndex: number;
   overlapVh?: number;
   enterScale?: boolean;
+  plain?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const staticLayers = usePreferStaticScrollLayers();
@@ -65,7 +68,10 @@ export function ScrollStackLayer({
       }}
     >
       <div ref={ref} className="relative">
-        <motion.div style={{ y: lift, scale }} className={sheetMotionShell}>
+        <motion.div
+          style={{ y: lift, scale }}
+          className={plain ? "pointer-events-auto relative" : sheetMotionShell}
+        >
           {children}
         </motion.div>
       </div>

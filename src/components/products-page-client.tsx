@@ -812,12 +812,12 @@ export default function ProductsPageClient({ locale }: { locale: Locale }) {
               </h3>
               <div className="btn-gradient-border" style={{ color: C.text1 }}>
                 <a href={`/${locale}#contact`}
-                  className="btn-gradient-border-inner inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-[14px] transition-all duration-300 hover:scale-105"
+                  className="btn-gradient-border-inner inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-[14px] sm:text-[15px] transition-all duration-300 hover:scale-105"
                   style={{ background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)", color: C.text1, fontFamily: YK, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
                   onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = C.text1; el.style.color = isDark ? "#000" : "#fff"; }}
                   onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)"; el.style.color = C.text1; }}>
                   {ui3(locale, "تماس با ما", "Contact Us", "联系我们")}
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
                     <path d={locale === "fa" ? "M9 7H3M6 4L3 7l3 3" : "M3 7h8M8 4l3 3-3 3"} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </a>

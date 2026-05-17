@@ -23,7 +23,7 @@ import SharedFooter from "@/components/shared-footer";
 import { ScrollStackLayer, usePreferStaticScrollLayers } from "@/components/scroll-stack-layers";
 import { UsageCalculatorSection } from "@/components/usage-calculator-section";
 import { GlobePresenceSection } from "@/components/globe-presence-section";
-import { HomeGlobeJourneyProvider, useHomeGlobeJourneyOptional } from "@/contexts/home-globe-journey-context";
+import { HomeGlobeJourneyProvider } from "@/contexts/home-globe-journey-context";
 import {
   HomeServicesSection,
   HomeCertificatesSection,
@@ -41,32 +41,6 @@ import {
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
-// ─── Reveal wrapper ────────────────────────────────────────────────────────────
-
-function Reveal({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  return <div className={className}>{children}</div>;
-}
-
-// ─── Section label pill ───────────────────────────────────────────────────────
-
-function Pill({ label }: { label: string }) {
-  const { isDark } = useTheme();
-  const C = isDark ? DARK_C : LIGHT_C;
-  return (
-    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-semibold tracking-[0.18em] uppercase mb-6"
-      style={{ background: C.accentBg, border: `1px solid ${C.accentBorder}`, color: C.accent }}>
-      <span className="w-1 h-1 rounded-full" style={{ background: C.accent }} />
-      {label}
-    </div>
-  );
-}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // 1. CONSTANTS (shared with sections below)
@@ -379,118 +353,6 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
 
 
 // ══════════════════════════════════════════════════════════════════════════════
-// 3. TESTIMONIALS
-// ══════════════════════════════════════════════════════════════════════════════
-
-function Testimonials({ locale }: { locale: Locale }) {
-  const { isDark } = useTheme();
-  const C = isDark ? DARK_C : LIGHT_C;
-  const showGlobeThrough = useHomeGlobeJourneyOptional()?.showGlobeBackdrop ?? false;
-  const [active, setActive] = useState(0);
-  const isRTL = locale === "fa";
-
-  const items = useMemo(
-    () => [
-      {
-        quote: ui3(
-          locale,
-          "سیستم ESS صنعتی 500kWh یوبتر در اولین سال هزینه برق اوج مصرف ما را ۳۸٪ کاهش داد. نصب بی‌دردسر بود و تیم مهندسی کاملاً حرفه‌ای عمل کرد.",
-          "UBETTER's 500 kWh industrial ESS reduced our peak electricity costs by 38% in the first year. The installation was seamless and the engineering team was exceptional.",
-          "UBETTER 500 kWh 工商业储能系统在首年将我们的峰值电费降低了约 38%。安装顺畅，工程团队非常专业。",
-        ),
-        author: "Zhang Wei",
-        role: ui3(locale, "مدیر عملیات، گوانگژو", "Operations Director", "运营总监"),
-        company: ui3(locale, "شرکت تولیدی گوانگژو", "Guangzhou Manufacturing Co.", "广州某制造企业"),
-      },
-      {
-        quote: ui3(
-          locale,
-          "سیستم‌های UBETTER را در سه ملک تجاری خود نصب کردیم. بازگشت سرمایه در ۱۸ ماه کاملاً مشهود بود. کیفیت محصول و پشتیبانی پس از فروش عالی است.",
-          "We deployed UBETTER systems across three commercial properties. The ROI was clear within 18 months. Outstanding product quality and after-sales support.",
-          "我们在三处商业地产部署了 UBETTER 系统，约 18 个月内投资回报清晰可见，产品质量与售后支持出色。",
-        ),
-        author: "Ahmad Hassan",
-        role: ui3(locale, "مدیر عامل", "CEO", "首席执行官"),
-        company: ui3(locale, "النور ملک، امارات", "Al Noor Real Estate, UAE", "阿联酋 Al Noor 地产"),
-      },
-      {
-        quote: ui3(
-          locale,
-          "همکاری OEM با UBETTER برای خط محصولات خورشیدی ما تحول‌آفرین بود. سلول‌های LiFePO4 آن‌ها بالاترین گواهینامه‌های بین‌المللی را دارند.",
-          "The OEM partnership with UBETTER has been transformative for our solar product line. Their LiFePO4 cells meet the highest international certifications.",
-          "与 UBETTER 的 OEM 合作让我们的光伏产品线焕然一新，其磷酸铁锂电芯具备顶尖国际认证。",
-        ),
-        author: "Thomas Müller",
-        role: ui3(locale, "مدیر محصول", "Product Director", "产品总监"),
-        company: "SolarTech Europe GmbH",
-      },
-    ],
-    [locale],
-  );
-
-  useEffect(() => {
-    const timer = setInterval(() => setActive((a) => (a + 1) % items.length), 6000);
-    return () => clearInterval(timer);
-  }, [items.length]);
-
-  return (
-    <section className="min-h-[100svh] flex flex-col justify-center py-20 sm:py-24" dir={isRTL ? "rtl" : "ltr"}
-      style={{
-        background: showGlobeThrough
-          ? isDark
-            ? "linear-gradient(165deg, rgba(6,8,6,0.48) 0%, rgba(10,12,8,0.52) 45%, rgba(5,5,5,0.58) 100%)"
-            : "linear-gradient(165deg, rgba(244,246,240,0.5) 0%, rgba(238,242,232,0.55) 45%, rgba(232,236,228,0.62) 100%)"
-          : isDark
-            ? "#050505"
-            : "#f0f0f0",
-        transition: "background 0.35s ease",
-      }}>
-      <div className="max-w-4xl mx-auto px-6">
-        <Reveal className="text-center mb-16">
-          <Pill label={ui3(locale, "نظرات مشتریان", "Testimonials", "客户评价")} />
-          <h2 className="text-4xl md:text-5xl font-bold" style={{ color: C.text1 }}>
-            {ui3(locale, "اعتماد رهبران صنعت", "Trusted by Industry Leaders", "深受行业领导者信赖")}
-          </h2>
-        </Reveal>
-
-        <div className="relative">
-          <AnimatePresence mode="wait">
-            <motion.div key={active} initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -24 }} transition={{ duration: 0.55 }}
-              className="rounded-3xl p-8 md:p-14 text-center"
-              style={{ background: C.card, border: `1px solid ${C.cardBorder}`, transition: "background 0.35s ease" }}>
-              <div className="flex justify-center gap-1 mb-8">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <svg key={i} className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style={{ color: C.accent }}>
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <blockquote className="text-[19px] md:text-[22px] leading-relaxed mb-10 italic" style={{ color: C.text2 }}>
-                &ldquo;{items[active].quote}&rdquo;
-              </blockquote>
-              <div>
-                <div className="font-bold text-[17px]" style={{ color: C.text1 }}>{items[active].author}</div>
-                <div className="text-sm mt-1.5" style={{ color: C.text3 }}>{items[active].role} — {items[active].company}</div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          <div className="flex justify-center gap-2 mt-8">
-            {items.map((_, i) => (
-              <button key={i} onClick={() => setActive(i)}
-                className="h-1.5 rounded-full transition-all duration-400"
-                style={{ width: i === active ? "32px" : "6px", background: i === active ? C.accent : C.divider }} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-
-// 4. FOOTER — now handled by SharedFooter
-// ══════════════════════════════════════════════════════════════════════════════
 
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -524,7 +386,7 @@ function ProductPortfolioScrollStack({
       <div ref={shellRef} className="relative">
         <motion.div
           style={{ y: lift, scale: shellScale }}
-          className="pointer-events-auto relative min-h-screen flex flex-col justify-center overflow-hidden origin-top rounded-t-[2.25rem] sm:rounded-t-[3.5rem] shadow-[0_-24px_60px_rgba(0,0,0,0.45),0_-72px_180px_rgba(0,0,0,0.72),0_-120px_240px_rgba(0,0,0,0.35)] ring-1 ring-white/[0.14] sm:ring-2 max-lg:[touch-action:pan-y]"
+          className="pointer-events-auto relative min-h-screen flex flex-col justify-center overflow-hidden origin-top max-lg:[touch-action:pan-y]"
         >
         <motion.div
           className="absolute inset-0 origin-center"
@@ -596,7 +458,7 @@ function ProductPortfolioScrollStack({
               <div className="btn-gradient-border" style={{ color: C.text1 }}>
                 <Link
                   href={`/${locale}/products`}
-                  className="btn-gradient-border-inner inline-flex items-center gap-2 px-5 py-2 font-semibold text-[13px] transition-all duration-300 hover:scale-105"
+                  className="btn-gradient-border-inner inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-[14px] sm:text-[15px] transition-all duration-300 hover:scale-105"
                   style={{
                     background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)",
                     color: C.text1,
@@ -616,7 +478,7 @@ function ProductPortfolioScrollStack({
                   }}
                 >
                   {ui3(locale, "مشاهده همه محصولات", "View All Products", "查看全部产品")}
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path
                       d={locale === "fa" ? "M10 8H4M7 5L4 8l3 3" : "M4 8h8M9 5l3 3-3 3"}
                       stroke="currentColor"
@@ -664,29 +526,26 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
       {/* Products teaser — scrolls up as a sheet over the hero */}
       <ProductPortfolioScrollStack locale={locale} isRTL={isRTL} isDark={isDark} C={C} />
 
-      <ScrollStackLayer zIndex={20} overlapVh={98}>
+      <ScrollStackLayer zIndex={20} overlapVh={98} plain>
         <UsageCalculatorSection locale={locale} />
       </ScrollStackLayer>
-      <ScrollStackLayer zIndex={30} overlapVh={99} enterScale={false}>
+      <ScrollStackLayer zIndex={30} overlapVh={99} enterScale={false} plain>
         <GlobePresenceSection locale={locale} />
       </ScrollStackLayer>
-      <ScrollStackLayer zIndex={35} overlapVh={98}>
+      <ScrollStackLayer zIndex={35} overlapVh={98} plain>
         <HomeServicesSection locale={locale} />
       </ScrollStackLayer>
-      <ScrollStackLayer zIndex={40} overlapVh={98}>
+      <ScrollStackLayer zIndex={40} overlapVh={98} plain>
         <HomeCertificatesSection locale={locale} />
       </ScrollStackLayer>
-      <ScrollStackLayer zIndex={45} overlapVh={98}>
+      <ScrollStackLayer zIndex={45} overlapVh={98} plain>
         <HomeProjectsSection locale={locale} />
       </ScrollStackLayer>
-      <ScrollStackLayer zIndex={50} overlapVh={98}>
+      <ScrollStackLayer zIndex={50} overlapVh={98} plain>
         <HomeArticlesSection locale={locale} />
       </ScrollStackLayer>
-      <ScrollStackLayer zIndex={55} overlapVh={98}>
+      <ScrollStackLayer zIndex={55} overlapVh={98} plain>
         <HomeCatalogSection locale={locale} />
-      </ScrollStackLayer>
-      <ScrollStackLayer zIndex={60} overlapVh={97}>
-        <Testimonials locale={locale} />
       </ScrollStackLayer>
       <SharedFooter locale={locale} />
     </div>

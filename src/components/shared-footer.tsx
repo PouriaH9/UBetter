@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import logoImg from "@/assets/LOGO.jpg";
 import type { Locale } from "@/i18n/config";
 import { locales, localizedPath } from "@/i18n/config";
@@ -11,12 +12,29 @@ import {
   localeNavLabel,
   localeSwitchAria,
 } from "@/components/locale-flag-mark";
+import { useHomeGlobeJourneyOptional } from "@/contexts/home-globe-journey-context";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 
 export default function SharedFooter({ locale }: { locale: Locale }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
+  const journey = useHomeGlobeJourneyOptional();
+  const stackAboveGlobe = journey?.showGlobeBackdrop ?? false;
+  const footerRef = useRef<HTMLElement>(null);
   const isRTL = locale === "fa";
+
+  useEffect(() => {
+    if (!journey || !footerRef.current) return;
+    const el = footerRef.current;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) journey.unpin();
+      },
+      { root: null, rootMargin: "0px 0px -12% 0px", threshold: 0.05 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [journey]);
   const pathname = usePathname() ?? "/";
   const alternateLocales = locales.filter((l) => l !== locale);
 
@@ -69,13 +87,19 @@ export default function SharedFooter({ locale }: { locale: Locale }) {
 
   return (
     <footer
+      ref={footerRef}
       dir={isRTL ? "rtl" : "ltr"}
       style={{
         background: isDark ? "#020202" : "#ececec",
         borderTop: `1px solid ${C.divider}`,
-        transition: "background 0.35s ease",
+        transition: "background 0.35s ease, box-shadow 0.35s ease",
+        boxShadow: stackAboveGlobe
+          ? isDark
+            ? "0 -28px 56px rgba(0,0,0,0.65)"
+            : "0 -20px 48px rgba(0,0,0,0.12)"
+          : undefined,
       }}
-      className="pt-20 pb-10"
+      className={`relative z-[60] pt-20 pb-10`}
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">

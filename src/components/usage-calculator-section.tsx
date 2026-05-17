@@ -1127,7 +1127,7 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
       id={UPS_CALCULATOR_SECTION_ID}
       dir={t.dir}
       lang={locale === "fa" ? "fa" : locale === "zh" ? "zh" : "en"}
-      className={`relative scroll-mt-[88px] sm:scroll-mt-[96px] pt-8 pb-16 sm:pt-10 sm:pb-24 overflow-hidden ${locale !== "fa" ? "font-sans" : ""}`}
+      className={`relative scroll-mt-[88px] sm:scroll-mt-[96px] pt-12 pb-16 sm:pt-14 sm:pb-24 overflow-hidden ${locale !== "fa" ? "font-sans" : ""}`}
       style={{
         borderTop: `1px solid ${M.sectionTopBorder}`,
         fontFamily: locale === "fa" ? YK : undefined,
@@ -1167,7 +1167,7 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
 
         {/* Section header — same glass treatment as products portfolio strip */}
         <div
-          className="text-center mb-8 sm:mb-9 max-w-3xl mx-auto w-full -mt-6 sm:-mt-6 md:-mt-1 lg:mt-4 xl:mt-6"
+          className="text-center mb-8 sm:mb-9 max-w-3xl mx-auto w-full mt-6 sm:mt-8 md:mt-10"
           style={{
             background: M.glassBg,
             backdropFilter: "blur(4px) saturate(120%)",

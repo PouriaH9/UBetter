@@ -7,6 +7,7 @@ import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 
 import { Atmosphere } from "./Atmosphere";
 import { Globe } from "./Globe";
+import { Starfield } from "./Starfield";
 import { CHINA_CENTROID, GLOBE_PRESENCE_TRANSITION_SEC, IRAN_CENTROID } from "./constants";
 import { GlobeLights } from "./GlobeLights";
 import type { CountryFeature, GlobePresencePhase } from "./globe-types";
@@ -171,6 +172,8 @@ function GlobeExperience({ polygons, presencePhase, cleanShell = false }: GlobeE
   return (
     <>
       <CanvasScrollPassthrough />
+
+      <Starfield />
 
       <GlobeLights>
 

@@ -3,6 +3,13 @@
 import { motion, useReducedMotion } from "framer-motion";
 import type { SVGProps } from "react";
 
+import {
+  buildAccentGlassSkin,
+  GlassPanelBadge,
+  GlassShimmerPanel,
+  glassPanelItemVariants,
+  sectionGlassSkin,
+} from "@/components/glass-shimmer-panel";
 import { useHomeGlobeJourneyOptional } from "@/contexts/home-globe-journey-context";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
@@ -222,6 +229,7 @@ function CertificateCard({
   const C = isDark ? DARK_C : LIGHT_C;
   const key = certIconKey(title);
   const Icon = CERT_ICONS[key];
+  const glass = sectionGlassSkin(isDark, "card");
 
   return (
     <motion.article
@@ -229,13 +237,13 @@ function CertificateCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-4% 0px" }}
       transition={{ delay: 0.06 * index, duration: 0.55, ease: easeOut }}
-      className="group relative flex gap-3.5 sm:gap-4 rounded-2xl p-4 sm:p-5 h-full min-w-0"
-      style={{
-        background: isDark ? "rgba(12,14,10,0.72)" : "rgba(255,255,255,0.88)",
-        border: `1px solid ${isDark ? "rgba(124,255,0,0.18)" : "rgba(124,255,0,0.2)"}`,
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        boxShadow: isDark ? "0 8px 32px rgba(0,0,0,0.35)" : "0 8px 28px rgba(0,0,0,0.06)",
+      className="group relative flex h-full min-w-0 gap-3.5 rounded-2xl p-4 sm:gap-4 sm:p-5"
+      style={glass}
+      whileHover={{
+        borderColor: isDark ? "rgba(124,255,0,0.38)" : "rgba(124,255,0,0.28)",
+        boxShadow: isDark
+          ? "inset 0 1px 0 rgba(124,255,0,0.12), inset 0 -1px 0 rgba(0,0,0,0.35), 0 12px 40px rgba(124,255,0,0.12)"
+          : "inset 0 1px 0 rgba(255,255,255,0.65), inset 0 -1px 0 rgba(0,0,0,0.06), 0 12px 36px rgba(124,255,0,0.1)",
       }}
     >
       <div
@@ -256,7 +264,10 @@ function CertificateCard({
         >
           {title}
         </h3>
-        <p className="text-[12px] sm:text-[13px] leading-relaxed" style={{ color: C.text2 }}>
+        <p
+          className="text-[12px] leading-relaxed sm:text-[13px]"
+          style={{ color: isDark ? "rgba(255,255,255,0.88)" : "rgba(0,0,0,0.75)" }}
+        >
           {desc}
         </p>
       </motion.div>
@@ -290,69 +301,74 @@ export function HomeCertificatesSection({ locale }: { locale: Locale }) {
             { n: "CE/UL", label: "Export safety" },
           ];
 
+  const panelSkin = buildAccentGlassSkin(isDark, C.accent, C.accentGlow);
+  const contentGlass = sectionGlassSkin(isDark, "panel");
+  const statGlass = sectionGlassSkin(isDark, "card");
+
   return (
     <section
       dir={t.dir}
       lang={locale === "fa" ? "fa" : locale === "zh" ? "zh" : "en"}
-      className={`relative overflow-hidden py-12 sm:py-16 lg:py-20 ${locale !== "fa" ? "font-sans" : ""}`}
+      className={`relative overflow-hidden min-h-[100svh] w-full flex flex-col justify-center pt-10 pb-10 sm:pt-14 sm:pb-14 ${locale !== "fa" ? "font-sans" : ""}`}
       style={{
         fontFamily: locale === "fa" ? YK : undefined,
-        borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`,
-        background: showGlobeThrough
-          ? isDark
-            ? "linear-gradient(165deg, rgba(6,8,6,0.48) 0%, rgba(10,12,8,0.52) 45%, rgba(5,5,5,0.58) 100%)"
-            : "linear-gradient(165deg, rgba(244,246,240,0.5) 0%, rgba(238,242,232,0.55) 45%, rgba(232,236,228,0.62) 100%)"
-          : undefined,
+        borderTop: showGlobeThrough
+          ? undefined
+          : `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`,
+        background: showGlobeThrough ? "transparent" : undefined,
       }}
     >
       {showGlobeThrough ? null : <CertificatesBackdrop isDark={isDark} />}
 
-      <div className="relative z-10 w-full max-w-[1200px] mx-auto px-4 sm:px-8 lg:px-10">
-        {/* Header */}
-        <motion.header
-          className="text-center max-w-2xl mx-auto mb-6 sm:mb-8"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-5% 0px" }}
-          transition={{ duration: 0.7, ease: easeOut }}
-        >
-          <motion.div
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-[0.18em] mb-3 sm:mb-4 ${locale === "en" ? "uppercase" : ""}`}
-            style={{
-              background: C.accentBg,
-              border: `1px solid ${C.accentBorder}`,
-              color: C.accent,
-            }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse flex-shrink-0" style={{ background: C.accent }} />
-            {copy.badge}
-          </motion.div>
-          <h2
-            className="font-black leading-[1.15] mb-2 sm:mb-3"
-            style={{
-              color: C.text1,
-              fontSize: "clamp(1.25rem, 4.5vw, 2.35rem)",
-              letterSpacing: locale === "fa" ? "0" : "-0.02em",
-            }}
-          >
-            {copy.title}
-          </h2>
-          <p
-            className="leading-relaxed px-1"
-            style={{ color: C.text2, fontSize: "clamp(12px, 3.2vw, 15px)" }}
-          >
-            {copy.subtitle}
-          </p>
-        </motion.header>
+      <motion.div
+        className="relative z-10 flex w-full max-w-[1340px] flex-col gap-8 sm:gap-10 lg:gap-12 mx-auto px-4 sm:px-8 lg:px-12 pointer-events-none"
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-8% 0px" }}
+        transition={{ duration: 0.75, ease: easeOut }}
+      >
+        <motion.div className="relative mx-auto w-full max-w-3xl pointer-events-auto">
+          <GlassShimmerPanel skin={panelSkin} isDark={isDark} cornerIcon={IconShield} compact>
+            <GlassPanelBadge locale={locale} label={copy.badge} skin={panelSkin} reduceMotion={false} />
+            <motion.h2
+              className="text-center font-black leading-[1.1] px-2"
+              style={{
+                color: panelSkin.titleColor,
+                textShadow: panelSkin.textShadow,
+                fontSize: "clamp(1.3rem, 3.2vw, 2.35rem)",
+                letterSpacing: locale === "fa" ? "0" : "-0.02em",
+              }}
+              variants={glassPanelItemVariants}
+            >
+              {copy.title}
+            </motion.h2>
+            <motion.p
+              className="mx-auto max-w-2xl px-2 text-center leading-relaxed"
+              style={{
+                color: panelSkin.subtitleColor,
+                textShadow: panelSkin.textShadow,
+                fontSize: "clamp(13px, 1.4vw, 16px)",
+              }}
+              variants={glassPanelItemVariants}
+            >
+              {copy.subtitle}
+            </motion.p>
+          </GlassShimmerPanel>
+        </motion.div>
 
-        {/* Mobile: icon strip + stats */}
         <motion.div
-          className="flex sm:hidden gap-2 overflow-x-auto pb-1 mb-5 -mx-1 px-1 scrollbar-none"
+          className="relative w-full pointer-events-auto rounded-[20px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8"
+          style={contentGlass}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-6% 0px" }}
+          transition={{ duration: 0.6, ease: easeOut }}
+        >
+            {/* Mobile: icon strip */}
+        <motion.div
+          className="flex w-full gap-2.5 overflow-x-auto px-1 pb-1 scrollbar-none sm:hidden"
           style={{ WebkitOverflowScrolling: "touch" }}
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1, duration: 0.5 }}
+          variants={glassPanelItemVariants}
         >
           {copy.cards.map((card) => {
             const key = certIconKey(card.title);
@@ -360,14 +376,14 @@ export function HomeCertificatesSection({ locale }: { locale: Locale }) {
             return (
               <motion.div
                 key={card.title}
-                className="flex-shrink-0 flex flex-col items-center gap-1.5 w-[4.25rem]"
+                className="flex w-[4.5rem] flex-shrink-0 flex-col items-center gap-2"
               >
                 <motion.div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl"
                   style={{
-                    background: C.accentBg,
-                    border: `1px solid ${C.accentBorder}`,
-                    color: C.accent,
+                    background: panelSkin.badgeBg,
+                    border: `1px solid ${panelSkin.badgeBorder}`,
+                    color: panelSkin.pulse,
                   }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -375,7 +391,7 @@ export function HomeCertificatesSection({ locale }: { locale: Locale }) {
                 </motion.div>
                 <span
                   className="text-[9px] font-bold text-center leading-tight"
-                  style={{ color: C.text2 }}
+                  style={{ color: panelSkin.subtitleColor }}
                 >
                   {CERT_SHORT_LABEL[key]}
                 </span>
@@ -384,46 +400,40 @@ export function HomeCertificatesSection({ locale }: { locale: Locale }) {
           })}
         </motion.div>
 
-        {/* Stats pills */}
-        <motion.div
-          className="grid grid-cols-3 gap-2 sm:gap-3 mb-6 sm:mb-8 max-w-lg sm:max-w-xl mx-auto"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.15, duration: 0.55 }}
-        >
-          {highlights.map((h) => (
-            <div
-              key={h.label}
-              className="text-center rounded-xl py-2.5 sm:py-3 px-2"
-              style={{
-                background: isDark ? "rgba(124,255,0,0.06)" : "rgba(124,255,0,0.1)",
-                border: `1px solid ${isDark ? "rgba(124,255,0,0.15)" : "rgba(124,255,0,0.22)"}`,
-              }}
+            <motion.div
+              className="mx-auto grid w-full max-w-xl grid-cols-3 gap-3 sm:gap-4"
+              variants={glassPanelItemVariants}
             >
-              <div className="font-black text-[15px] sm:text-[17px]" style={{ color: C.accent }}>
-                {h.n}
-              </div>
-              <motion.div className="text-[9px] sm:text-[10px] font-semibold mt-0.5 leading-tight" style={{ color: C.text2 }}>
-                {h.label}
-              </motion.div>
-            </div>
-          ))}
-        </motion.div>
+              {highlights.map((h) => (
+                <motion.div
+                  key={h.label}
+                  className="rounded-xl px-2 py-3 text-center"
+                  style={statGlass}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="font-black text-[15px] sm:text-[18px]" style={{ color: C.accent }}>
+                    {h.n}
+                  </div>
+                  <motion.div className="mt-1 text-[9px] font-semibold leading-tight sm:text-[10px]" style={{ color: panelSkin.subtitleColor }}>
+                    {h.label}
+                  </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
 
-        {/* Cards — single column mobile, 2 col tablet, 3 col desktop */}
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-4% 0px" }}
-          variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
-        >
-          {copy.cards.map((card, i) => (
-            <CertificateCard key={card.title} locale={locale} title={card.title} desc={card.desc} index={i} />
-          ))}
+            <motion.div
+              className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-4% 0px" }}
+              variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
+            >
+              {copy.cards.map((card, i) => (
+                <CertificateCard key={card.title} locale={locale} title={card.title} desc={card.desc} index={i} />
+              ))}
+            </motion.div>
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 }

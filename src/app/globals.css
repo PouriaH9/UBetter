@@ -106,10 +106,10 @@ img { image-rendering: -webkit-optimize-contrast; }
 
 .btn-gradient-border {
   display: inline-flex;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 .btn-gradient-border-inner {
-  border-radius: 8px;
+  border-radius: 10px;
   position: relative;
   z-index: 1;
 }
