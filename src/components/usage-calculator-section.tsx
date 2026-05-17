@@ -1134,7 +1134,7 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
       }}
     >
       {/* Background — desktop / mobile art */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden>
+      <div className="absolute inset-0 pointer-events-none z-10" aria-hidden>
         <Image
           src={calculatorHeroDesktop}
           alt=""

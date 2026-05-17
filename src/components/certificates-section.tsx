@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
-import type { SVGProps } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useEffect, useId, useState, type SVGProps } from "react";
 
 import {
   buildAccentGlassSkin,
@@ -214,6 +214,108 @@ function CertificatesBackdrop({ isDark }: { isDark: boolean }) {
   );
 }
 
+type CertCardCopy = { title: string; desc: string };
+
+function CertMobileBadge({
+  card,
+  panelSkin,
+  isDark,
+  isOpen,
+  onHover,
+  onTap,
+}: {
+  card: CertCardCopy;
+  panelSkin: ReturnType<typeof buildAccentGlassSkin>;
+  isDark: boolean;
+  isOpen: boolean;
+  onHover: (open: boolean) => void;
+  onTap: () => void;
+}) {
+  const key = certIconKey(card.title);
+  const Icon = CERT_ICONS[key];
+  const tipId = useId();
+
+  return (
+    <div className="relative flex flex-col items-center gap-2" data-cert-badge>
+      <button
+        type="button"
+        className="flex flex-col items-center gap-2 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(124,255,0,0.55)]"
+        style={{ WebkitTapHighlightColor: "transparent" }}
+        aria-expanded={isOpen}
+        aria-describedby={isOpen ? tipId : undefined}
+        onMouseEnter={() => onHover(true)}
+        onMouseLeave={() => onHover(false)}
+        onFocus={() => onHover(true)}
+        onBlur={() => onHover(false)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onTap();
+        }}
+      >
+        <motion.div
+          className="flex h-11 w-11 items-center justify-center rounded-xl"
+          style={{
+            background: panelSkin.badgeBg,
+            border: `1px solid ${isOpen ? panelSkin.pulse : panelSkin.badgeBorder}`,
+            color: panelSkin.pulse,
+            boxShadow: isOpen ? `0 0 16px ${panelSkin.pulse}33` : undefined,
+          }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Icon className="w-5 h-5" />
+        </motion.div>
+        <span
+          className="text-[9px] font-bold text-center leading-tight"
+          style={{ color: panelSkin.subtitleColor }}
+        >
+          {CERT_SHORT_LABEL[key]}
+        </span>
+      </button>
+
+      <AnimatePresence>
+        {isOpen ? (
+          <motion.div
+            id={tipId}
+            role="tooltip"
+            initial={{ opacity: 0, y: 6, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.96 }}
+            transition={{ duration: 0.18, ease: easeOut }}
+            className="absolute top-[calc(100%+6px)] left-1/2 z-30 w-[min(148px,calc(100vw-2rem))] -translate-x-1/2 rounded-xl px-2.5 py-2 text-center shadow-lg pointer-events-none"
+            style={{
+              background: isDark ? "rgba(12,14,10,0.96)" : "rgba(255,255,255,0.97)",
+              border: `1px solid ${isDark ? "rgba(124,255,0,0.28)" : "rgba(124,255,0,0.22)"}`,
+              boxShadow: isDark
+                ? "0 8px 28px rgba(0,0,0,0.45), 0 0 0 1px rgba(124,255,0,0.08)"
+                : "0 8px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(124,255,0,0.06)",
+            }}
+          >
+            <p
+              className="text-[10px] font-bold leading-snug mb-0.5"
+              style={{ color: panelSkin.titleColor }}
+            >
+              {card.title}
+            </p>
+            <p
+              className="text-[9px] leading-relaxed"
+              style={{ color: panelSkin.subtitleColor }}
+            >
+              {card.desc}
+            </p>
+            <span
+              className="absolute left-1/2 bottom-full -translate-x-1/2 mb-px border-[5px] border-transparent"
+              style={{
+                borderBottomColor: isDark ? "rgba(12,14,10,0.96)" : "rgba(255,255,255,0.97)",
+              }}
+              aria-hidden
+            />
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 function CertificateCard({
   locale,
   title,
@@ -303,6 +405,17 @@ export function HomeCertificatesSection({ locale }: { locale: Locale }) {
   const panelSkin = buildAccentGlassSkin(isDark, C.accent, C.accentGlow);
   const contentGlass = sectionGlassSkin(isDark, "panel");
   const statGlass = sectionGlassSkin(isDark, "card");
+  const [hoveredCert, setHoveredCert] = useState<CertIconKey | null>(null);
+  const [tappedCert, setTappedCert] = useState<CertIconKey | null>(null);
+
+  useEffect(() => {
+    if (!tappedCert) return;
+    const close = (e: MouseEvent) => {
+      if (!(e.target as Element).closest("[data-cert-badge]")) setTappedCert(null);
+    };
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [tappedCert]);
 
   return (
     <section
@@ -363,38 +476,25 @@ export function HomeCertificatesSection({ locale }: { locale: Locale }) {
           viewport={{ once: true, margin: "-6% 0px" }}
           transition={{ duration: 0.6, ease: easeOut }}
         >
-            {/* Mobile: icon strip */}
+            {/* Mobile: icon grid (no horizontal scroll) */}
         <motion.div
-          className="flex w-full gap-2.5 overflow-x-auto px-1 pb-1 scrollbar-none sm:hidden"
-          style={{ WebkitOverflowScrolling: "touch" }}
+          className="grid w-full grid-cols-3 gap-x-2 gap-y-4 sm:hidden"
           variants={glassPanelItemVariants}
         >
           {copy.cards.map((card) => {
             const key = certIconKey(card.title);
-            const Icon = CERT_ICONS[key];
+            const isOpen =
+              tappedCert === key || (tappedCert === null && hoveredCert === key);
             return (
-              <motion.div
+              <CertMobileBadge
                 key={card.title}
-                className="flex w-[4.5rem] flex-shrink-0 flex-col items-center gap-2"
-              >
-                <motion.div
-                  className="flex h-11 w-11 items-center justify-center rounded-xl"
-                  style={{
-                    background: panelSkin.badgeBg,
-                    border: `1px solid ${panelSkin.badgeBorder}`,
-                    color: panelSkin.pulse,
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Icon className="w-5 h-5" />
-                </motion.div>
-                <span
-                  className="text-[9px] font-bold text-center leading-tight"
-                  style={{ color: panelSkin.subtitleColor }}
-                >
-                  {CERT_SHORT_LABEL[key]}
-                </span>
-              </motion.div>
+                card={card}
+                panelSkin={panelSkin}
+                isDark={isDark}
+                isOpen={isOpen}
+                onHover={(open) => setHoveredCert(open ? key : null)}
+                onTap={() => setTappedCert(tappedCert === key ? null : key)}
+              />
             );
           })}
         </motion.div>

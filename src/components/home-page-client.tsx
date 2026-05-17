@@ -17,7 +17,8 @@ import hero3MImg from "@/assets/HERO3M.png";
 
 import { translations } from "@/i18n/translations";
 import type { Locale } from "@/i18n/config";
-import { ui3 } from "@/i18n/locale-ui";
+import { CATEGORIES } from "@/data/product-categories";
+import { localeNumber, ui3 } from "@/i18n/locale-ui";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
 import { ScrollStackLayer, usePreferStaticScrollLayers } from "@/components/scroll-stack-layers";
@@ -47,6 +48,9 @@ const easeOut = [0.22, 1, 0.36, 1] as const;
 // ══════════════════════════════════════════════════════════════════════════════
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
+
+const PORTFOLIO_PRODUCT_COUNT = CATEGORIES.reduce((sum, c) => sum + c.products.length, 0);
+const PORTFOLIO_CATEGORY_COUNT = CATEGORIES.length;
 
 // ══════════════════════════════════════════════════════════════════════════════
 // 2. HERO
@@ -432,7 +436,8 @@ function ProductPortfolioScrollStack({
                 {ui3(locale, "پورتفولیو محصولات", "Product Portfolio", "产品矩阵")}
               </div>
               <h2
-                className="font-black mb-6 leading-none"
+                key={locale}
+                className="font-black mb-6 leading-none tabular-nums"
                 style={{
                   color: "#ffffff",
                   fontFamily: YK,
@@ -443,15 +448,24 @@ function ProductPortfolioScrollStack({
               >
                 {locale === "fa" ? (
                   <>
-                    ۲۳ محصول در <span style={{ color: C.text1 }}>۶ دسته‌بندی</span>
+                    {localeNumber(PORTFOLIO_PRODUCT_COUNT, locale)} محصول در{" "}
+                    <span style={{ color: C.text1 }}>
+                      {localeNumber(PORTFOLIO_CATEGORY_COUNT, locale)} دسته‌بندی
+                    </span>
                   </>
                 ) : locale === "zh" ? (
                   <>
-                    <span style={{ color: C.text1 }}>6 大类</span> 共 23 款产品
+                    <span style={{ color: C.text1 }}>
+                      {localeNumber(PORTFOLIO_CATEGORY_COUNT, locale)} 大类
+                    </span>{" "}
+                    共 {localeNumber(PORTFOLIO_PRODUCT_COUNT, locale)} 款产品
                   </>
                 ) : (
                   <>
-                    23 Products across <span style={{ color: C.text1 }}>6 Categories</span>
+                    {localeNumber(PORTFOLIO_PRODUCT_COUNT, locale)} Products across{" "}
+                    <span style={{ color: C.text1 }}>
+                      {localeNumber(PORTFOLIO_CATEGORY_COUNT, locale)} Categories
+                    </span>
                   </>
                 )}
               </h2>

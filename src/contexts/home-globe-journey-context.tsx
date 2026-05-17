@@ -16,6 +16,9 @@ import type { CountryFeature, GlobePresencePhase } from "@/components/globe/glob
 /** Section top at or below this (px from viewport top) = pin sticky globe. */
 export const GLOBE_JOURNEY_ENTER_OFFSET_PX = 100;
 
+/** Section top above this (px) while scrolling up = unpin / fade globe out (keep close to enter for a short exit). */
+export const GLOBE_JOURNEY_EXIT_OFFSET_PX = 175;
+
 /** Below scroll-stack sheets (20+) so content stays above the pinned globe. */
 export const GLOBE_PINNED_Z_INDEX = 15;
 

@@ -1,7 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { AnimatePresence, motion, type Transition } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useSpring,
+  type Transition,
+} from "framer-motion";
 import {
   useEffect,
   useLayoutEffect,
@@ -15,6 +21,7 @@ import {
 
 import {
   GLOBE_JOURNEY_ENTER_OFFSET_PX,
+  GLOBE_JOURNEY_EXIT_OFFSET_PX,
   GLOBE_PINNED_Z_INDEX,
   useHomeGlobeJourneyOptional,
 } from "@/contexts/home-globe-journey-context";
@@ -25,7 +32,11 @@ import type { Locale } from "@/i18n/config";
 import { translations } from "@/i18n/translations";
 import { globePresenceCopy } from "@/i18n/globe-presence.dict";
 
-import { GLOBE_PRESENCE_EASE_CSS, GLOBE_PRESENCE_TRANSITION_SEC } from "./globe/constants";
+import {
+  GLOBE_PRESENCE_EASE_CSS,
+  GLOBE_PRESENCE_EASE_FRAMER,
+  GLOBE_PRESENCE_TRANSITION_SEC,
+} from "./globe/constants";
 import type { GlobePresencePhase } from "./globe/globe-types";
 
 const GlobeInteractiveCanvas = dynamic(
@@ -367,6 +378,7 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
   const sectionRef = useRef<HTMLElement>(null);
   const [navReserve, setNavReserve] = useState(72);
   const [globeDocked, setGlobeDocked] = useState(false);
+  const globeTargetY = useMotionValue(0);
 
   const isPinned = journey?.isPinned ?? false;
   const homeJourney = journey != null;
@@ -384,6 +396,55 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
     if (isPinned) setGlobeDocked(true);
   }, [isPinned]);
 
+  const slide = presencePhase === "china" ? presenceCopy.china : presenceCopy.iran;
+  const reduceMotion = usePrefersReducedMotion();
+  const globeSmoothY = useSpring(globeTargetY, {
+    stiffness: reduceMotion ? 2000 : 360,
+    damping: reduceMotion ? 200 : 40,
+    mass: 0.8,
+  });
+
+  /** Pinned = glide to viewport slot; unpinned target is updated on scroll below. */
+  useEffect(() => {
+    if (!globeDocked) {
+      globeTargetY.set(0);
+      return;
+    }
+    if (isPinned) globeTargetY.set(0);
+  }, [globeDocked, isPinned, globeTargetY]);
+
+  /** While unpinned, track the section slot (spring smooths pin/unpin relocations). */
+  useEffect(() => {
+    if (!globeDocked || isPinned) return;
+
+    let raf = 0;
+    const sync = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top;
+      const vh = window.innerHeight;
+      if (top > vh) {
+        globeTargetY.set(0);
+        return;
+      }
+      globeTargetY.set(top - navReserve);
+    };
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(sync);
+    };
+
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [globeDocked, isPinned, navReserve, globeTargetY]);
+
   /** Pin when globe zone is reached; stay pinned through footer; unpin only when scrolling back above the block. */
   useEffect(() => {
     if (!homeJourney || !sectionRef.current) return;
@@ -397,7 +458,7 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
 
       if (top <= GLOBE_JOURNEY_ENTER_OFFSET_PX) {
         journey.pin();
-      } else if (top > vh * 1.02) {
+      } else if (top > GLOBE_JOURNEY_EXIT_OFFSET_PX || top > vh * 1.02) {
         journey.unpin();
       }
     };
@@ -419,7 +480,7 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
       window.removeEventListener("resize", schedule);
       ro.disconnect();
     };
-  }, [homeJourney, journey]);
+  }, [homeJourney, journey, navReserve]);
 
   const globeCanvasStyle = useMemo(() => {
     if (!globeDocked) return undefined;
@@ -430,8 +491,6 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
       width: "100vw",
       height: `calc(100vh - ${navReserve}px)`,
       zIndex: GLOBE_PINNED_Z_INDEX,
-      opacity: isPinned ? 1 : 0,
-      visibility: isPinned ? ("visible" as const) : ("hidden" as const),
       pointerEvents: isPinned ? ("auto" as const) : ("none" as const),
     };
   }, [globeDocked, isPinned, navReserve]);
@@ -477,8 +536,13 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
     };
   }, [presencePhase, isDark, C.accent]);
 
-  const slide = presencePhase === "china" ? presenceCopy.china : presenceCopy.iran;
-  const reduceMotion = usePrefersReducedMotion();
+  const globePinVisible = globeDocked && isPinned;
+  const globePinFade: Transition = reduceMotion
+    ? { duration: 0 }
+    : {
+        duration: globePinVisible ? 0.75 : 0.32,
+        ease: GLOBE_PRESENCE_EASE_FRAMER,
+      };
 
   return (
     <section
@@ -493,11 +557,21 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
       }}
     >
       <motion.div
-        className="absolute inset-0 z-0 w-full min-h-[100svh]"
-        style={globeCanvasStyle}
+        className={
+          globeDocked
+            ? "z-0 w-full min-h-[100svh]"
+            : "absolute inset-0 z-0 w-full min-h-[100svh]"
+        }
+        style={{
+          ...globeCanvasStyle,
+          y: globeDocked ? globeSmoothY : 0,
+        }}
+        initial={false}
+        animate={{ opacity: globePinVisible ? 1 : 0 }}
+        transition={{ opacity: globePinFade }}
         role="img"
         aria-label={globeAriaLabel}
-        aria-hidden={!isPinned}
+        aria-hidden={!globePinVisible}
       >
         {polygons && polygons.length > 0 ? (
           <GlobeInteractiveCanvas
