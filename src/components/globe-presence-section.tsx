@@ -371,6 +371,8 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
   const journey = useHomeGlobeJourneyOptional();
 
   const [navReserve, setNavReserve] = useState(72);
+  /** After first pin, keep canvas in a fixed layer — only fade in/out to avoid scroll jumps. */
+  const [globeDocked, setGlobeDocked] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
   const isPinned = journey?.isPinned ?? false;
@@ -398,7 +400,7 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
 
       if (top <= GLOBE_JOURNEY_ENTER_OFFSET_PX) {
         journey?.pin();
-      } else if (top > vh) {
+      } else if (top > vh * 1.02) {
         journey?.unpin();
       }
     };
@@ -422,20 +424,25 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
     };
   }, [homeJourney, journey]);
 
-  const pinnedCanvasStyle = useMemo(
-    () =>
-      isPinned
-        ? {
-            position: "fixed" as const,
-            top: navReserve,
-            left: 0,
-            width: "100vw",
-            height: `calc(100vh - ${navReserve}px)`,
-            zIndex: GLOBE_PINNED_Z_INDEX,
-          }
-        : undefined,
-    [isPinned, navReserve],
-  );
+  useEffect(() => {
+    if (isPinned) setGlobeDocked(true);
+  }, [isPinned]);
+
+  const globeCanvasStyle = useMemo(() => {
+    if (!globeDocked) return undefined;
+    return {
+      position: "fixed" as const,
+      top: navReserve,
+      left: 0,
+      width: "100vw",
+      height: `calc(100vh - ${navReserve}px)`,
+      zIndex: GLOBE_PINNED_Z_INDEX,
+      opacity: isPinned ? 1 : 0,
+      visibility: isPinned ? ("visible" as const) : ("hidden" as const),
+      pointerEvents: isPinned ? ("auto" as const) : ("none" as const),
+      transition: "opacity 0.4s ease",
+    };
+  }, [globeDocked, isPinned, navReserve]);
 
   const sectionTopBorder = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
 
@@ -495,10 +502,10 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
     >
       <motion.div
         className="absolute inset-0 z-0 w-full min-h-[100svh]"
-        style={pinnedCanvasStyle}
+        style={globeCanvasStyle}
         role="img"
         aria-label={globeAriaLabel}
-        aria-hidden={isPinned}
+        aria-hidden={!isPinned}
       >
         {polygons && polygons.length > 0 ? (
           <GlobeInteractiveCanvas
