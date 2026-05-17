@@ -11,11 +11,13 @@ import {
   localeNavLabel,
   localeSwitchAria,
 } from "@/components/locale-flag-mark";
+import { useHomeGlobeJourneyOptional } from "@/contexts/home-globe-journey-context";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 
 export default function SharedFooter({ locale }: { locale: Locale }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
+  const stackAboveGlobe = useHomeGlobeJourneyOptional()?.showGlobeBackdrop ?? false;
   const isRTL = locale === "fa";
   const pathname = usePathname() ?? "/";
   const alternateLocales = locales.filter((l) => l !== locale);
@@ -75,7 +77,7 @@ export default function SharedFooter({ locale }: { locale: Locale }) {
         borderTop: `1px solid ${C.divider}`,
         transition: "background 0.35s ease",
       }}
-      className="pt-20 pb-10"
+      className={`pt-20 pb-10${stackAboveGlobe ? " relative z-[60]" : ""}`}
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">

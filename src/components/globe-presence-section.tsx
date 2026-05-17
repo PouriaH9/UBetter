@@ -4,14 +4,21 @@ import dynamic from "next/dynamic";
 import { AnimatePresence, motion, type Transition } from "framer-motion";
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
+  useRef,
   useState,
   type ComponentType,
   type ReactNode,
   type SVGProps,
 } from "react";
 
-import { useHomeGlobeJourneyOptional } from "@/contexts/home-globe-journey-context";
+import {
+  GLOBE_JOURNEY_ENTER_OFFSET_PX,
+  GLOBE_PINNED_Z_INDEX,
+  useHomeGlobeJourneyOptional,
+} from "@/contexts/home-globe-journey-context";
+import { homeStickyHeaderReservePx } from "@/lib/scroll-to-anchor";
 
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
@@ -357,8 +364,77 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
   const presenceCopy = globePresenceCopy[locale];
   const globeAriaLabel = t.globe.ariaLabel;
   const journey = useHomeGlobeJourneyOptional();
+  const sectionRef = useRef<HTMLElement>(null);
+  const [navReserve, setNavReserve] = useState(72);
+  const [globeDocked, setGlobeDocked] = useState(false);
+
+  const isPinned = journey?.isPinned ?? false;
+  const homeJourney = journey != null;
   const presencePhase: GlobePresencePhase = journey?.presencePhase ?? "china";
   const polygons = journey?.polygons ?? null;
+
+  useLayoutEffect(() => {
+    const sync = () => setNavReserve(homeStickyHeaderReservePx());
+    sync();
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
+  }, []);
+
+  useEffect(() => {
+    if (isPinned) setGlobeDocked(true);
+  }, [isPinned]);
+
+  /** Pin when globe zone is reached; stay pinned through footer; unpin only when scrolling back above the block. */
+  useEffect(() => {
+    if (!homeJourney || !sectionRef.current) return;
+
+    let raf = 0;
+    const check = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top;
+      const vh = window.innerHeight;
+
+      if (top <= GLOBE_JOURNEY_ENTER_OFFSET_PX) {
+        journey.pin();
+      } else if (top > vh * 1.02) {
+        journey.unpin();
+      }
+    };
+
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(check);
+    };
+
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    const ro = new ResizeObserver(schedule);
+    ro.observe(sectionRef.current);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      ro.disconnect();
+    };
+  }, [homeJourney, journey]);
+
+  const globeCanvasStyle = useMemo(() => {
+    if (!globeDocked) return undefined;
+    return {
+      position: "fixed" as const,
+      top: navReserve,
+      left: 0,
+      width: "100vw",
+      height: `calc(100vh - ${navReserve}px)`,
+      zIndex: GLOBE_PINNED_Z_INDEX,
+      opacity: isPinned ? 1 : 0,
+      visibility: isPinned ? ("visible" as const) : ("hidden" as const),
+      pointerEvents: isPinned ? ("auto" as const) : ("none" as const),
+    };
+  }, [globeDocked, isPinned, navReserve]);
 
   const sectionTopBorder = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
 
@@ -406,19 +482,22 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
 
   return (
     <section
+      ref={sectionRef}
       dir={t.dir}
       lang={locale === "fa" ? "fa" : locale === "zh" ? "zh" : "en"}
       className={`relative overflow-hidden min-h-[100svh] w-full ${locale !== "fa" ? "font-sans" : ""}`}
       style={{
         borderTop: `1px solid ${sectionTopBorder}`,
         fontFamily: locale === "fa" ? YK : undefined,
-        background: isDark ? "#040506" : "#dde6ea",
+        background: isPinned && homeJourney ? "transparent" : isDark ? "#040506" : "#dde6ea",
       }}
     >
       <motion.div
         className="absolute inset-0 z-0 w-full min-h-[100svh]"
+        style={globeCanvasStyle}
         role="img"
         aria-label={globeAriaLabel}
+        aria-hidden={!isPinned}
       >
         {polygons && polygons.length > 0 ? (
           <GlobeInteractiveCanvas
@@ -441,7 +520,7 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
 
       <motion.div
         className="relative w-full max-w-[1340px] mx-auto px-4 sm:px-8 lg:px-12 pt-10 pb-10 sm:pt-14 sm:pb-14 pointer-events-none"
-        style={{ zIndex: 10 }}
+        style={{ zIndex: isPinned ? 20 : 10 }}
       >
         <div
           className="relative mx-auto w-full max-w-3xl pointer-events-auto"
