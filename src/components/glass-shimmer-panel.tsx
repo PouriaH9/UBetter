@@ -191,10 +191,6 @@ export function GlassShimmerPanel({
           boxShadow: skin.glassShadow,
           color: skin.titleColor,
         }}
-        animate={reduceMotion ? undefined : { y: [0, -4, 0] }}
-        transition={
-          reduceMotion ? undefined : { duration: 5.5, repeat: Infinity, ease: "easeInOut" }
-        }
       >
         <motion.div
           className="pointer-events-none absolute inset-0"

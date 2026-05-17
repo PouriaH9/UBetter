@@ -10,7 +10,6 @@ import {
   glassPanelItemVariants,
   sectionGlassSkin,
 } from "@/components/glass-shimmer-panel";
-import { useHomeGlobeJourneyOptional } from "@/contexts/home-globe-journey-context";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
 import { homeSectionsCopy } from "@/i18n/home-sections.dict";
@@ -280,8 +279,6 @@ export function HomeCertificatesSection({ locale }: { locale: Locale }) {
   const C = isDark ? DARK_C : LIGHT_C;
   const copy = homeSectionsCopy[locale].certificates;
   const t = translations[locale];
-  const showGlobeThrough = useHomeGlobeJourneyOptional()?.showGlobeBackdrop ?? false;
-
   const highlights =
     locale === "fa"
       ? [
@@ -312,13 +309,10 @@ export function HomeCertificatesSection({ locale }: { locale: Locale }) {
       className={`relative overflow-hidden min-h-[100svh] w-full flex flex-col justify-center pt-10 pb-10 sm:pt-14 sm:pb-14 ${locale !== "fa" ? "font-sans" : ""}`}
       style={{
         fontFamily: locale === "fa" ? YK : undefined,
-        borderTop: showGlobeThrough
-          ? undefined
-          : `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`,
-        background: showGlobeThrough ? "transparent" : undefined,
+        borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`,
       }}
     >
-      {showGlobeThrough ? null : <CertificatesBackdrop isDark={isDark} />}
+      <CertificatesBackdrop isDark={isDark} />
 
       <motion.div
         className="relative z-10 flex w-full max-w-[1340px] flex-col gap-8 sm:gap-10 lg:gap-12 mx-auto px-4 sm:px-8 lg:px-12 pointer-events-none"

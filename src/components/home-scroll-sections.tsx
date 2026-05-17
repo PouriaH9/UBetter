@@ -13,7 +13,6 @@ import {
   sectionGlassSkin,
 } from "@/components/glass-shimmer-panel";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
-import { useHomeGlobeJourneyOptional } from "@/contexts/home-globe-journey-context";
 import type { Locale } from "@/i18n/config";
 import { homeSectionsCopy, type HomeSectionBlock } from "@/i18n/home-sections.dict";
 import { translations } from "@/i18n/translations";
@@ -249,7 +248,6 @@ function SectionShell({
   children,
   className = "",
   heroArt,
-  globeBackdrop = false,
   bare = false,
   looseBottom = false,
   contentInGlass = true,
@@ -261,8 +259,7 @@ function SectionShell({
   children: ReactNode;
   className?: string;
   heroArt?: { desktop: StaticImageData; mobile: StaticImageData; variant?: "default" | "garanty" };
-  globeBackdrop?: boolean;
-  /** No section fill or top border — content (glass header + children) only. */
+  /** Use glass header panel layout for scroll-stack sections. */
   bare?: boolean;
   /** Extra padding below section content (e.g. services grid). */
   looseBottom?: boolean;
@@ -273,9 +270,7 @@ function SectionShell({
   const C = isDark ? DARK_C : LIGHT_C;
   const t = translations[locale];
   const grad = SECTION_GRADIENTS[gradientKey][isDark ? "dark" : "light"];
-  const journey = useHomeGlobeJourneyOptional();
-  const showGlobeThrough = !bare && globeBackdrop && (journey?.showGlobeBackdrop ?? false) && !heroArt;
-  const useGlassPanel = bare && globeBackdrop && !heroArt;
+  const useGlassPanel = bare && !heroArt;
   const BadgeIcon = SECTION_BADGE_ICONS[gradientKey];
   const panelSkin = buildAccentGlassSkin(isDark, C.accent, C.accentGlow);
 
@@ -322,8 +317,9 @@ function SectionShell({
         lang={locale === "fa" ? "fa" : locale === "zh" ? "zh" : "en"}
         className={`relative overflow-hidden min-h-[100svh] w-full flex flex-col justify-center pt-10 pb-10 sm:pt-14 sm:pb-14 ${looseBottom ? "pb-20 sm:pb-28 lg:pb-32" : ""} ${locale !== "fa" ? "font-sans" : ""} ${className}`}
         style={{
-          background: "transparent",
+          background: grad,
           fontFamily: locale === "fa" ? YK : undefined,
+          borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`,
         }}
       >
         <motion.div
@@ -374,17 +370,9 @@ function SectionShell({
       lang={locale === "fa" ? "fa" : locale === "zh" ? "zh" : "en"}
       className={`relative overflow-hidden min-h-[100svh] flex flex-col justify-center py-14 sm:py-16 ${looseBottom ? "pb-24 sm:pb-32 lg:pb-40" : ""} ${locale !== "fa" ? "font-sans" : ""} ${className}`}
       style={{
-        background: bare
-          ? "transparent"
-          : showGlobeThrough
-            ? isDark
-              ? "linear-gradient(165deg, rgba(6,8,6,0.48) 0%, rgba(10,12,8,0.52) 45%, rgba(5,5,5,0.58) 100%)"
-              : "linear-gradient(165deg, rgba(244,246,240,0.5) 0%, rgba(238,242,232,0.55) 45%, rgba(232,236,228,0.62) 100%)"
-            : heroArt
-              ? undefined
-              : grad,
+        background: heroArt ? undefined : grad,
         fontFamily: locale === "fa" ? YK : undefined,
-        borderTop: bare ? undefined : `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`,
+        borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`,
       }}
     >
       {heroArt ? (
@@ -680,7 +668,7 @@ export function HomeServicesSection({ locale }: { locale: Locale }) {
   const copy = homeSectionsCopy[locale].services;
 
   return (
-    <SectionShell locale={locale} gradientKey="services" copy={copy} globeBackdrop bare looseBottom>
+    <SectionShell locale={locale} gradientKey="services" copy={copy} bare looseBottom>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-y-12 sm:gap-y-14 md:gap-y-0 md:gap-x-5 lg:gap-x-6">
         {copy.cards.map((card, i) => (
           <ServicesFeatureCard key={card.title} locale={locale} {...card} index={i} />
@@ -701,7 +689,7 @@ export function HomeProjectsSection({ locale }: { locale: Locale }) {
   const copy = homeSectionsCopy[locale].projects;
 
   return (
-    <SectionShell locale={locale} gradientKey="projects" copy={copy} globeBackdrop bare>
+    <SectionShell locale={locale} gradientKey="projects" copy={copy} bare>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
         {copy.cards.map((card, i) => (
           <FeatureCard key={card.title} locale={locale} {...card} index={i} />
@@ -718,7 +706,7 @@ export function HomeArticlesSection({ locale }: { locale: Locale }) {
   const copy = homeSectionsCopy[locale].articles;
 
   return (
-    <SectionShell locale={locale} gradientKey="articles" copy={copy} globeBackdrop bare>
+    <SectionShell locale={locale} gradientKey="articles" copy={copy} bare>
       <motion.div
         className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5"
         initial="hidden"
@@ -742,7 +730,7 @@ export function HomeCatalogSection({ locale }: { locale: Locale }) {
   const C = isDark ? DARK_C : LIGHT_C;
   const copy = homeSectionsCopy[locale].catalog;
   return (
-    <SectionShell locale={locale} gradientKey="catalog" copy={copy} globeBackdrop bare contentInGlass={false}>
+    <SectionShell locale={locale} gradientKey="catalog" copy={copy} bare contentInGlass={false}>
       <motion.div
         className="flex w-full max-w-md flex-col items-center gap-5 rounded-[20px] px-6 py-6 sm:px-8 sm:py-7"
         style={sectionGlassSkin(isDark, "card")}
@@ -784,7 +772,7 @@ export function HomeContactSection({ locale }: { locale: Locale }) {
   const copy = homeSectionsCopy[locale].contact;
 
   return (
-    <SectionShell locale={locale} sectionId="contact" gradientKey="contact" copy={copy} globeBackdrop>
+    <SectionShell locale={locale} sectionId="contact" gradientKey="contact" copy={copy}>
       <motion.div
         className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8 sm:mb-10"
         initial={{ opacity: 0, y: 20 }}

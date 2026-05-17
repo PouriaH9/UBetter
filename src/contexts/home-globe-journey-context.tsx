@@ -2,7 +2,6 @@
 
 import {
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -13,18 +12,7 @@ import {
 import { GEOJSON_URL } from "@/components/globe/constants";
 import type { CountryFeature, GlobePresencePhase } from "@/components/globe/globe-types";
 
-/** Section top at or below this (px from viewport top) = OK + pin. */
-export const GLOBE_JOURNEY_ENTER_OFFSET_PX = 100;
-export const GLOBE_JOURNEY_LEAVE_OFFSET_PX = 56;
-
-/** Below scroll-stack sheets (20+) so content stays above the pinned globe. */
-export const GLOBE_PINNED_Z_INDEX = 15;
-
 type HomeGlobeJourneyValue = {
-  isPinned: boolean;
-  pin: () => void;
-  unpin: () => void;
-  showGlobeBackdrop: boolean;
   polygons: CountryFeature[] | null;
   presencePhase: GlobePresencePhase;
 };
@@ -39,13 +27,8 @@ function normalizeFeatures(raw: CountryFeature[]): CountryFeature[] {
 }
 
 export function HomeGlobeJourneyProvider({ children }: { children: ReactNode }) {
-  const [isPinned, setIsPinned] = useState(false);
   const [polygons, setPolygons] = useState<CountryFeature[] | null>(null);
   const [presencePhase, setPresencePhase] = useState<GlobePresencePhase>("china");
-
-  const pin = useCallback(() => setIsPinned(true), []);
-  const unpin = useCallback(() => setIsPinned(false), []);
-  const showGlobeBackdrop = isPinned;
 
   useEffect(() => {
     const reduce =
@@ -77,14 +60,10 @@ export function HomeGlobeJourneyProvider({ children }: { children: ReactNode }) 
 
   const value = useMemo<HomeGlobeJourneyValue>(
     () => ({
-      isPinned,
-      pin,
-      unpin,
-      showGlobeBackdrop,
       polygons,
       presencePhase,
     }),
-    [isPinned, pin, unpin, showGlobeBackdrop, polygons, presencePhase],
+    [polygons, presencePhase],
   );
 
   return (
