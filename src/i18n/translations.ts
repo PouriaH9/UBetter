@@ -133,7 +133,7 @@ export const translations: Record<Locale, Translation> = {
     upsCalculator: upsCalculatorEn,
     globe: {
       ariaLabel:
-        "Globe map with Iran emphasized; wide screens drag to orbit. Wheel and trackpad scroll the page, not zoom the globe.",
+        "Decorative globe map with Iran emphasized; scroll the page normally to explore the site.",
     },
   },
   fa: {
@@ -222,7 +222,7 @@ export const translations: Record<Locale, Translation> = {
     upsCalculator: upsCalculatorFa,
     globe: {
       ariaLabel:
-        "نقشهٔ کره‌ای با ایران برجسته؛ در صفحهٔ پهن با کشیدن می‌توانید بچرخانید؛ اسکرول معمولی صفحه است.",
+        "نقشهٔ تزئینی کره‌ای با ایران برجسته؛ برای پیمایش سایت به‌طور معمول اسکرول کنید.",
     },
   },
   zh: {
@@ -312,7 +312,7 @@ export const translations: Record<Locale, Translation> = {
     upsCalculator: upsCalculatorZh,
     globe: {
       ariaLabel:
-        "地球示意图突出伊朗；宽屏可拖拽旋转；滚轮与触控板滚动页面而非缩放地球。",
+        "装饰性地球示意图，突出伊朗；请正常滚动页面浏览网站。",
     },
   },
 };

@@ -1,7 +1,28 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+
+const NARROW_MAX = "(max-width: 1023px)";
+
+/**
+ * Scroll-linked translate + scale on full-width sheets is heavy on mobile Chrome (compositor jank,
+ * rounded-clip glitches). Prefer normal document scroll below `lg`; keep the effect from `lg` up.
+ */
+export function usePreferStaticScrollLayers() {
+  const reduceMotion = useReducedMotion();
+  const [narrow, setNarrow] = useState(false);
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia(NARROW_MAX);
+    const sync = () => setNarrow(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  return Boolean(reduceMotion || narrow);
+}
 
 const sheetMotionShell =
   "pointer-events-auto relative origin-top overflow-hidden rounded-t-[2.25rem] sm:rounded-t-[3.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.4),0_-64px_170px_rgba(0,0,0,0.68),0_-110px_220px_rgba(0,0,0,0.32)] ring-1 ring-white/[0.12] sm:ring-2";
@@ -20,16 +41,16 @@ export function ScrollStackLayer({
   enterScale?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const reduceMotion = useReducedMotion();
+  const staticLayers = usePreferStaticScrollLayers();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "start 0.3"],
   });
-  const lift = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [280, 0]);
+  const lift = useTransform(scrollYProgress, [0, 1], staticLayers ? [0, 0] : [280, 0]);
   const scale = useTransform(
     scrollYProgress,
     [0, 1],
-    reduceMotion || !enterScale ? [1, 1] : [0.86, 1],
+    staticLayers || !enterScale ? [1, 1] : [0.86, 1],
   );
 
   // Ref must sit *below* the overlap padding so "start" tracks the visible sheet, not the pulled-up margin edge.
@@ -64,13 +85,13 @@ export function ScrollSheetOverHero({
   className?: string;
 }) {
   const shellRef = useRef<HTMLDivElement>(null);
-  const reduceMotion = useReducedMotion();
+  const staticLayers = usePreferStaticScrollLayers();
   const { scrollYProgress } = useScroll({
     target: shellRef,
     offset: ["start end", "start 0.28"],
   });
-  const lift = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [340, 0]);
-  const shellScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [0.84, 1]);
+  const lift = useTransform(scrollYProgress, [0, 1], staticLayers ? [0, 0] : [340, 0]);
+  const shellScale = useTransform(scrollYProgress, [0, 1], staticLayers ? [1, 1] : [0.84, 1]);
 
   return (
     <div className={`relative z-10 -mt-[100vh] pt-[100vh] pointer-events-none ${className}`}>

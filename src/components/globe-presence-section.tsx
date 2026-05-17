@@ -2,7 +2,15 @@
 
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+
+import {
+  GLOBE_JOURNEY_ENTER_OFFSET_PX,
+  GLOBE_JOURNEY_LEAVE_OFFSET_PX,
+  useHomeGlobeJourneyOptional,
+} from "@/contexts/home-globe-journey-context";
+import { useElementTopAtViewport } from "@/lib/use-element-top-at-viewport";
+import { homeStickyHeaderReservePx } from "@/lib/scroll-to-anchor";
 
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
@@ -10,39 +18,18 @@ import { translations } from "@/i18n/translations";
 import { globePresenceCopy } from "@/i18n/globe-presence.dict";
 
 import {
-  GEOJSON_URL,
   GLOBE_PRESENCE_EASE_CSS,
   GLOBE_PRESENCE_EASE_FRAMER,
   GLOBE_PRESENCE_TRANSITION_SEC,
 } from "./globe/constants";
-import type { CountryFeature, GlobePresencePhase } from "./globe/globe-types";
-
-const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
+import type { GlobePresencePhase } from "./globe/globe-types";
 
 const GlobeInteractiveCanvas = dynamic(
   () => import("@/components/globe/GlobeInteractiveCanvas"),
-  { ssr: false, loading: () => <GlobeLoadingPlaceholder /> },
+  { ssr: false },
 );
 
-function GlobeLoadingPlaceholder() {
-  return (
-    <div
-      className="absolute inset-0 w-full h-full min-h-[100svh] animate-pulse"
-      style={{
-        background:
-          "radial-gradient(ellipse 100% 70% at 50% 55%,rgba(124,255,0,0.08),transparent),linear-gradient(180deg,#060708 0%,#030304 100%)",
-      }}
-      aria-hidden
-    />
-  );
-}
-
-function normalizeFeatures(raw: CountryFeature[]): CountryFeature[] {
-  return raw.filter((f) => {
-    const iso = f.properties?.ISO_A2;
-    return typeof iso === "string" && iso.length === 2 && iso !== "AQ" && iso !== "-99";
-  });
-}
+const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 
 const BRAND_MARK = "UBETTER";
 const TITLE_SEP = " — ";
@@ -77,59 +64,74 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
   const t = translations[locale];
   const presenceCopy = globePresenceCopy[locale];
   const globeAriaLabel = t.globe.ariaLabel;
+  const journey = useHomeGlobeJourneyOptional();
 
-  const [phase, setPhase] = useState<GlobePresencePhase>("china");
-  const [polygons, setPolygons] = useState<CountryFeature[] | null>(null);
+  const [showTopHitOk, setShowTopHitOk] = useState(false);
+  const [navReserve, setNavReserve] = useState(72);
+  const sectionRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    const reduce =
-      typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const intervalMs = reduce ? 14000 : 7000;
-    const id = window.setInterval(() => {
-      setPhase((p) => (p === "china" ? "iran" : "china"));
-    }, intervalMs);
-    return () => window.clearInterval(id);
+  const isPinned = journey?.isPinned ?? false;
+  const homeJourney = journey != null;
+  const presencePhase: GlobePresencePhase = journey?.presencePhase ?? "china";
+  const polygons = journey?.polygons ?? null;
+
+  useLayoutEffect(() => {
+    const sync = () => setNavReserve(homeStickyHeaderReservePx());
+    sync();
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
   }, []);
 
+  const onSectionEnter = useCallback(() => {
+    journey?.pin();
+    setShowTopHitOk(true);
+  }, [journey]);
+
+  const onSectionLeave = useCallback(() => {
+    journey?.unpin();
+  }, [journey]);
+
+  useElementTopAtViewport(sectionRef, onSectionEnter, {
+    offsetPx: GLOBE_JOURNEY_ENTER_OFFSET_PX,
+    leaveOffsetPx: GLOBE_JOURNEY_LEAVE_OFFSET_PX,
+    once: !homeJourney,
+    onLeave: homeJourney ? onSectionLeave : undefined,
+  });
+
+  const pinnedCanvasStyle = useMemo(
+    () =>
+      isPinned
+        ? {
+            position: "fixed" as const,
+            top: navReserve,
+            left: 0,
+            width: "100vw",
+            height: `calc(100vh - ${navReserve}px)`,
+            zIndex: 0,
+          }
+        : undefined,
+    [isPinned, navReserve],
+  );
+
   useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        const res = await fetch(GEOJSON_URL);
-        if (!res.ok) throw new Error(String(res.status));
-        const gj = await res.json();
-        const list = gj?.features as CountryFeature[] | undefined;
-        if (alive && Array.isArray(list)) setPolygons(normalizeFeatures(list));
-      } catch {
-        /* keep null; graceful empty state */
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
+    if (!showTopHitOk) return;
+    const id = setTimeout(() => setShowTopHitOk(false), 2200);
+    return () => clearTimeout(id);
+  }, [showTopHitOk]);
 
   const M = useMemo(() => {
     return {
       sectionTopBorder: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
-      halo: isDark ? "rgba(124,255,0,0.04)" : "rgba(124,255,0,0.06)",
       glassBg: isDark ? "rgba(8,10,8,0.45)" : "rgba(255,255,255,0.82)",
       glassBorder: isDark ? "rgba(124,255,0,0.22)" : "rgba(124,255,0,0.15)",
       glassShadow: isDark
         ? "inset 0 1px 0 rgba(124,255,0,0.08), inset 0 -1px 0 rgba(0,0,0,0.35), 0 12px 48px rgba(0,0,0,0.55)"
         : "inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.06), 0 12px 44px rgba(0,0,0,0.1)",
-      canvasBgBase: isDark ? "#040506" : "#dde6ea",
-      scrimTop: isDark
-        ? "linear-gradient(180deg,rgba(4,5,6,0.92) 0%,rgba(4,5,6,0.45) 28%,transparent 55%)"
-        : "linear-gradient(180deg,rgba(248,252,250,0.34) 0%,rgba(248,252,250,0.1) 26%,transparent 50%)",
-      scrimBottom: isDark
-        ? "linear-gradient(0deg,rgba(4,5,6,0.88) 0%,rgba(4,5,6,0.35) 30%,transparent 58%)"
-        : "linear-gradient(0deg,rgba(220,230,235,0.32) 0%,rgba(220,230,235,0.06) 40%,transparent 56%)",
     };
   }, [isDark]);
 
   const cardSkin = useMemo(() => {
-    if (phase === "china") {
+    if (presencePhase === "china") {
       return {
         glassBg: isDark ? "rgba(36,10,10,0.5)" : "rgba(255,246,246,0.9)",
         glassBorder: isDark ? "rgba(255,100,100,0.45)" : "rgba(210,70,70,0.32)",
@@ -153,61 +155,57 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
       pulseGlow: isDark ? "0 0 12px rgba(124,255,0,0.75)" : "0 0 12px rgba(74,156,0,0.45)",
       statNum: C.accent,
     };
-  }, [phase, isDark, M.glassBg, M.glassBorder, M.glassShadow, C.accent]);
+  }, [presencePhase, isDark, M.glassBg, M.glassBorder, M.glassShadow, C.accent]);
 
-  const slide = phase === "china" ? presenceCopy.china : presenceCopy.iran;
+  const slide = presencePhase === "china" ? presenceCopy.china : presenceCopy.iran;
 
   return (
     <section
+      ref={sectionRef}
       dir={t.dir}
       lang={locale === "fa" ? "fa" : locale === "zh" ? "zh" : "en"}
       className={`relative overflow-hidden min-h-[100svh] w-full ${locale !== "fa" ? "font-sans" : ""}`}
       style={{
         borderTop: `1px solid ${M.sectionTopBorder}`,
         fontFamily: locale === "fa" ? YK : undefined,
-        background: M.canvasBgBase,
+        background: isPinned && homeJourney ? "transparent" : isDark ? "#040506" : "#dde6ea",
       }}
     >
-      {/* Full-viewport WebGL layer (background) */}
       <div
         className="absolute inset-0 z-0 w-full min-h-[100svh]"
+        style={pinnedCanvasStyle}
         role="img"
         aria-label={globeAriaLabel}
+        aria-hidden={isPinned}
       >
-        {polygons && polygons.length ? (
+        {polygons && polygons.length > 0 ? (
           <GlobeInteractiveCanvas
-            presencePhase={phase}
+            presencePhase={presencePhase}
             polygons={polygons}
-            className="absolute inset-0 block h-full w-full min-h-[100svh] [&>canvas]:absolute [&>canvas]:inset-0 [&>canvas]:h-full [&>canvas]:min-h-[100svh] [&>canvas]:w-full [&>canvas]:outline-none [&>canvas]:block"
+            cleanShell
+            className="absolute inset-0 block h-full w-full [&>canvas]:absolute [&>canvas]:inset-0 [&>canvas]:h-full [&>canvas]:w-full [&>canvas]:outline-none [&>canvas]:block"
             style={{
               position: "absolute",
               inset: 0,
               width: "100%",
               height: "100%",
-              minHeight: "100svh",
               background: "transparent",
             }}
           />
         ) : (
-          <GlobeLoadingPlaceholder />
+          <div className="absolute inset-0" aria-hidden />
         )}
       </div>
 
-      {/* Legibility + brand wash (no pointer capture) */}
-      <div
-        aria-hidden
-        className="absolute inset-0 z-[1] min-h-[100svh] pointer-events-none"
-        style={{
-          background: `${M.scrimTop}, ${M.scrimBottom}, radial-gradient(ellipse 130% 85% at 50% 42%,${M.halo},transparent 70%)`,
-        }}
-      />
-
-      {/* Foreground copy — only the card captures pointer events */}
-      <div className="relative z-10 w-full max-w-[1340px] mx-auto px-4 sm:px-8 lg:px-12 pt-10 pb-10 sm:pt-14 sm:pb-14 pointer-events-none">
-        <div
-          className="text-center mx-auto max-w-3xl w-full pointer-events-auto"
+      <motion.div
+        className="relative w-full max-w-[1340px] mx-auto px-4 sm:px-8 lg:px-12 pt-10 pb-10 sm:pt-14 sm:pb-14 pointer-events-none"
+        style={{ zIndex: isPinned ? 20 : 10 }}
+      >
+        <motion.div
+          className="relative text-center mx-auto max-w-3xl w-full pointer-events-auto"
           aria-live="polite"
           style={{
+            zIndex: isPinned ? 21 : 1,
             background: cardSkin.glassBg,
             backdropFilter: "blur(10px) saturate(120%)",
             WebkitBackdropFilter: "blur(10px) saturate(120%)",
@@ -220,18 +218,17 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
-              key={phase}
+              key={presencePhase}
               className="flex flex-col items-center gap-3 sm:gap-4"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{
-                /* Exit + enter = one full `GLOBE_PRESENCE_TRANSITION_SEC`, same as globe blend */
                 duration: GLOBE_PRESENCE_TRANSITION_SEC * 0.5,
                 ease: GLOBE_PRESENCE_EASE_FRAMER,
               }}
             >
-              <div
+              <motion.div
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold tracking-[0.22em] ${locale === "en" ? "uppercase" : ""}`}
                 style={{
                   background: cardSkin.badgeBg,
@@ -249,7 +246,7 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
                   }}
                 />
                 {slide.badge}
-              </div>
+              </motion.div>
               <h2
                 className="font-black leading-[1.08]"
                 style={{
@@ -258,15 +255,15 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
                   letterSpacing: locale === "fa" ? "0" : locale === "zh" ? "0" : "-0.02em",
                 }}
               >
-                {phase === "china" ? globeChinaHeading(slide.title) : slide.title}
+                {presencePhase === "china" ? globeChinaHeading(slide.title) : slide.title}
               </h2>
-              {phase === "china" ? (
+              {presencePhase === "china" ? (
                 <div
                   className="grid grid-cols-3 gap-3 sm:gap-5 w-full max-w-xl mx-auto pt-1"
                   dir="ltr"
                 >
                   {presenceCopy.china.stats.map((row) => (
-                    <div key={row.label} className="flex flex-col items-center gap-1">
+                    <motion.div key={row.label} className="flex flex-col items-center gap-1">
                       <div
                         className="font-black tabular-nums leading-none flex flex-wrap items-baseline justify-center gap-0.5"
                         style={{
@@ -291,14 +288,34 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
                       >
                         {row.label}
                       </p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               ) : null}
             </motion.div>
           </AnimatePresence>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
+
+      <AnimatePresence>
+        {showTopHitOk ? (
+          <motion.div
+            role="status"
+            initial={{ opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.22, ease: GLOBE_PRESENCE_EASE_FRAMER }}
+            className="fixed left-1/2 top-1/2 z-[100] -translate-x-1/2 -translate-y-1/2 px-6 py-3 rounded-full text-sm font-bold tracking-wide pointer-events-none"
+            style={{
+              background: isDark ? "rgba(124,255,0,0.92)" : "rgba(74,156,0,0.94)",
+              color: isDark ? "#041004" : "#fff",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.12)",
+            }}
+          >
+            OK
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </section>
   );
 }

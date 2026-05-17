@@ -10,13 +10,14 @@ import { CHINA_CENTROID, IRAN_CENTROID } from "./constants";
 /** UBETTER accent green `#7CFF00` — borders + Iran fill. */
 const IR_CAP = "rgba(124,255,0,0.78)";
 const IR_SIDE = "rgba(60,140,0,0.68)";
-const IR_STROKE = "#d4ff8a";
+const IR_STROKE = "#c8ff88";
 /** China flag red `#DE2910` — cap + stroke on globe. */
 const CN_CAP = "rgba(222,41,16,0.82)";
 const CN_SIDE = "rgba(120,28,14,0.74)";
-const CN_STROKE = "#ffb4a8";
+const CN_STROKE = "#ffc8c0";
 const TRANSPARENT = "rgba(0,0,0,0)";
-const WORLD_STROKE = "rgba(124,255,0,0.92)";
+/** World outlines — bright enough for subtle bloom on edges only. */
+const WORLD_STROKE = "rgba(158,255,92,0.78)";
 
 /** Animated dash strand width (FatLine linewidth, ~px). */
 const CONNECTOR_LINE_PX = 1.95;

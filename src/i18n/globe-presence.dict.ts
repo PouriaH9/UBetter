@@ -33,9 +33,9 @@ export const globePresenceCopy: Record<Locale, GlobePresenceCopy> = {
       badge: "مقر چین",
       title: "UBETTER",
       stats: [
-        { value: "60", unit: "مورد", label: "ثبت اختراع" },
-        { value: "16", unit: "مورد", label: "گواهینامه سازمانی" },
-        { value: "39", unit: "مورد", label: "گواهینامه محصول" },
+        { value: "60", unit: "", label: "ثبت اختراع" },
+        { value: "16", unit: "", label: "گواهینامه سازمانی" },
+        { value: "39", unit: "", label: "گواهینامه محصول" },
       ],
     },
     iran: {

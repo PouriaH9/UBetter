@@ -99,7 +99,7 @@ export default function SharedNavbar({
   activePage = "home",
 }: {
   locale: Locale;
-  activePage?: "home" | "products";
+  activePage?: "home" | "products" | "warranty";
 }) {
   const [open, setOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
@@ -206,44 +206,46 @@ export default function SharedNavbar({
   const homePath = `/${locale}`;
   const upsCalculatorHref = `${homePath}#${UPS_CALCULATOR_SECTION_ID}`;
 
+  const warrantyPath = `/${locale}/warranty`;
+
   const faLinks = [
-    { href: homePath, label: "خانه", page: "home" },
-    { href: `/${locale}/products`, label: "محصولات", page: "products" },
+    { href: homePath, label: "خانه", page: "home" as const },
+    { href: `/${locale}/products`, label: "محصولات", page: "products" as const },
     {
       href: upsCalculatorHref,
       label: "ماشین حساب",
-      page: "home",
+      page: "home" as const,
       scrollTargetId: UPS_CALCULATOR_SECTION_ID,
     },
-    { href: `${homePath}#about`, label: "تکنولوژی", page: "home" },
-    { href: `${homePath}#about`, label: "درباره ما", page: "home" },
-    { href: `${homePath}#contact`, label: "تماس با ما", page: "home" },
+    { href: warrantyPath, label: "گارانتی", page: "warranty" as const },
+    { href: `${homePath}#about`, label: "درباره ما", page: "home" as const },
+    { href: `${homePath}#contact`, label: "تماس با ما", page: "home" as const },
   ];
   const enLinks = [
-    { href: homePath, label: "Home", page: "home" },
-    { href: `/${locale}/products`, label: "Products", page: "products" },
+    { href: homePath, label: "Home", page: "home" as const },
+    { href: `/${locale}/products`, label: "Products", page: "products" as const },
     {
       href: upsCalculatorHref,
       label: "Calculator",
-      page: "home",
+      page: "home" as const,
       scrollTargetId: UPS_CALCULATOR_SECTION_ID,
     },
-    { href: `${homePath}#about`, label: "Technology", page: "home" },
-    { href: `${homePath}#about`, label: "About", page: "home" },
-    { href: `${homePath}#contact`, label: "Contact", page: "home" },
+    { href: warrantyPath, label: "Warranty", page: "warranty" as const },
+    { href: `${homePath}#about`, label: "About", page: "home" as const },
+    { href: `${homePath}#contact`, label: "Contact", page: "home" as const },
   ];
   const zhLinks = [
-    { href: homePath, label: "首页", page: "home" },
-    { href: `/${locale}/products`, label: "产品", page: "products" },
+    { href: homePath, label: "首页", page: "home" as const },
+    { href: `/${locale}/products`, label: "产品", page: "products" as const },
     {
       href: upsCalculatorHref,
       label: "计算器",
-      page: "home",
+      page: "home" as const,
       scrollTargetId: UPS_CALCULATOR_SECTION_ID,
     },
-    { href: `${homePath}#about`, label: "技术", page: "home" },
-    { href: `${homePath}#about`, label: "关于我们", page: "home" },
-    { href: `${homePath}#contact`, label: "联系我们", page: "home" },
+    { href: warrantyPath, label: "保修服务", page: "warranty" as const },
+    { href: `${homePath}#about`, label: "关于我们", page: "home" as const },
+    { href: `${homePath}#contact`, label: "联系我们", page: "home" as const },
   ];
   const navLinks = locale === "fa" ? faLinks : locale === "zh" ? zhLinks : enLinks;
 
@@ -326,6 +328,7 @@ export default function SharedNavbar({
           {navLinks.map((l) => {
             const isActive =
               (l.page === "products" && activePage === "products") ||
+              (l.page === "warranty" && activePage === "warranty") ||
               (l.page === "home" && l.label === homeNavLabel && activePage === "home");
             const isProducts = l.href === `/${locale}/products`;
 
@@ -526,6 +529,9 @@ export default function SharedNavbar({
           >
             {navLinks.map((l) => {
               const isProducts = l.href === `/${locale}/products`;
+              const isMobileLinkActive =
+                (l.page === "warranty" && activePage === "warranty") ||
+                (l.page === "home" && l.label === homeNavLabel && activePage === "home");
               return (
                 <div key={l.label} style={{ borderBottom: `1px solid ${C.divider}` }}>
                   {isProducts ? (
@@ -592,9 +598,11 @@ export default function SharedNavbar({
                         setOpen(false);
                       }}
                       className="flex items-center px-6 py-4 transition-colors duration-200"
-                      style={{ fontFamily: YK, fontSize: "15px", color: C.text2 }}
+                      style={{ fontFamily: YK, fontSize: "15px", color: isMobileLinkActive ? C.accent : C.text2 }}
                       onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.accent; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.text2; }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLAnchorElement).style.color = isMobileLinkActive ? C.accent : C.text2;
+                      }}
                     >
                       {l.label}
                     </Link>

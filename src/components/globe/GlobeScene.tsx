@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 
@@ -12,15 +11,16 @@ import { CHINA_CENTROID, GLOBE_PRESENCE_TRANSITION_SEC, IRAN_CENTROID } from "./
 import { GlobeLights } from "./GlobeLights";
 import type { CountryFeature, GlobePresencePhase } from "./globe-types";
 
-/** Default framing for pointer orbit (zoom disabled — wheel must scroll the page, not dolly the camera). */
+/** Fixed camera framing (no user orbit — drag/wheel must scroll the page). */
 const CAM_Y = 29;
 const CAM_Z = 348;
 const CAM_FOV = 40;
-const ORBIT_DIST = Math.hypot(CAM_Z, CAM_Y);
 
 type GlobeExperienceProps = {
   polygons: CountryFeature[];
   presencePhase: GlobePresencePhase;
+  /** No atmosphere halo, bloom, or vignette — globe geometry only. */
+  cleanShell?: boolean;
 };
 
 /** Matches `three-globe` internal `polar2Cartesian(lat, lng)` (unit direction from globe center). */
@@ -150,76 +150,60 @@ function GlobeLockedOnIran({ children }: { children: ReactNode }) {
   return <group quaternion={quat}>{children}</group>;
 }
 
-const NARROW_MAX = "(max-width: 1023px)";
-
-/** Below `lg`, let the page keep touch + scroll; canvas ignores hit-testing. */
+/**
+ * Globe is display-only: pointer events pass through so drag/scroll hits the page on all viewports.
+ * (No OrbitControls — they captured desktop drag and rotated the globe instead of scrolling.)
+ */
 function CanvasScrollPassthrough() {
   const gl = useThree((s) => s.gl);
   useLayoutEffect(() => {
-    const apply = () => {
-      const narrow = window.matchMedia(NARROW_MAX).matches;
-      const el = gl.domElement;
-      el.style.pointerEvents = narrow ? "none" : "auto";
-      el.style.touchAction = narrow ? "auto" : "none";
-    };
-    apply();
-    const mq = window.matchMedia(NARROW_MAX);
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
+    let node: HTMLElement | null = gl.domElement;
+    for (let i = 0; i < 4 && node; i++) {
+      node.style.pointerEvents = "none";
+      node.style.touchAction = "pan-y";
+      node = node.parentElement;
+    }
   }, [gl]);
   return null;
 }
 
-function GlobeExperience({ polygons, presencePhase }: GlobeExperienceProps) {
-  const [narrowViewport, setNarrowViewport] = useState(() =>
-    typeof window !== "undefined" && typeof window.matchMedia === "function"
-      ? window.matchMedia(NARROW_MAX).matches
-      : false,
-  );
-
-  useEffect(() => {
-    const mq = window.matchMedia(NARROW_MAX);
-    const sync = () => setNarrowViewport(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-
+function GlobeExperience({ polygons, presencePhase, cleanShell = false }: GlobeExperienceProps) {
   return (
     <>
       <CanvasScrollPassthrough />
 
-      <GlobeLights />
+      <GlobeLights>
 
       <GlobeLockedOnIran>
         <GlobePresencePhaseMotion phase={presencePhase}>
           <Globe polygons={polygons} />
-          <Atmosphere />
+          {!cleanShell ? <Atmosphere /> : null}
         </GlobePresencePhaseMotion>
       </GlobeLockedOnIran>
 
-      <OrbitControls
-        enablePan={false}
-        enableRotate={!narrowViewport}
-        enableZoom={false}
-        rotateSpeed={0.42}
-        minDistance={ORBIT_DIST * 0.74}
-        maxDistance={ORBIT_DIST * 1.48}
-        minPolarAngle={Math.PI * 0.14}
-        maxPolarAngle={Math.PI * 0.86}
-        enableDamping={false}
-        makeDefault
-      />
+      </GlobeLights>
 
       <EffectComposer multisampling={0} enableNormalPass={false}>
-        <Bloom
-          intensity={0.88}
-          luminanceThreshold={0.18}
-          luminanceSmoothing={0.9}
-          mipmapBlur
-          radius={0.55}
-        />
-        <Vignette eskil={false} offset={0.09} darkness={0.42} />
+        {cleanShell ? (
+          <Bloom
+            intensity={0.42}
+            luminanceThreshold={0.62}
+            luminanceSmoothing={0.25}
+            mipmapBlur
+            radius={0.32}
+          />
+        ) : (
+          <>
+            <Bloom
+              intensity={0.88}
+              luminanceThreshold={0.18}
+              luminanceSmoothing={0.9}
+              mipmapBlur
+              radius={0.55}
+            />
+            <Vignette eskil={false} offset={0.09} darkness={0.42} />
+          </>
+        )}
       </EffectComposer>
     </>
   );
@@ -230,17 +214,24 @@ export type GlobeCanvasProps = {
   presencePhase: GlobePresencePhase;
   className?: string;
   style?: CSSProperties;
+  cleanShell?: boolean;
 };
 
 /**
- * react-three-fiber Canvas + drei controls + country polygons on three-globe.
+ * react-three-fiber Canvas + country polygons on three-globe (fixed camera; no user orbit).
  * Consume only from a Next.js `dynamic(..., { ssr: false })` boundary.
  */
-export function GlobeCanvas({ polygons, presencePhase, className, style }: GlobeCanvasProps) {
+export function GlobeCanvas({
+  polygons,
+  presencePhase,
+  className,
+  style,
+  cleanShell = false,
+}: GlobeCanvasProps) {
   return (
     <Canvas
       className={className}
-      style={style}
+      style={{ ...style, pointerEvents: "none", touchAction: "pan-y" }}
       camera={{
         position: [0, CAM_Y, CAM_Z],
         fov: CAM_FOV,
@@ -258,7 +249,11 @@ export function GlobeCanvas({ polygons, presencePhase, className, style }: Globe
       onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
     >
       <Suspense fallback={null}>
-        <GlobeExperience polygons={polygons} presencePhase={presencePhase} />
+        <GlobeExperience
+          polygons={polygons}
+          presencePhase={presencePhase}
+          cleanShell={cleanShell}
+        />
       </Suspense>
     </Canvas>
   );

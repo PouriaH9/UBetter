@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, type ReactNode, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
@@ -147,7 +148,7 @@ function AddToCartButton({ onAdd, isInCart, locale, C, isDark }: {
     <motion.button
       onClick={handleClick}
       whileTap={{ scale: 0.93 }}
-      className="flex-1 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5"
+      className="w-full py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5"
       style={{
         background: added ? C.accent : (isInCart ? C.accentBg : C.accent),
         color: added ? (isDark ? "#000" : "#fff") : (isInCart ? C.accent : (isDark ? "#000" : "#fff")),
@@ -204,8 +205,11 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: 
           outline: isDark ? "1px solid rgba(255,255,255,0.09)" : "1px solid rgba(0,0,0,0.1)",
         }}
       >
-        {/* Image area */}
-        <div className="flex items-center justify-center" style={{ height: "200px", background: "#ffffff", position: "relative", borderBottom: `1px solid rgba(0,0,0,0.06)` }}>
+        <Link
+          href={`/${locale}/products/${productNum}`}
+          className="flex items-center justify-center"
+          style={{ height: "200px", background: "#ffffff", position: "relative", borderBottom: `1px solid rgba(0,0,0,0.06)` }}
+        >
           {img ? (
             <div className="relative h-full" style={{ width: "160px" }}>
               <Image src={img} alt={tx(product.name, locale)} fill sizes="160px" className="object-contain" />
@@ -218,11 +222,11 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: 
               </svg>
             </div>
           )}
-          <div className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black"
+          <div className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black pointer-events-none"
             style={{ background: C.numBadgeBg, border: `1px solid ${C.cardBorder}`, color: C.numBadgeTxt, fontFamily: "'Inter', system-ui" }}>
             {productNum <= 21 ? productNum : productNum === 22 ? "E" : "H"}
           </div>
-        </div>
+        </Link>
 
         {/* Content */}
         <div className="flex flex-col flex-1 p-5" dir={dir}>
@@ -231,10 +235,12 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: 
             {tx(product.category, locale)}
           </span>
 
-          <h3 className="font-bold mb-3 leading-snug"
-            style={{ color: C.text1, fontFamily: YK, fontSize: "15px", lineHeight: 1.4, minHeight: "42px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-            {tx(product.name, locale)}
-          </h3>
+          <Link href={`/${locale}/products/${productNum}`} className="block group/title">
+            <h3 className="font-bold mb-3 leading-snug transition-opacity duration-200 group-hover/title:opacity-85"
+              style={{ color: C.text1, fontFamily: YK, fontSize: "15px", lineHeight: 1.4, minHeight: "42px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+              {tx(product.name, locale)}
+            </h3>
+          </Link>
 
           <div className="mb-3 h-px" style={{ background: C.divider }} />
 
@@ -258,18 +264,27 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: 
             ))}
           </div>
 
-          <div className="flex gap-2">
-            <button onClick={onOpenSpecs}
-              className="flex-1 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5"
-              style={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.12)"}`, color: C.text2, background: "transparent", fontFamily: YK }}
-              onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)"; b.style.color = C.text1; }}
-              onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "transparent"; b.style.color = C.text2; }}>
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                <rect x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.2" />
-                <path d="M4 6h4M6 4v4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
-              </svg>
-              {ui3(locale, "مشخصات", "Specs", "规格")}
-            </button>
+          <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                href={`/${locale}/products/${productNum}`}
+                className="py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 text-center"
+                style={{ background: C.accent, color: isDark ? "#000" : "#fff", border: `1px solid ${C.accentBorder}`, fontFamily: YK }}
+              >
+                {ui3(locale, "جزئیات", "Details", "详情")}
+              </Link>
+              <button type="button" onClick={onOpenSpecs}
+                className="py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5"
+                style={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.12)"}`, color: C.text2, background: "transparent", fontFamily: YK }}
+                onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)"; b.style.color = C.text1; }}
+                onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "transparent"; b.style.color = C.text2; }}>
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                  <rect x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.2" />
+                  <path d="M4 6h4M6 4v4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+                </svg>
+                {ui3(locale, "مشخصات", "Specs", "规格")}
+              </button>
+            </div>
             <AddToCartButton onAdd={onAddToCart} isInCart={false} locale={locale} C={C} isDark={isDark} />
           </div>
         </div>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useLayoutEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 
 import logoImg from "@/assets/LOGO.jpg";
 import productsHeroDesktop from "@/assets/Source/products HERO desktopsize.png";
@@ -20,9 +20,17 @@ import type { Locale } from "@/i18n/config";
 import { ui3 } from "@/i18n/locale-ui";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
-import { ScrollStackLayer } from "@/components/scroll-stack-layers";
+import { ScrollStackLayer, usePreferStaticScrollLayers } from "@/components/scroll-stack-layers";
 import { UsageCalculatorSection } from "@/components/usage-calculator-section";
 import { GlobePresenceSection } from "@/components/globe-presence-section";
+import { HomeGlobeJourneyProvider, useHomeGlobeJourneyOptional } from "@/contexts/home-globe-journey-context";
+import {
+  HomeServicesSection,
+  HomeCertificatesSection,
+  HomeProjectsSection,
+  HomeArticlesSection,
+  HomeCatalogSection,
+} from "@/components/home-scroll-sections";
 import { useTheme, DARK_C, LIGHT_C, type ColorPalette } from "@/contexts/theme-context";
 import {
   UPS_CALCULATOR_SECTION_ID,
@@ -32,10 +40,6 @@ import {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
-
-function stripLeadingEmoji(s: string) {
-  return s.replace(/^[\s\S]*?([A-Za-z\u0600-\u06FF])/, "$1");
-}
 
 // ─── Reveal wrapper ────────────────────────────────────────────────────────────
 
@@ -373,6 +377,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
   );
 }
 
+
 // ══════════════════════════════════════════════════════════════════════════════
 // 3. TESTIMONIALS
 // ══════════════════════════════════════════════════════════════════════════════
@@ -380,6 +385,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
 function Testimonials({ locale }: { locale: Locale }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
+  const showGlobeThrough = useHomeGlobeJourneyOptional()?.showGlobeBackdrop ?? false;
   const [active, setActive] = useState(0);
   const isRTL = locale === "fa";
 
@@ -423,13 +429,22 @@ function Testimonials({ locale }: { locale: Locale }) {
   );
 
   useEffect(() => {
-    const t = setInterval(() => setActive((a) => (a + 1) % items.length), 6000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setActive((a) => (a + 1) % items.length), 6000);
+    return () => clearInterval(timer);
   }, [items.length]);
 
   return (
-    <section className="py-32" dir={isRTL ? "rtl" : "ltr"}
-      style={{ background: isDark ? "#050505" : "#f0f0f0", transition: "background 0.35s ease" }}>
+    <section className="min-h-[100svh] flex flex-col justify-center py-20 sm:py-24" dir={isRTL ? "rtl" : "ltr"}
+      style={{
+        background: showGlobeThrough
+          ? isDark
+            ? "linear-gradient(165deg, rgba(6,8,6,0.48) 0%, rgba(10,12,8,0.52) 45%, rgba(5,5,5,0.58) 100%)"
+            : "linear-gradient(165deg, rgba(244,246,240,0.5) 0%, rgba(238,242,232,0.55) 45%, rgba(232,236,228,0.62) 100%)"
+          : isDark
+            ? "#050505"
+            : "#f0f0f0",
+        transition: "background 0.35s ease",
+      }}>
       <div className="max-w-4xl mx-auto px-6">
         <Reveal className="text-center mb-16">
           <Pill label={ui3(locale, "نظرات مشتریان", "Testimonials", "客户评价")} />
@@ -473,92 +488,10 @@ function Testimonials({ locale }: { locale: Locale }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// 5. CTA SECTION
+
+// 4. FOOTER — now handled by SharedFooter
 // ══════════════════════════════════════════════════════════════════════════════
 
-function CTA({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) {
-  const { isDark } = useTheme();
-  const C = isDark ? DARK_C : LIGHT_C;
-  const isRTL = locale === "fa";
-
-  return (
-    <section id="contact" className="py-32" dir={isRTL ? "rtl" : "ltr"}
-      style={{ background: isDark ? "#050505" : "#f0f0f0", transition: "background 0.35s ease" }}>
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Banner */}
-        <div
-          className="relative rounded-3xl overflow-hidden p-12 md:p-20 text-center mb-12"
-          style={{ background: isDark ? `linear-gradient(135deg,${C.accentBg} 0%,#0a0a0a 50%,#111 100%)` : `linear-gradient(135deg,${C.accentBg} 0%,#ffffff 50%,#f8f8f8 100%)`, border: `1px solid ${C.accentBorder}` }}
-        >
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl pointer-events-none" style={{ background: C.accentGlow }} />
-          <div className="relative z-10">
-            <Pill label={ui3(locale, "شروع کنید", "Get Started Today", "立即开始")} />
-            <h2 className="text-4xl md:text-[60px] font-bold leading-tight mb-5" style={{ color: C.text1 }}>
-              {ui3(locale, "آماده‌اید آینده انرژی\nخود را بسازید؟", "Ready to Power\nYour Future?", "准备好打造\n您的能源未来了吗？")}
-            </h2>
-            <p className="text-[17px] max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: C.text2 }}>
-              {ui3(
-                locale,
-                "با تیم مهندسی ما تماس بگیرید تا مشاوره رایگان و پیش‌فاکتور اختصاصی برای پروژه ذخیره‌سازی انرژی شما دریافت کنید.",
-                "Contact our engineering team for a free consultation and tailored quotation for your residential, commercial, or industrial energy storage project.",
-                "联系我们的工程团队，获取免费咨询以及面向住宅、工商业储能项目的专属报价方案。",
-              )}
-            </p>
-            <a href="mailto:info@ubetterenergy.com"
-              className="inline-flex items-center gap-3 px-10 py-5 text-black font-bold rounded-full text-[16px] transition-all duration-300 hover:scale-105"
-              style={{ background: C.accent, boxShadow: `0 0 40px ${C.accentGlow}` }}>
-              {ui3(locale, "دریافت پیش‌فاکتور رایگان", "Get Free Quote", "获取免费报价")}
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 20 20">
-                <path d="M4 10h12M12 5l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
-          </div>
-        </div>
-
-        {/* Contact form */}
-        <div
-          className="rounded-3xl p-8 md:p-12"
-          style={{ background: C.card, border: `1px solid ${C.cardBorder}`, transition: "background 0.35s ease" }}>
-          <h3 className="text-[22px] font-bold mb-8 text-center" style={{ color: C.text1 }}>
-            {ui3(locale, "ارسال درخواست", "Send an Inquiry", "发送询价")}
-          </h3>
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={(e) => e.preventDefault()}>
-            {[
-              { label: t.contact.name, type: "text", ph: ui3(locale, "نام شما", "Your full name", "您的姓名") },
-              { label: t.contact.email, type: "email", ph: "email@company.com" },
-              { label: t.contact.phone, type: "tel", ph: "+1 234 567 890" },
-              { label: t.contact.company, type: "text", ph: ui3(locale, "نام شرکت", "Your company", "公司名称") },
-            ].map((f) => (
-              <div key={f.label}>
-                <label className="block text-[13px] mb-2 font-medium" style={{ color: C.text3 }}>{f.label}</label>
-                <input type={f.type} placeholder={f.ph}
-                  className="w-full rounded-xl px-4 py-3.5 text-[14px] focus:outline-none transition-all duration-200"
-                  style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${C.cardBorder}`, color: C.text1 }} />
-              </div>
-            ))}
-            <div className="md:col-span-2">
-              <label className="block text-[13px] mb-2 font-medium" style={{ color: C.text3 }}>{t.contact.message}</label>
-              <textarea rows={4} placeholder={t.contact.message}
-                className="w-full rounded-xl px-4 py-3.5 text-[14px] focus:outline-none transition-all duration-200 resize-none"
-                style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${C.cardBorder}`, color: C.text1 }} />
-            </div>
-            <div className="md:col-span-2 flex justify-center">
-              <button type="submit" className="px-12 py-4 text-black font-bold rounded-full text-[15px] transition-all duration-300 hover:scale-105"
-                style={{ background: C.accent }}>
-                {stripLeadingEmoji(t.contact.send)}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 6. FOOTER — now handled by SharedFooter
-// ══════════════════════════════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SCROLL LAYERS — stacked sheets (each block scrolls up over the one below)
@@ -576,22 +509,22 @@ function ProductPortfolioScrollStack({
   C: ColorPalette;
 }) {
   const shellRef = useRef<HTMLDivElement>(null);
-  const reduceMotion = useReducedMotion();
+  const staticLayers = usePreferStaticScrollLayers();
   const { scrollYProgress } = useScroll({
     target: shellRef,
     // Longer range = motion plays across more scroll
     offset: ["start end", "start 0.28"],
   });
-  const lift = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [340, 0]);
-  const shellScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [0.84, 1]);
-  const bgScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [1.32, 1]);
+  const lift = useTransform(scrollYProgress, [0, 1], staticLayers ? [0, 0] : [340, 0]);
+  const shellScale = useTransform(scrollYProgress, [0, 1], staticLayers ? [1, 1] : [0.84, 1]);
+  const bgScale = useTransform(scrollYProgress, [0, 1], staticLayers ? [1, 1] : [1.32, 1]);
 
   return (
     <div className="relative z-10 -mt-[100vh] pt-[100vh] pointer-events-none">
       <div ref={shellRef} className="relative">
         <motion.div
           style={{ y: lift, scale: shellScale }}
-          className="pointer-events-auto relative min-h-screen flex flex-col justify-center overflow-hidden origin-top rounded-t-[2.25rem] sm:rounded-t-[3.5rem] shadow-[0_-24px_60px_rgba(0,0,0,0.45),0_-72px_180px_rgba(0,0,0,0.72),0_-120px_240px_rgba(0,0,0,0.35)] ring-1 ring-white/[0.14] sm:ring-2"
+          className="pointer-events-auto relative min-h-screen flex flex-col justify-center overflow-hidden origin-top rounded-t-[2.25rem] sm:rounded-t-[3.5rem] shadow-[0_-24px_60px_rgba(0,0,0,0.45),0_-72px_180px_rgba(0,0,0,0.72),0_-120px_240px_rgba(0,0,0,0.35)] ring-1 ring-white/[0.14] sm:ring-2 max-lg:[touch-action:pan-y]"
         >
         <motion.div
           className="absolute inset-0 origin-center"
@@ -720,7 +653,10 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
   }, []);
 
   return (
-    <div className="overflow-x-hidden" dir={t.dir}
+    <HomeGlobeJourneyProvider>
+    <div
+      className="overflow-x-hidden"
+      dir={t.dir}
       style={{ background: C.pageBg, color: C.text1, transition: "background 0.35s ease, color 0.35s ease" }}>
       <SharedNavbar locale={locale} activePage="home" />
       <Hero locale={locale} t={t} />
@@ -734,13 +670,26 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
       <ScrollStackLayer zIndex={30} overlapVh={99} enterScale={false}>
         <GlobePresenceSection locale={locale} />
       </ScrollStackLayer>
-      <ScrollStackLayer zIndex={40} overlapVh={97}>
-        <Testimonials locale={locale} />
+      <ScrollStackLayer zIndex={35} overlapVh={98}>
+        <HomeServicesSection locale={locale} />
       </ScrollStackLayer>
-      <ScrollStackLayer zIndex={50} overlapVh={97}>
-        <CTA locale={locale} t={t} />
+      <ScrollStackLayer zIndex={40} overlapVh={98}>
+        <HomeCertificatesSection locale={locale} />
+      </ScrollStackLayer>
+      <ScrollStackLayer zIndex={45} overlapVh={98}>
+        <HomeProjectsSection locale={locale} />
+      </ScrollStackLayer>
+      <ScrollStackLayer zIndex={50} overlapVh={98}>
+        <HomeArticlesSection locale={locale} />
+      </ScrollStackLayer>
+      <ScrollStackLayer zIndex={55} overlapVh={98}>
+        <HomeCatalogSection locale={locale} />
+      </ScrollStackLayer>
+      <ScrollStackLayer zIndex={60} overlapVh={97}>
+        <Testimonials locale={locale} />
       </ScrollStackLayer>
       <SharedFooter locale={locale} />
     </div>
+    </HomeGlobeJourneyProvider>
   );
 }

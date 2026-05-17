@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
+import { ScrollViewportDebug } from "@/components/scroll-viewport-debug";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -18,7 +19,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={spaceGrotesk.variable}>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        {children}
+        <ScrollViewportDebug />
+      </body>
     </html>
   );
 }
