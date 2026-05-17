@@ -16,10 +16,9 @@ import {
 
 import {
   GLOBE_JOURNEY_ENTER_OFFSET_PX,
-  GLOBE_JOURNEY_LEAVE_OFFSET_PX,
+  GLOBE_PINNED_Z_INDEX,
   useHomeGlobeJourneyOptional,
 } from "@/contexts/home-globe-journey-context";
-import { useElementTopAtViewport } from "@/lib/use-element-top-at-viewport";
 import { homeStickyHeaderReservePx } from "@/lib/scroll-to-anchor";
 
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
@@ -386,20 +385,42 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
     return () => window.removeEventListener("resize", sync);
   }, []);
 
-  const onSectionEnter = useCallback(() => {
-    journey?.pin();
-  }, [journey]);
+  /** Pin for the full scroll journey; unpin only when user scrolls back above the globe block. */
+  useEffect(() => {
+    if (!homeJourney || !sectionRef.current) return;
 
-  const onSectionLeave = useCallback(() => {
-    journey?.unpin();
-  }, [journey]);
+    let raf = 0;
+    const check = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top;
+      const vh = window.innerHeight;
 
-  useElementTopAtViewport(sectionRef, onSectionEnter, {
-    offsetPx: GLOBE_JOURNEY_ENTER_OFFSET_PX,
-    leaveOffsetPx: GLOBE_JOURNEY_LEAVE_OFFSET_PX,
-    once: !homeJourney,
-    onLeave: homeJourney ? onSectionLeave : undefined,
-  });
+      if (top <= GLOBE_JOURNEY_ENTER_OFFSET_PX) {
+        journey?.pin();
+      } else if (top > vh) {
+        journey?.unpin();
+      }
+    };
+
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(check);
+    };
+
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    const ro = new ResizeObserver(schedule);
+    ro.observe(sectionRef.current);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      ro.disconnect();
+    };
+  }, [homeJourney, journey]);
 
   const pinnedCanvasStyle = useMemo(
     () =>
@@ -410,7 +431,7 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
             left: 0,
             width: "100vw",
             height: `calc(100vh - ${navReserve}px)`,
-            zIndex: 0,
+            zIndex: GLOBE_PINNED_Z_INDEX,
           }
         : undefined,
     [isPinned, navReserve],

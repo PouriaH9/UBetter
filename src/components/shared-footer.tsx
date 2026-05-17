@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
 import logoImg from "@/assets/LOGO.jpg";
 import type { Locale } from "@/i18n/config";
 import { locales, localizedPath } from "@/i18n/config";
@@ -18,23 +17,8 @@ import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 export default function SharedFooter({ locale }: { locale: Locale }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
-  const journey = useHomeGlobeJourneyOptional();
-  const stackAboveGlobe = journey?.showGlobeBackdrop ?? false;
-  const footerRef = useRef<HTMLElement>(null);
+  const stackAboveGlobe = useHomeGlobeJourneyOptional()?.showGlobeBackdrop ?? false;
   const isRTL = locale === "fa";
-
-  useEffect(() => {
-    if (!journey || !footerRef.current) return;
-    const el = footerRef.current;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) journey.unpin();
-      },
-      { root: null, rootMargin: "0px 0px -12% 0px", threshold: 0.05 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [journey]);
   const pathname = usePathname() ?? "/";
   const alternateLocales = locales.filter((l) => l !== locale);
 
@@ -87,7 +71,6 @@ export default function SharedFooter({ locale }: { locale: Locale }) {
 
   return (
     <footer
-      ref={footerRef}
       dir={isRTL ? "rtl" : "ltr"}
       style={{
         background: isDark ? "#020202" : "#ececec",
