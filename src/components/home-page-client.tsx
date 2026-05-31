@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 
-import logoImg from "@/assets/LOGO.jpg";
 import productsHeroDesktop from "@/assets/Source/products HERO desktopsize.png";
 import productsHeroMobile from "@/assets/Source/products HERO mobilesize.png";
 import hero1Img from "@/assets/HERO1.png";
@@ -21,6 +20,7 @@ import { CATEGORIES } from "@/data/product-categories";
 import { localeNumber, ui3 } from "@/i18n/locale-ui";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
+import { BrandTrustSection } from "@/components/brand-trust-section";
 import { ScrollStackLayer, usePreferStaticScrollLayers } from "@/components/scroll-stack-layers";
 import { UsageCalculatorSection } from "@/components/usage-calculator-section";
 import { GlobePresenceSection } from "@/components/globe-presence-section";
@@ -540,6 +540,9 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
       {/* Products teaser — scrolls up as a sheet over the hero */}
       <ProductPortfolioScrollStack locale={locale} isRTL={isRTL} isDark={isDark} C={C} />
 
+      <ScrollStackLayer zIndex={18} overlapVh={98} plain>
+        <BrandTrustSection locale={locale} />
+      </ScrollStackLayer>
       <ScrollStackLayer zIndex={20} overlapVh={98} plain>
         <UsageCalculatorSection locale={locale} />
       </ScrollStackLayer>

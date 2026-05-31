@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
-import logoImg from "@/assets/LOGO.jpg";
+import { UbetterLogoWithAiBadge } from "@/components/brand-logo";
 import type { Locale } from "@/i18n/config";
 import { locales, localizedPath } from "@/i18n/config";
 import {
@@ -83,13 +82,8 @@ export default function SharedFooter({ locale }: { locale: Locale }) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href={`/${locale}`} className="flex items-center gap-2.5 mb-5">
-              <div className="w-7 h-7 relative rounded-md overflow-hidden">
-                <Image src={logoImg} alt="UBETTER" fill className="object-cover" sizes="28px" />
-              </div>
-              <span className="font-bold text-[15px]" style={{ color: C.text1 }}>
-                UBETTER
-              </span>
+            <Link href={`/${locale}`} className="inline-flex mb-5">
+              <UbetterLogoWithAiBadge size="sm" />
             </Link>
             <p className="text-[13px] leading-relaxed mb-5" style={{ color: C.text3 }}>
               {tagline}
