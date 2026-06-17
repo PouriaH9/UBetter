@@ -25,7 +25,7 @@ const PRODUCT_CATS = [
   { id: "industrial", fa: "صنعتی", en: "Industrial", zh: "工业" },
   { id: "solar", fa: "خورشیدی و هیبریدی", en: "Solar & Hybrid", zh: "光伏与混合系统" },
   { id: "large-scale", fa: "پروژه‌های بزرگ و میکروگرید", en: "Large Projects & Microgrid", zh: "大型项目与微电网" },
-  { id: "ups", fa: "برق اضطراری و UPS", en: "Emergency Power & UPS", zh: "应急电源与 UPS" },
+  { id: "ups", fa: "ذخیره‌ساز انرژی هوشمند", en: "Smart Energy Storage", zh: "智能储能", de: "Intelligenter Energiespeicher" },
 ] as const;
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -34,6 +34,7 @@ const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 function catLabel(locale: Locale, cat: (typeof PRODUCT_CATS)[number]): string {
   if (locale === "fa") return cat.fa;
   if (locale === "zh") return cat.zh;
+  if (locale === "de") return "de" in cat ? cat.de : cat.en;
   return cat.en;
 }
 
@@ -218,7 +219,7 @@ export default function SharedNavbar({
       scrollTargetId: UPS_CALCULATOR_SECTION_ID,
     },
     { href: warrantyPath, label: "گارانتی", page: "warranty" as const },
-    { href: `${homePath}#about`, label: "درباره ما", page: "home" as const },
+    { href: `/${locale}/about`, label: "درباره ما", page: "home" as const },
     { href: `${homePath}#contact`, label: "تماس با ما", page: "home" as const },
   ];
   const enLinks = [
@@ -231,7 +232,7 @@ export default function SharedNavbar({
       scrollTargetId: UPS_CALCULATOR_SECTION_ID,
     },
     { href: warrantyPath, label: "Warranty", page: "warranty" as const },
-    { href: `${homePath}#about`, label: "About", page: "home" as const },
+    { href: `/${locale}/about`, label: "About", page: "home" as const },
     { href: `${homePath}#contact`, label: "Contact", page: "home" as const },
   ];
   const zhLinks = [
@@ -244,7 +245,7 @@ export default function SharedNavbar({
       scrollTargetId: UPS_CALCULATOR_SECTION_ID,
     },
     { href: warrantyPath, label: "保修服务", page: "warranty" as const },
-    { href: `${homePath}#about`, label: "关于我们", page: "home" as const },
+    { href: `/${locale}/about`, label: "关于我们", page: "home" as const },
     { href: `${homePath}#contact`, label: "联系我们", page: "home" as const },
   ];
   const navLinks = locale === "fa" ? faLinks : locale === "zh" ? zhLinks : enLinks;
@@ -284,7 +285,7 @@ export default function SharedNavbar({
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: easeOut }}
-      className={`fixed inset-x-0 top-0 z-50 overflow-visible ${
+      className={`fixed inset-x-0 top-0 z-[100] overflow-visible ${
         compactDesktopBar ? "md:mx-6 lg:mx-10 xl:mx-14 md:pt-3" : ""
       }`}
       style={{

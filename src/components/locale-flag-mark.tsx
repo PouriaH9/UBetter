@@ -3,7 +3,7 @@ import type { Locale } from "@/i18n/config";
 const ring =
   "shrink-0 rounded-[3px] overflow-hidden ring-1 ring-black/12 dark:ring-white/18";
 
-/** Compact SVG flags for locale switcher (Iran / USA / China). */
+/** Compact SVG flags for locale switcher. */
 export function LocaleFlagMark({ locale }: { locale: Locale }) {
   if (locale === "fa") {
     return (
@@ -26,6 +26,15 @@ export function LocaleFlagMark({ locale }: { locale: Locale }) {
         <circle fill="#FFDE00" cx="20.5" cy="7.5" r="1.35" />
         <circle fill="#FFDE00" cx="20.5" cy="11.5" r="1.35" />
         <circle fill="#FFDE00" cx="17.5" cy="14" r="1.35" />
+      </svg>
+    );
+  }
+  if (locale === "de") {
+    return (
+      <svg className={ring} width="22" height="13" viewBox="0 0 22 13" aria-hidden>
+        <rect fill="#000000" width="22" height="4.33" />
+        <rect fill="#DD0000" width="22" height="4.34" y="4.33" />
+        <rect fill="#FFCE00" width="22" height="4.33" y="8.67" />
       </svg>
     );
   }
@@ -59,6 +68,8 @@ export function localeNavLabel(locale: Locale, size: "short" | "long"): string {
         return "فا";
       case "zh":
         return "中文";
+      case "de":
+        return "DE";
       default:
         return "EN";
     }
@@ -68,6 +79,8 @@ export function localeNavLabel(locale: Locale, size: "short" | "long"): string {
       return "فارسی";
     case "zh":
       return "中文";
+    case "de":
+      return "Deutsch";
     default:
       return "English";
   }
@@ -79,6 +92,8 @@ export function localeSwitchAria(target: Locale): string {
       return "Switch to Persian";
     case "zh":
       return "Switch to Chinese";
+    case "de":
+      return "Switch to German";
     default:
       return "Switch to English";
   }

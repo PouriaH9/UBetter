@@ -2,7 +2,8 @@
 
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
 import type { ComponentType, MouseEvent, ReactNode, SVGProps } from "react";
 
 import {
@@ -17,6 +18,8 @@ import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
 import { homeSectionsCopy, type HomeSectionBlock } from "@/i18n/home-sections.dict";
 import { translations } from "@/i18n/translations";
+import { localeHtmlLang } from "@/i18n/locale-ui";
+import { caseStudyImagesForSection } from "@/assets/casestudyImages";
 
 const CATALOG_PDF_URL = "/UBETTER-Catalog.pdf";
 const CATALOG_DOWNLOAD_NAME = "UBETTER-Catalog.pdf";
@@ -25,6 +28,8 @@ const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 /** Matches products page / site gradient CTAs */
 const GRADIENT_CTA_INNER_CLASS =
   "btn-gradient-border-inner inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-[14px] sm:text-[15px] transition-all duration-300 hover:scale-105";
+const GRADIENT_CTA_INNER_DISABLED_CLASS =
+  "btn-gradient-border-inner inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-[14px] sm:text-[15px] cursor-not-allowed";
 const easeOut = [0.22, 1, 0.36, 1] as const;
 const easeSpring = [0.34, 1.45, 0.64, 1] as const;
 
@@ -253,6 +258,7 @@ function SectionShell({
   bare = false,
   looseBottom = false,
   contentInGlass = true,
+  unifiedPanel = false,
 }: {
   locale: Locale;
   sectionId?: string;
@@ -269,6 +275,8 @@ function SectionShell({
   looseBottom?: boolean;
   /** Wrap section body in frosted glass (off for minimal blocks e.g. catalog CTA). */
   contentInGlass?: boolean;
+  /** Render children inside the header glass panel (single box). */
+  unifiedPanel?: boolean;
 }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
@@ -301,17 +309,19 @@ function SectionShell({
       >
         {copy.title}
       </motion.h2>
-      <motion.p
-        className="max-w-2xl mx-auto leading-relaxed px-2"
-        style={{
-          color: panelSkin.subtitleColor,
-          textShadow: panelSkin.textShadow,
-          fontSize: "clamp(13px, 1.4vw, 16px)",
-        }}
-        variants={glassPanelItemVariants}
-      >
-        {copy.subtitle}
-      </motion.p>
+      {copy.subtitle ? (
+        <motion.p
+          className="max-w-2xl mx-auto leading-relaxed px-2"
+          style={{
+            color: panelSkin.subtitleColor,
+            textShadow: panelSkin.textShadow,
+            fontSize: "clamp(13px, 1.4vw, 16px)",
+          }}
+          variants={glassPanelItemVariants}
+        >
+          {copy.subtitle}
+        </motion.p>
+      ) : null}
     </>
   );
 
@@ -320,7 +330,7 @@ function SectionShell({
       <section
         id={sectionId}
         dir={t.dir}
-        lang={locale === "fa" ? "fa" : locale === "zh" ? "zh" : "en"}
+        lang={localeHtmlLang(locale)}
         className={`relative overflow-hidden min-h-[100svh] w-full flex flex-col justify-center pt-10 pb-10 sm:pt-14 sm:pb-14 ${looseBottom ? "pb-20 sm:pb-28 lg:pb-32" : ""} ${locale !== "fa" ? "font-sans" : ""} ${className}`}
         style={{
           background: "transparent",
@@ -337,9 +347,17 @@ function SectionShell({
           <motion.div className="relative mx-auto w-full max-w-3xl pointer-events-auto">
             <GlassShimmerPanel skin={panelSkin} isDark={isDark} cornerIcon={BadgeIcon} compact>
               {headerBlock}
+              {unifiedPanel ? (
+                <motion.div
+                  className="flex w-full flex-col items-center pt-2 sm:pt-3"
+                  variants={glassPanelItemVariants}
+                >
+                  {children}
+                </motion.div>
+              ) : null}
             </GlassShimmerPanel>
           </motion.div>
-          {contentInGlass ? (
+          {!unifiedPanel && contentInGlass ? (
             <motion.div
               className="relative flex w-full flex-col gap-6 pointer-events-auto rounded-[20px] p-4 sm:gap-8 sm:p-6"
               style={sectionGlassSkin(isDark, "panel")}
@@ -350,7 +368,7 @@ function SectionShell({
             >
               {children}
             </motion.div>
-          ) : (
+          ) : !unifiedPanel ? (
             <motion.div
               className="relative flex w-full flex-col items-center gap-6 pointer-events-auto sm:gap-8"
               initial={{ opacity: 0, y: 20 }}
@@ -360,7 +378,7 @@ function SectionShell({
             >
               {children}
             </motion.div>
-          )}
+          ) : null}
         </motion.div>
       </section>
     );
@@ -439,16 +457,18 @@ function SectionShell({
           >
             {copy.title}
           </motion.h2>
-          <motion.p
-            className="max-w-2xl mx-auto leading-relaxed"
-            style={{ color: C.text2, fontSize: "clamp(13px, 1.35vw, 16px)" }}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.14, duration: 0.55, ease: easeOut }}
-          >
-            {copy.subtitle}
-          </motion.p>
+          {copy.subtitle ? (
+            <motion.p
+              className="max-w-2xl mx-auto leading-relaxed"
+              style={{ color: C.text2, fontSize: "clamp(13px, 1.35vw, 16px)" }}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.14, duration: 0.55, ease: easeOut }}
+            >
+              {copy.subtitle}
+            </motion.p>
+          ) : null}
         </motion.header>
         {children}
       </motion.div>
@@ -531,11 +551,27 @@ function sectionCtaHoverOut(e: MouseEvent<HTMLElement>, isDark: boolean, C: type
   el.style.color = C.text1;
 }
 
-function SectionCta({ locale, label, href }: { locale: Locale; label: string; href?: string }) {
+function SectionCta({
+  locale,
+  label,
+  href,
+  comingSoon = false,
+}: {
+  locale: Locale;
+  label: string;
+  href?: string;
+  comingSoon?: boolean;
+}) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
 
   const innerStyle = sectionCtaInnerStyle(isDark, C);
+  const disabledStyle = comingSoon
+    ? ({
+        ...innerStyle,
+        opacity: 0.55,
+      } as const)
+    : innerStyle;
 
   const arrow = (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
@@ -557,8 +593,21 @@ function SectionCta({ locale, label, href }: { locale: Locale; label: string; hr
       viewport={{ once: true }}
       transition={{ delay: 0.35, duration: 0.5 }}
     >
-      <div className="btn-gradient-border" style={{ color: C.text1 }}>
-        {href ? (
+      <div
+        className={`btn-gradient-border${comingSoon ? " opacity-70 pointer-events-none" : ""}`}
+        style={{ color: C.text1 }}
+      >
+        {comingSoon ? (
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            className={GRADIENT_CTA_INNER_DISABLED_CLASS}
+            style={disabledStyle}
+          >
+            {label}
+          </button>
+        ) : href ? (
           <Link
             href={href}
             className={GRADIENT_CTA_INNER_CLASS}
@@ -698,17 +747,130 @@ export { HomeCertificatesSection } from "@/components/certificates-section";
 
 // ─── 7. Projects ─────────────────────────────────────────────────────────────
 
+function CaseStudyCarousel({
+  images,
+  sectionKey,
+  isDark,
+}: {
+  images: StaticImageData[];
+  sectionKey: number;
+  isDark: boolean;
+}) {
+  const [slide, setSlide] = useState(0);
+
+  useEffect(() => {
+    setSlide(0);
+  }, [sectionKey]);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const id = window.setInterval(() => {
+      setSlide((current) => (current + 1) % images.length);
+    }, 3000);
+    return () => window.clearInterval(id);
+  }, [images.length, sectionKey]);
+
+  if (images.length === 0) return null;
+
+  return (
+    <motion.div
+      className="relative w-full max-w-3xl mx-auto"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.08 }}
+    >
+      <div
+        className="relative aspect-[16/10] sm:aspect-[16/9] overflow-hidden rounded-2xl"
+        style={{ ...sectionGlassSkin(isDark, "card"), padding: 0 }}
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={`${sectionKey}-${slide}`}
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ background: isDark ? "rgba(0,0,0,0.28)" : "rgba(0,0,0,0.04)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            <Image
+              src={images[slide]}
+              alt=""
+              fill
+              className="object-contain p-2 sm:p-3"
+              sizes="(max-width: 768px) 100vw, 768px"
+              quality={88}
+              priority={slide === 0}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+}
+
 export function HomeProjectsSection({ locale }: { locale: Locale }) {
   const copy = homeSectionsCopy[locale].projects;
+  const { isDark } = useTheme();
+  const C = isDark ? DARK_C : LIGHT_C;
+  const [activeIdx, setActiveIdx] = useState(0);
+  const active = copy.cards[activeIdx] ?? copy.cards[0];
+  const sectionImages = useMemo(() => caseStudyImagesForSection(activeIdx), [activeIdx]);
 
   return (
     <SectionShell locale={locale} gradientKey="projects" copy={copy} globeBackdrop bare>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
         {copy.cards.map((card, i) => (
-          <FeatureCard key={card.title} locale={locale} {...card} index={i} />
+          <button
+            key={card.title}
+            type="button"
+            onClick={() => setActiveIdx(i)}
+            className="px-4 py-2.5 rounded-xl text-[12px] sm:text-[13px] font-bold transition-all duration-200"
+            style={{
+              background: activeIdx === i ? C.accent : isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
+              color: activeIdx === i ? "#000" : C.text2,
+              border: `1px solid ${activeIdx === i ? C.accent : C.divider}`,
+              fontFamily: locale === "fa" ? YK : undefined,
+            }}
+          >
+            {card.title}
+          </button>
         ))}
       </div>
-      {copy.cta ? <SectionCta locale={locale} label={copy.cta} /> : null}
+      {active ? (
+        <motion.div
+          key={active.title}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="w-full max-w-4xl mx-auto flex flex-col gap-6 sm:gap-8"
+        >
+          <div
+            className="max-w-2xl mx-auto w-full text-center rounded-2xl p-6 sm:p-8"
+            style={sectionGlassSkin(isDark, "card")}
+          >
+            {active.tag ? (
+              <span
+                className="inline-block mb-3 text-[10px] font-bold tracking-wide px-2.5 py-1 rounded-full"
+                style={{ background: C.accentBg, color: C.accent, border: `1px solid ${C.accentBorder}` }}
+              >
+                {active.tag}
+              </span>
+            ) : null}
+            <h3
+              className="font-bold text-[18px] sm:text-[20px] mb-3"
+              style={{ color: C.text1, fontFamily: locale === "fa" ? YK : undefined }}
+            >
+              {active.title}
+            </h3>
+            <p className="text-[14px] sm:text-[15px] leading-relaxed" style={{ color: C.text2 }}>
+              {active.desc}
+            </p>
+          </div>
+
+          <CaseStudyCarousel images={sectionImages} sectionKey={activeIdx} isDark={isDark} />
+        </motion.div>
+      ) : null}
     </SectionShell>
   );
 }
@@ -731,7 +893,7 @@ export function HomeArticlesSection({ locale }: { locale: Locale }) {
           <FeatureCard key={card.title} locale={locale} {...card} index={i} />
         ))}
       </motion.div>
-      {copy.cta ? <SectionCta locale={locale} label={copy.cta} /> : null}
+      {copy.cta ? <SectionCta locale={locale} label={copy.cta} comingSoon /> : null}
     </SectionShell>
   );
 }
@@ -743,38 +905,23 @@ export function HomeCatalogSection({ locale }: { locale: Locale }) {
   const C = isDark ? DARK_C : LIGHT_C;
   const copy = homeSectionsCopy[locale].catalog;
   return (
-    <SectionShell locale={locale} gradientKey="catalog" copy={copy} globeBackdrop bare contentInGlass={false}>
-      <motion.div
-        className="flex w-full max-w-md flex-col items-center gap-5 rounded-[20px] px-6 py-6 sm:px-8 sm:py-7"
-        style={sectionGlassSkin(isDark, "card")}
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-6% 0px" }}
-        transition={{ duration: 0.6, ease: easeOut }}
+    <SectionShell locale={locale} gradientKey="catalog" copy={copy} globeBackdrop bare unifiedPanel>
+      <a
+        href={CATALOG_PDF_URL}
+        download={CATALOG_DOWNLOAD_NAME}
+        className="inline-flex items-center gap-3 rounded-full px-8 py-4 text-[15px] font-bold transition-all duration-200 hover:scale-[1.03] sm:px-10 sm:text-[16px]"
+        style={{
+          background: C.accent,
+          color: "#000",
+          fontFamily: locale === "fa" ? YK : undefined,
+          boxShadow: `0 0 28px ${C.accentGlow}`,
+        }}
       >
-        <p
-          className="text-center text-[13px] leading-relaxed sm:text-[14px]"
-          style={{ color: isDark ? "rgba(255,255,255,0.88)" : "rgba(0,0,0,0.72)" }}
-        >
-          {copy.subtitle}
-        </p>
-        <a
-          href={CATALOG_PDF_URL}
-          download={CATALOG_DOWNLOAD_NAME}
-          className="inline-flex items-center gap-3 rounded-full px-8 py-4 text-[15px] font-bold transition-all duration-200 hover:scale-[1.03] sm:px-10 sm:text-[16px]"
-          style={{
-            background: C.accent,
-            color: "#000",
-            fontFamily: locale === "fa" ? YK : undefined,
-            boxShadow: `0 0 28px ${C.accentGlow}`,
-          }}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M12 3v12M8 11l4 4 4-4M5 21h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          {copy.cta}
-        </a>
-      </motion.div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M12 3v12M8 11l4 4 4-4M5 21h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        {copy.cta}
+      </a>
     </SectionShell>
   );
 }

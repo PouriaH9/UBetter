@@ -1,9 +1,10 @@
 import type { Locale } from "@/i18n/config";
+import { localeNumTag } from "@/i18n/locale-ui";
 import type { UpsCategoryId } from "@/i18n/ups-device-data";
 
-export type UpsTypeId = "online" | "line-interactive" | "offline";
+export type UpsTypeId = "all-in-one-lv" | "separate-lv" | "hv" | "commercial-hv";
 
-/** All UI + device/category labels for the home-page UPS wizard */
+/** All UI + device/category labels for the home-page energy-storage wizard */
 export type UpsCalculatorDict = {
   meta: { stepWord: string; ofWord: string };
   section: { badge: string; titleBefore: string; titleHighlight: string; subtitle: string };
@@ -41,18 +42,15 @@ export type UpsCalculatorDict = {
     title: string;
     subtitle: string;
     statTotalLoad: string;
-    statMinVa: string;
+    statInverter: string;
     statNominal: string;
     statBackup: string;
     subWatts: string;
-    subVa: string;
+    subInverter: string;
     subNominal: string;
-    subStdBattery: string;
-    batteryTitle: string;
-    battCount: string;
-    battEach: string;
-    battTotal: string;
-    battUnit: string;
+    subSelectedBackup: string;
+    capacityTitle: string;
+    capacityNote: string;
     promoTitle: string;
     promoLarge: string;
     promoMid: string;
@@ -71,16 +69,14 @@ export type UpsCalculatorDict = {
     rowTotalLoad: string;
     rowUpsType: string;
     rowTarget: string;
-    rowActual: string;
-    rowBattery: string;
-    rowWh: string;
+    rowInverter: string;
+    rowCapacity: string;
     deviceList: string;
     downloadPng: string;
     restart: string;
   };
-  /** CTA row under the wizard (tel: dial) */
-  panelCall: { hint: string; button: string };
-  time: { halfHour: string; hourSuffix: string };
+  panelCall: { hint: string; button: string; phones: string[] };
+  time: { hourSuffix: string };
   upsTypes: Record<UpsTypeId, { title: string; desc: string; suitable: string }>;
   categories: Record<UpsCategoryId, string>;
   devices: Record<string, string>;
@@ -236,150 +232,119 @@ const DEVICE_KEYS_ZH: Record<string, string> = {
   patient_monitor: "病人监护仪",
 };
 
-export const upsCalculatorEn: UpsCalculatorDict = {
-  meta: { stepWord: "Step", ofWord: "of" },
-  section: {
-    badge: "UPS selection",
-    titleBefore: "Pick the right",
-    titleHighlight: "UPS",
-    subtitle:
-      "Enter your load so we can recommend a matching UPS size and battery configuration.",
+const DEVICE_KEYS_DE: Record<string, string> = { ...DEVICE_KEYS_EN };
+
+const ESS_TYPES_EN: UpsCalculatorDict["upsTypes"] = {
+  "all-in-one-lv": {
+    title: "ALL-in-ONE low-voltage (LV) ESS",
+    desc: "Integrated inverter (3–11 kW) and lithium battery (3–15 kWh). Modern smart design for apartments, villas, and offices.",
+    suitable: "Light residential & office",
   },
-  wizardSteps: [
-    { label: "Load & power", hint: "Estimate connected load" },
-    { label: "UPS topology", hint: "Technology type" },
-    { label: "Sizing & runtime", hint: "Capacity & backup time" },
-    { label: "Report & contact", hint: "Summary & next steps" },
-  ],
-  step1: {
-    title: "Do you know the total load to connect to the UPS?",
-    subtitle:
-      'If you already know total watts, choose "Yes". Otherwise, build a list from our presets and we will sum the load for you.',
-    yesTitle: "Yes",
-    yesSub: "I know my total load in watts",
-    noTitle: "No",
-    noSub: "Help me estimate from a device list",
-    directWattLabel: "Total load (watts)",
-    pickDevicesHint:
-      "Choose devices you plan to run on the UPS from the list, then add them to the table.",
-    category: "Category",
-    deviceName: "Device",
-    watt: "Power (W)",
-    qty: "Qty",
-    addDevice: "+ Add device",
-    remove: "Remove",
-    mobileTotal: "Total load",
-    footnote:
-      "* All values are in watts. Default powers are typical averages for the listed equipment.",
-    nextStep: "Next: UPS type",
-    lineTotal: "Line total*",
-    actions: "Actions",
+  "separate-lv": {
+    title: "Split low-voltage (LV) ESS",
+    desc: "Separate inverter (3–12 kW) and lithium battery (3–30 kWh). Ideal for apartments, villas, and offices.",
+    suitable: "Flexible home & office",
   },
-  step2: {
-    title: "Choose the UPS type and target backup time",
-    subtitle:
-      "Pick the topology that matches equipment sensitivity, then select how long you need to run on battery.",
-    suitablePrefix: "Typical use:",
-    backupLabel: "Target backup time on battery",
-    back: "Back",
-    calcUps: "Calculate sizing",
+  hv: {
+    title: "High-voltage (HV) ESS",
+    desc: "Inverter (10–60 kW) and lithium battery (10–120 kWh). For higher loads such as large stores, clinics, and residential complexes.",
+    suitable: "Medium–high consumption",
   },
-  step3: {
-    title: "Engineering sizing: UPS & battery",
-    subtitle:
-      "Estimates use power factor and a 25% safety margin. Runtime assumes the suggested standard battery blocks.",
-    statTotalLoad: "Total load",
-    statMinVa: "Minimum VA",
-    statNominal: "Suggested UPS",
-    statBackup: "Estimated backup",
-    subWatts: "Watts",
-    subVa: "Volt-amps",
-    subNominal: "Nameplate",
-    subStdBattery: "With standard battery",
-    batteryTitle: "Suggested battery layout",
-    battCount: "Batteries:",
-    battEach: "Each cell:",
-    battTotal: "Total stored:",
-    battUnit: "units",
-    promoTitle: "Related UBETTER products",
-    promoLarge:
-      "For this power class, industrial energy-storage and large-format UBETTER UPS tiers are often the right fit.",
-    promoMid:
-      "UBETTER power stations can cover this UPS need while also acting as a full backup energy hub.",
-    promoSmall:
-      "Portable UBETTER power stations are a strong match at this load — flexible UPS-style backup plus mobile energy.",
-    viewProducts: "View UBETTER products",
-    back: "Back",
-    viewReport: "View & download report",
-    calcError: "Could not calculate. Please complete step 1.",
+  "commercial-hv": {
+    title: "Commercial high-voltage (HV) ESS",
+    desc: "Inverter (120–2500 kW) and lithium battery (120–5000 kWh). For hospitals, banks, and factories.",
+    suitable: "Large commercial & industrial",
   },
-  step4: {
-    title: "Summary report & how to reach our team",
-    subtitle:
-      "Save the report image below, or contact sales for a formal quote and site-specific engineering.",
-    reportTitle: "UPS sizing report",
-    reportTagline: "UBETTER Energy — informal planning summary",
-    suggestedUps: "Suggested UPS",
-    rowTotalLoad: "Total load",
-    rowUpsType: "UPS type",
-    rowTarget: "Target backup",
-    rowActual: "Estimated backup",
-    rowBattery: "Battery",
-    rowWh: "Total battery energy",
-    deviceList: "Load list:",
-    downloadPng: "Download report image",
-    restart: "Start over",
-  },
-  panelCall: {
-    hint: "Or simply call us — our team can help you choose the right UPS.",
-    button: "Call now",
-  },
-  time: { halfHour: "30 min", hourSuffix: "hours" },
-  upsTypes: {
-    online: {
-      title: "Online (double-conversion)",
-      desc: "Maximum protection — fully isolated, clean output and zero transfer time.",
-      suitable: "Servers, medical, industrial",
-    },
-    "line-interactive": {
-      title: "Line-interactive",
-      desc: "Strong protection with AVR and fast switchover when mains fails.",
-      suitable: "PC, network gear, CCTV",
-    },
-    offline: {
-      title: "Offline (standby)",
-      desc: "Basic protection when power drops — simple and cost-effective.",
-      suitable: "Home office, small office loads",
-    },
-  },
-  categories: {
-    home: "Residential",
-    lighting: "Lighting",
-    computer_it: "Computer & IT",
-    network: "Network & telecom",
-    security: "Security",
-    medical: "Medical",
-  },
-  devices: DEVICE_KEYS_EN,
 };
+
+const ESS_TYPES_FA: UpsCalculatorDict["upsTypes"] = {
+  "all-in-one-lv": {
+    title: "ذخیره ساز انرژی ALL in ONE ولتاژ پایین LV",
+    desc: "با اینورتر (سانورتر) 3 تا 11 کیلووات و باتری لیتیومی از 3 تا 15 کیلووات ساعت، طراحی مدرن و هوشمند و مناسب برای آپارتمان، ویلا و دفاتر کاری",
+    suitable: "پروژه‌های سبک خانگی و اداری",
+  },
+  "separate-lv": {
+    title: "ذخیره ساز انرژی منفصل ولتاژ پایین LV",
+    desc: "با اینورتر (سانورتر) 3 تا 12 کیلووات و باتری لیتیومی از 3 تا 30 کیلووات ساعت، مناسب برای آپارتمان، ویلا و دفاتر کاری",
+    suitable: "خانگی و اداری انعطاف‌پذیر",
+  },
+  hv: {
+    title: "ذخیره ساز انرژی ولتاژ بالا HV",
+    desc: "با اینورتر( سانورتر) از 10 تا 60 کیلووات و باتری لیتیومی از 10 تا 120 کیلووات ساعت، مناسب برای توان مصرفی بالاتر همچون فروشگاه های بزرگ و کلینیک های پزشکی و مجتمع های مسکونی",
+    suitable: "مصرف متوسط تا بالا",
+  },
+  "commercial-hv": {
+    title: "ذخیره ساز انرژی تجاری ولتاژ بالا HV",
+    desc: "با اینورتر (سانورتر) از 120 تا 2500 کیلووات و باتری لیتیومی از 120 تا 5000 کیلووات مناسب برای بیمارستان ها، بانکها و کارخانه ها",
+    suitable: "تجاری و صنعتی بزرگ",
+  },
+};
+
+const ESS_TYPES_ZH: UpsCalculatorDict["upsTypes"] = {
+  "all-in-one-lv": {
+    title: "低压一体化 ALL-in-ONE 储能",
+    desc: "逆变器 3–11 kW，锂电 3–15 kWh，现代智能设计，适合公寓、别墅与办公室。",
+    suitable: "轻型家用与办公",
+  },
+  "separate-lv": {
+    title: "低压分体式储能",
+    desc: "逆变器 3–12 kW，锂电 3–30 kWh，适合公寓、别墅与办公室。",
+    suitable: "灵活家用与办公",
+  },
+  hv: {
+    title: "高压储能 HV",
+    desc: "逆变器 10–60 kW，锂电 10–120 kWh，适合大型商店、诊所与住宅综合体等高负载场景。",
+    suitable: "中高负载",
+  },
+  "commercial-hv": {
+    title: "商业高压储能 HV",
+    desc: "逆变器 120–2500 kW，锂电 120–5000 kWh，适合医院、银行与工厂。",
+    suitable: "大型工商业",
+  },
+};
+
+const ESS_TYPES_DE: UpsCalculatorDict["upsTypes"] = {
+  "all-in-one-lv": {
+    title: "ALL-in-ONE Niederspannungs-Energiespeicher (LV)",
+    desc: "Wechselrichter 3–11 kW und Lithiumbatterie 3–15 kWh. Moderne Smart-Lösung für Wohnungen, Villen und Büros.",
+    suitable: "Leichte Wohn- & Büroprojekte",
+  },
+  "separate-lv": {
+    title: "Getrennter Niederspannungs-Energiespeicher (LV)",
+    desc: "Wechselrichter 3–12 kW und Lithiumbatterie 3–30 kWh. Für Wohnungen, Villen und Büros.",
+    suitable: "Flexibles Wohnen & Büro",
+  },
+  hv: {
+    title: "Hochspannungs-Energiespeicher (HV)",
+    desc: "Wechselrichter 10–60 kW und Lithiumbatterie 10–120 kWh. Für höhere Lasten wie große Geschäfte, Kliniken und Wohnanlagen.",
+    suitable: "Mittlere bis hohe Last",
+  },
+  "commercial-hv": {
+    title: "Gewerblicher Hochspannungs-Energiespeicher (HV)",
+    desc: "Wechselrichter 120–2500 kW und Lithiumbatterie 120–5000 kWh. Für Krankenhäuser, Banken und Fabriken.",
+    suitable: "Großgewerbe & Industrie",
+  },
+};
+
+const SALES_PHONES = ["09333401555", "09333402555", "09333403555", "02188547867"];
 
 export const upsCalculatorFa: UpsCalculatorDict = {
   meta: { stepWord: "مرحله", ofWord: "از" },
   section: {
-    badge: "انتخاب یوپی‌اس",
-    titleBefore: "یو پی اس",
-    titleHighlight: "مناسب رو انتخاب کن!",
+    badge: "ماشین‌حساب آنلاین ذخیره‌ساز انرژی",
+    titleBefore: "ذخیره‌ساز انرژی هوشمند",
+    titleHighlight: "مناسب رو انتخاب کن",
     subtitle:
-      "توان مصرفی تجهیزات خود را وارد کنید تا یوپی‌اس و باتری مناسب برای شما پیشنهاد شود",
+      "توان مصرفی تجهیزات خود را وارد کنید تا ذخیره‌ساز انرژی و اینورتر (سانورتر) مناسب برای شما پیشنهاد شود",
   },
   wizardSteps: [
     { label: "تعیین توان مصرفی", hint: "برآورد بار متصل" },
-    { label: "انتخاب نوع یوپی‌اس", hint: "نوع فناوری UPS" },
-    { label: "محاسبه یوپی‌اس و باتری", hint: "ظرفیت و زمان پشتیبان" },
-    { label: "پرینت گزارش و تماس", hint: "خلاصه و ارتباط" },
+    { label: "انتخاب نوع ذخیره‌ساز", hint: "نوع سیستم ESS" },
+    { label: "محاسبه ظرفیت", hint: "اینورتر و زمان پشتیبان" },
+    { label: "گزارش و تماس", hint: "خلاصه و ارتباط" },
   ],
   step1: {
-    title: "آیا توان کل بار مورد نظر برای اتصال به UPS را می‌دانید؟",
+    title: "آیا توان کل بار مورد نظر برای اتصال به ذخیره‌ساز انرژی را می‌دانید؟",
     subtitle:
       "در صورت دانستن مقدار توان کلی تجهیزات خود، گزینه «بله» را انتخاب کنید؛ در غیر این صورت با فهرست دستگاه‌ها توان را برآورد می‌کنیم.",
     yesTitle: "بله",
@@ -388,7 +353,7 @@ export const upsCalculatorFa: UpsCalculatorDict = {
     noSub: "نیاز به کمک برای محاسبه دارم",
     directWattLabel: "توان کل تجهیزات (وات)",
     pickDevicesHint:
-      "تجهیزات مورد نظر خود برای اتصال به یوپی‌اس را از لیست موجود انتخاب و اضافه نمایید:",
+      "تجهیزات مورد نظر خود برای اتصال به ذخیره‌ساز انرژی را از لیست موجود انتخاب و اضافه نمایید:",
     category: "دسته‌بندی",
     deviceName: "نام دستگاه",
     watt: "توان (W)",
@@ -398,43 +363,40 @@ export const upsCalculatorFa: UpsCalculatorDict = {
     mobileTotal: "جمع کل توان",
     footnote:
       "*: واحدها به [وات] می‌باشد. توان‌های پیش‌فرض، متوسط توان مصرفی دستگاه‌های موجود در لیست می‌باشد.",
-    nextStep: "مرحله بعد: انتخاب نوع یوپی‌اس",
+    nextStep: "مرحله بعد: انتخاب نوع ذخیره‌ساز انرژی",
     lineTotal: "جمع بار*",
     actions: "عملیات",
   },
   step2: {
-    title: "نوع یوپی‌اس و زمان پشتیبان را مشخص کنید",
+    title: "نوع ذخیره‌ساز انرژی و زمان پشتیبان را مشخص کنید",
     subtitle:
-      "بر اساس نوع تجهیزات و حساسیت بار، فناوری مناسب را انتخاب کنید؛ سپس زمان مورد نیاز برای کار روی باتری را تعیین نمایید.",
+      "بر اساس نوع پروژه و توان مصرفی، سیستم مناسب را انتخاب کنید؛ سپس زمان مورد نیاز برای کار روی باتری را تعیین نمایید.",
     suitablePrefix: "مناسب:",
-    backupLabel: "زمان پشتیبان‌گیری مورد نیاز",
+    backupLabel: "زمان پشتیبان‌گیری",
     back: "مرحله قبل",
-    calcUps: "محاسبه یوپی‌اس",
+    calcUps: "محاسبه ذخیره‌ساز انرژی",
   },
   step3: {
-    title: "نتیجه مهندسی ظرفیت یوپی‌اس و باتری",
+    title: "نتیجه پیشنهادی ذخیره‌ساز انرژی",
     subtitle:
-      "این پیشنهاد بر اساس بار وارد شده، ضریب توان و حاشیه امن ۲۵٪ محاسبه شده است؛ زمان پشتیبان با فرض باتری استاندارد تخمین زده می‌شود.",
+      "ذخیره‌ساز انرژی پیشنهادی شامل اینورتر (سانورتر) با ظرفیت ولت‌آمپر (VA) برابر با بار متصل ضربدر ۱٫۲۵ است. ظرفیت باتری بر اساس توان اینورتر و زمان پشتیبان انتخاب‌شده محاسبه می‌شود.",
     statTotalLoad: "توان کل بار",
-    statMinVa: "حداقل ظرفیت نیاز",
-    statNominal: "یوپی‌اس پیشنهادی",
+    statInverter: "توان اینورتر پیشنهادی",
+    statNominal: "ذخیره‌ساز پیشنهادی",
     statBackup: "زمان پشتیبان‌گیری",
     subWatts: "وات",
-    subVa: "ولت آمپر",
-    subNominal: "ظرفیت اسمی",
-    subStdBattery: "با باتری استاندارد",
-    batteryTitle: "پیکربندی باتری پیشنهادی",
-    battCount: "تعداد باتری:",
-    battEach: "ظرفیت هر باتری:",
-    battTotal: "ظرفیت کل:",
-    battUnit: "عدد",
+    subInverter: "× ۱٫۲۵ بار درخواستی",
+    subNominal: "اینورتر + باتری",
+    subSelectedBackup: "انتخاب شما",
+    capacityTitle: "ظرفیت پیشنهادی",
+    capacityNote: "توان اینورتر × زمان پشتیبان",
     promoTitle: "محصولات مرتبط یوبتر انرژی",
     promoLarge:
-      "برای این سطح از توان، راهکارهای ذخیره‌سازی انرژی صنعتی و سیستم‌های UPS مقیاس بزرگ UBETTER پیشنهاد می‌شود.",
+      "برای این سطح از توان، راهکارهای ذخیره‌سازی انرژی تجاری و صنعتی UBETTER پیشنهاد می‌شود.",
     promoMid:
-      "سیستم‌های پاور استیشن UBETTER می‌توانند نیاز یوپی‌اس شما را پوشش دهند و علاوه بر آن، منبع انرژی پشتیبان کامل فراهم آورند.",
+      "ذخیره‌سازهای انرژی ولتاژ بالا UBETTER برای این سطح از توان گزینه مناسبی هستند.",
     promoSmall:
-      "پاور استیشن‌های قابل‌حمل UBETTER برای این سطح از توان گزینه مناسبی هستند — هم UPS و هم منبع انرژی همه‌کاره.",
+      "ذخیره‌سازهای ALL-in-ONE و منفصل ولتاژ پایین UBETTER برای این سطح از توان ایده‌آل‌اند.",
     viewProducts: "مشاهده محصولات UBETTER",
     back: "مرحله قبل",
     viewReport: "مشاهده و دانلود گزارش",
@@ -444,41 +406,25 @@ export const upsCalculatorFa: UpsCalculatorDict = {
     title: "گزارش خلاصه و مسیر ارتباط با مهندسی یوبتر",
     subtitle:
       "می‌توانید تصویر گزارش را ذخیره کنید یا برای پیش‌فاکتور و مشاوره دقیق‌تر با تیم ما در تماس باشید.",
-    reportTitle: "گزارش محاسبه یوپی‌اس",
+    reportTitle: "گزارش محاسبه ذخیره‌ساز انرژی",
     reportTagline: "UBETTER Energy — یوبتر انرژی · سند غیررسمی راهنما",
-    suggestedUps: "یوپی‌اس پیشنهادی",
+    suggestedUps: "ذخیره‌ساز انرژی پیشنهادی",
     rowTotalLoad: "توان کل بار",
-    rowUpsType: "نوع یوپی‌اس",
-    rowTarget: "زمان هدف",
-    rowActual: "زمان واقعی",
-    rowBattery: "باتری پیشنهادی",
-    rowWh: "ظرفیت کل باتری",
+    rowUpsType: "نوع ذخیره‌ساز",
+    rowTarget: "زمان پشتیبان",
+    rowInverter: "توان اینورتر (×۱٫۲۵، VA)",
+    rowCapacity: "ظرفیت باتری",
     deviceList: "لیست تجهیزات:",
     downloadPng: "دانلود تصویر گزارش",
     restart: "شروع مجدد محاسبه",
   },
   panelCall: {
-    hint: "یا به‌سادگی با ما تماس بگیرید؛ برای انتخاب یوپی‌اس راهنمایی‌تان می‌کنیم.",
+    hint: "یا به‌سادگی با ما تماس بگیرید؛ برای مشاوره تخصصی و انتخاب ذخیره‌ساز انرژی راهنمایی‌تان می‌کنیم. شماره:",
     button: "تماس تلفنی",
+    phones: SALES_PHONES,
   },
-  time: { halfHour: "نیم ساعت", hourSuffix: "ساعت" },
-  upsTypes: {
-    online: {
-      title: "آنلاین (دوگانه تبدیل)",
-      desc: "بالاترین سطح محافظت. برق ورودی کاملاً ایزوله و تمیز. زمان سوئیچ صفر.",
-      suitable: "سرور، تجهیزات پزشکی، صنعتی",
-    },
-    "line-interactive": {
-      title: "لاین اینتراکتیو",
-      desc: "محافظت خوب با تنظیم خودکار ولتاژ (AVR). سوئیچ سریع در هنگام قطع برق.",
-      suitable: "کامپیوتر، شبکه، دوربین مداربسته",
-    },
-    offline: {
-      title: "آف‌لاین (استند بای)",
-      desc: "محافظت پایه در برابر قطع برق. ساده و مقرون‌به‌صرفه.",
-      suitable: "کامپیوتر خانگی، تجهیزات اداری",
-    },
-  },
+  time: { hourSuffix: "ساعت" },
+  upsTypes: ESS_TYPES_FA,
   categories: {
     home: "خانگی",
     lighting: "روشنایی",
@@ -490,30 +436,137 @@ export const upsCalculatorFa: UpsCalculatorDict = {
   devices: DEVICE_KEYS_FA,
 };
 
+export const upsCalculatorEn: UpsCalculatorDict = {
+  meta: { stepWord: "Step", ofWord: "of" },
+  section: {
+    badge: "Online energy-storage calculator",
+    titleBefore: "Choose the right",
+    titleHighlight: "smart energy storage",
+    subtitle:
+      "Enter your load so we can recommend a matching energy storage system and inverter for your needs.",
+  },
+  wizardSteps: [
+    { label: "Load & power", hint: "Estimate connected load" },
+    { label: "ESS type", hint: "System category" },
+    { label: "Sizing", hint: "Inverter & backup time" },
+    { label: "Report & contact", hint: "Summary & next steps" },
+  ],
+  step1: {
+    title: "Do you know the total load to connect to the energy storage system?",
+    subtitle:
+      'If you already know total watts, choose "Yes". Otherwise, build a list from our presets and we will sum the load for you.',
+    yesTitle: "Yes",
+    yesSub: "I know my total load in watts",
+    noTitle: "No",
+    noSub: "Help me estimate from a device list",
+    directWattLabel: "Total load (watts)",
+    pickDevicesHint:
+      "Choose devices you plan to run on the energy storage system from the list, then add them to the table.",
+    category: "Category",
+    deviceName: "Device",
+    watt: "Power (W)",
+    qty: "Qty",
+    addDevice: "+ Add device",
+    remove: "Remove",
+    mobileTotal: "Total load",
+    footnote:
+      "* All values are in watts. Default powers are typical averages for the listed equipment.",
+    nextStep: "Next: ESS type",
+    lineTotal: "Line total*",
+    actions: "Actions",
+  },
+  step2: {
+    title: "Choose the energy storage type and backup time",
+    subtitle:
+      "Pick the system that matches your project, then select how long you need to run on battery.",
+    suitablePrefix: "Typical use:",
+    backupLabel: "Backup time",
+    back: "Back",
+    calcUps: "Calculate sizing",
+  },
+  step3: {
+    title: "Suggested energy storage sizing",
+    subtitle:
+      "The suggested system includes an inverter rated at 1.25× your connected load (VA). Battery capacity = inverter power × selected backup time.",
+    statTotalLoad: "Total load",
+    statInverter: "Suggested inverter",
+    statNominal: "Suggested ESS",
+    statBackup: "Backup time",
+    subWatts: "Watts",
+    subInverter: "1.25× requested load",
+    subNominal: "Inverter + battery",
+    subSelectedBackup: "Your selection",
+    capacityTitle: "Suggested capacity",
+    capacityNote: "Inverter power × backup time",
+    promoTitle: "Related UBETTER products",
+    promoLarge:
+      "For this power class, commercial and industrial UBETTER energy storage systems are often the right fit.",
+    promoMid: "UBETTER high-voltage ESS tiers are a strong match at this load level.",
+    promoSmall:
+      "UBETTER low-voltage ALL-in-ONE and split ESS systems are ideal at this load level.",
+    viewProducts: "View UBETTER products",
+    back: "Back",
+    viewReport: "View & download report",
+    calcError: "Could not calculate. Please complete step 1.",
+  },
+  step4: {
+    title: "Summary report & how to reach our team",
+    subtitle:
+      "Save the report image below, or contact sales for a formal quote and site-specific engineering.",
+    reportTitle: "Energy storage sizing report",
+    reportTagline: "UBETTER Energy — informal planning summary",
+    suggestedUps: "Suggested ESS",
+    rowTotalLoad: "Total load",
+    rowUpsType: "ESS type",
+    rowTarget: "Backup time",
+    rowInverter: "Inverter (×1.25, VA)",
+    rowCapacity: "Battery capacity",
+    deviceList: "Load list:",
+    downloadPng: "Download report image",
+    restart: "Start over",
+  },
+  panelCall: {
+    hint: "Or simply call us — our team can help you choose the right energy storage system.",
+    button: "Call now",
+    phones: SALES_PHONES,
+  },
+  time: { hourSuffix: "hours" },
+  upsTypes: ESS_TYPES_EN,
+  categories: {
+    home: "Residential",
+    lighting: "Lighting",
+    computer_it: "Computer & IT",
+    network: "Network & telecom",
+    security: "Security",
+    medical: "Medical",
+  },
+  devices: DEVICE_KEYS_EN,
+};
+
 export const upsCalculatorZh: UpsCalculatorDict = {
   meta: { stepWord: "步骤", ofWord: "共" },
   section: {
-    badge: "UPS 选型",
-    titleBefore: "挑选合适的",
-    titleHighlight: "UPS",
-    subtitle: "输入负载功率，我们将为您推荐匹配的 UPS 容量与电池配置。",
+    badge: "在线储能计算器",
+    titleBefore: "选择适合的",
+    titleHighlight: "智能储能系统",
+    subtitle: "输入负载功率，我们将为您推荐匹配的储能系统与逆变器。",
   },
   wizardSteps: [
     { label: "负载与功率", hint: "估算接入负载" },
-    { label: "UPS 拓扑", hint: "技术类型" },
-    { label: "容量与后备时间", hint: "续航配置" },
+    { label: "储能类型", hint: "系统类别" },
+    { label: "容量估算", hint: "逆变器与后备时间" },
     { label: "报告与联系", hint: "摘要与下一步" },
   ],
   step1: {
-    title: "您是否已知接入 UPS 的总负载？",
+    title: "您是否已知接入储能系统的总负载？",
     subtitle:
-      '若已知总功率（瓦特），请选择「是」。否则从预设清单勾选设备，由我们为您汇总负载。',
+      "若已知总功率（瓦特），请选择「是」。否则从预设清单勾选设备，由我们为您汇总负载。",
     yesTitle: "是",
     yesSub: "我已知道总负载（瓦）",
     noTitle: "否",
     noSub: "帮我从设备清单估算",
     directWattLabel: "总负载（瓦）",
-    pickDevicesHint: "从列表中选择计划在 UPS 上运行的设备，并加入表格。",
+    pickDevicesHint: "从列表中选择计划在储能系统上运行的设备，并加入表格。",
     category: "类别",
     deviceName: "设备",
     watt: "功率（W）",
@@ -522,40 +575,36 @@ export const upsCalculatorZh: UpsCalculatorDict = {
     remove: "移除",
     mobileTotal: "负载合计",
     footnote: "* 数值单位为瓦特，默认功率为所列设备的典型平均值。",
-    nextStep: "下一步：UPS 类型",
+    nextStep: "下一步：储能类型",
     lineTotal: "行合计*",
     actions: "操作",
   },
   step2: {
-    title: "选择 UPS 类型与目标后备时间",
-    subtitle: "根据设备敏感度选择拓扑，再选择在电池供电下需要运行多久。",
+    title: "选择储能类型与后备时间",
+    subtitle: "根据项目类型选择系统，再选择在电池供电下需要运行多久。",
     suitablePrefix: "典型用途：",
-    backupLabel: "目标电池后备时间",
+    backupLabel: "后备时间",
     back: "返回",
     calcUps: "计算选型",
   },
   step3: {
-    title: "工程估算：UPS 与电池",
+    title: "推荐储能配置",
     subtitle:
-      "估算已考虑功率因数与 25% 安全裕量；续航基于推荐的标准电池组。",
+      "推荐系统逆变器容量为请求负载的 1.25 倍。电池容量 = 逆变器功率 × 所选后备时间。",
     statTotalLoad: "总负载",
-    statMinVa: "最小 VA",
-    statNominal: "推荐 UPS",
-    statBackup: "估算后备",
+    statInverter: "推荐逆变器",
+    statNominal: "推荐储能",
+    statBackup: "后备时间",
     subWatts: "瓦特",
-    subVa: "伏安",
-    subNominal: "铭牌容量",
-    subStdBattery: "标配电池",
-    batteryTitle: "推荐电池组合",
-    battCount: "电池数量：",
-    battEach: "单节：",
-    battTotal: "总储能：",
-    battUnit: "节",
+    subInverter: "1.25× 请求负载",
+    subNominal: "逆变器 + 电池",
+    subSelectedBackup: "您的选择",
+    capacityTitle: "推荐容量",
+    capacityNote: "逆变器功率 × 后备时间",
     promoTitle: "相关 UBETTER 产品",
-    promoLarge: "在此功率等级，工商业储能与大功率 UBETTER UPS 往往更合适。",
-    promoMid: "UBETTER 储能电站可同时满足 UPS 需求并作为完整备用能源枢纽。",
-    promoSmall:
-      "便携式 UBETTER 储能电源非常适合该负载——兼具 UPS 式备份与移动用电。",
+    promoLarge: "在此功率等级，工商业 UBETTER 储能系统往往更合适。",
+    promoMid: "UBETTER 高压储能非常适合该负载等级。",
+    promoSmall: "UBETTER 低压一体化与分体式储能非常适合该负载等级。",
     viewProducts: "查看 UBETTER 产品",
     back: "返回",
     viewReport: "查看并下载报告",
@@ -563,43 +612,26 @@ export const upsCalculatorZh: UpsCalculatorDict = {
   },
   step4: {
     title: "摘要报告与联系我们",
-    subtitle:
-      "可保存下方报告图片，或联系销售获取正式报价与现场工程方案。",
-    reportTitle: "UPS 选型报告",
+    subtitle: "可保存下方报告图片，或联系销售获取正式报价与现场工程方案。",
+    reportTitle: "储能选型报告",
     reportTagline: "UBETTER Energy — 非正式规划摘要",
-    suggestedUps: "推荐 UPS",
+    suggestedUps: "推荐储能",
     rowTotalLoad: "总负载",
-    rowUpsType: "UPS 类型",
-    rowTarget: "目标后备",
-    rowActual: "估算后备",
-    rowBattery: "电池",
-    rowWh: "电池总能量",
+    rowUpsType: "储能类型",
+    rowTarget: "后备时间",
+    rowInverter: "逆变器（×1.25，VA）",
+    rowCapacity: "电池容量",
     deviceList: "负载清单：",
     downloadPng: "下载报告图片",
     restart: "重新开始",
   },
   panelCall: {
-    hint: "您也可以直接致电，我们的团队将协助选择合适的 UPS。",
+    hint: "您也可以直接致电，我们的团队将协助选择合适的储能系统。",
     button: "立即拨打",
+    phones: SALES_PHONES,
   },
-  time: { halfHour: "30 分钟", hourSuffix: "小时" },
-  upsTypes: {
-    online: {
-      title: "在线式（双变换）",
-      desc: "最高保护等级——输出完全隔离、洁净，切换时间为零。",
-      suitable: "服务器、医疗、工业",
-    },
-    "line-interactive": {
-      title: "互动式",
-      desc: "具备稳压 AVR，市电中断时快速切换。",
-      suitable: "电脑、网络设备、监控",
-    },
-    offline: {
-      title: "后备式",
-      desc: "市电断电时提供基础保护——简单经济。",
-      suitable: "家庭办公、小型负载",
-    },
-  },
+  time: { hourSuffix: "小时" },
+  upsTypes: ESS_TYPES_ZH,
   categories: {
     home: "家用",
     lighting: "照明",
@@ -611,9 +643,116 @@ export const upsCalculatorZh: UpsCalculatorDict = {
   devices: DEVICE_KEYS_ZH,
 };
 
+export const upsCalculatorDe: UpsCalculatorDict = {
+  meta: { stepWord: "Schritt", ofWord: "von" },
+  section: {
+    badge: "Online-Energiespeicher-Rechner",
+    titleBefore: "Wählen Sie den passenden",
+    titleHighlight: "intelligenten Energiespeicher",
+    subtitle:
+      "Geben Sie Ihre Last ein — wir empfehlen ein passendes Energiespeichersystem und Wechselrichter.",
+  },
+  wizardSteps: [
+    { label: "Last & Leistung", hint: "Angeschlossene Last schätzen" },
+    { label: "ESS-Typ", hint: "Systemkategorie" },
+    { label: "Dimensionierung", hint: "Wechselrichter & Backup" },
+    { label: "Bericht & Kontakt", hint: "Zusammenfassung" },
+  ],
+  step1: {
+    title: "Kennen Sie die Gesamtlast für den Anschluss an den Energiespeicher?",
+    subtitle:
+      'Wenn Sie die Gesamtleistung in Watt kennen, wählen Sie „Ja“. Andernfalls erstellen wir die Summe aus der Geräteliste.',
+    yesTitle: "Ja",
+    yesSub: "Ich kenne meine Gesamtlast in Watt",
+    noTitle: "Nein",
+    noSub: "Helfen Sie mir bei der Schätzung",
+    directWattLabel: "Gesamtlast (Watt)",
+    pickDevicesHint:
+      "Wählen Sie Geräte aus der Liste, die am Energiespeicher betrieben werden sollen.",
+    category: "Kategorie",
+    deviceName: "Gerät",
+    watt: "Leistung (W)",
+    qty: "Anz.",
+    addDevice: "+ Gerät hinzufügen",
+    remove: "Entfernen",
+    mobileTotal: "Gesamtlast",
+    footnote:
+      "* Alle Werte in Watt. Standardwerte sind typische Durchschnittsleistungen.",
+    nextStep: "Weiter: ESS-Typ",
+    lineTotal: "Zeilensumme*",
+    actions: "Aktionen",
+  },
+  step2: {
+    title: "Energiespeichertyp und Backup-Zeit wählen",
+    subtitle:
+      "Wählen Sie das passende System und wie lange Sie im Batteriebetrieb versorgt sein möchten.",
+    suitablePrefix: "Typisch:",
+    backupLabel: "Backup-Zeit",
+    back: "Zurück",
+    calcUps: "Berechnen",
+  },
+  step3: {
+    title: "Empfohlene Energiespeicher-Dimensionierung",
+    subtitle:
+      "Empfohlener Wechselrichter: 1,25× Ihre angeforderte Last. Batteriekapazität = Wechselrichterleistung × gewählte Backup-Zeit.",
+    statTotalLoad: "Gesamtlast",
+    statInverter: "Empfohlener Wechselrichter",
+    statNominal: "Empfohlenes ESS",
+    statBackup: "Backup-Zeit",
+    subWatts: "Watt",
+    subInverter: "1,25× angeforderte Last",
+    subNominal: "Wechselrichter + Batterie",
+    subSelectedBackup: "Ihre Auswahl",
+    capacityTitle: "Empfohlene Kapazität",
+    capacityNote: "Wechselrichterleistung × Backup-Zeit",
+    promoTitle: "Passende UBETTER-Produkte",
+    promoLarge:
+      "Für diese Leistungsklasse eignen sich gewerbliche und industrielle UBETTER-Systeme.",
+    promoMid: "UBETTER Hochspannungs-ESS ist für diese Last oft ideal.",
+    promoSmall: "UBETTER Niederspannungs ALL-in-ONE und getrennte Systeme passen hier gut.",
+    viewProducts: "UBETTER-Produkte ansehen",
+    back: "Zurück",
+    viewReport: "Bericht ansehen & herunterladen",
+    calcError: "Berechnung fehlgeschlagen. Bitte Schritt 1 abschließen.",
+  },
+  step4: {
+    title: "Zusammenfassung & Kontakt",
+    subtitle:
+      "Speichern Sie das Berichtsbild oder kontaktieren Sie unser Team für ein Angebot.",
+    reportTitle: "Energiespeicher-Bericht",
+    reportTagline: "UBETTER Energy — informelle Planungsübersicht",
+    suggestedUps: "Empfohlenes ESS",
+    rowTotalLoad: "Gesamtlast",
+    rowUpsType: "ESS-Typ",
+    rowTarget: "Backup-Zeit",
+    rowInverter: "Wechselrichter (×1,25, VA)",
+    rowCapacity: "Batteriekapazität",
+    deviceList: "Lastliste:",
+    downloadPng: "Berichtsbild herunterladen",
+    restart: "Neu starten",
+  },
+  panelCall: {
+    hint: "Oder rufen Sie uns an — wir beraten Sie bei der Auswahl des richtigen Energiespeichers.",
+    button: "Jetzt anrufen",
+    phones: SALES_PHONES,
+  },
+  time: { hourSuffix: "Stunden" },
+  upsTypes: ESS_TYPES_DE,
+  categories: {
+    home: "Wohnbereich",
+    lighting: "Beleuchtung",
+    computer_it: "Computer & IT",
+    network: "Netzwerk & Telekom",
+    security: "Sicherheit",
+    medical: "Medizin",
+  },
+  devices: DEVICE_KEYS_DE,
+};
+
 export function getUpsCalculator(locale: Locale): UpsCalculatorDict {
   if (locale === "fa") return upsCalculatorFa;
   if (locale === "zh") return upsCalculatorZh;
+  if (locale === "de") return upsCalculatorDe;
   return upsCalculatorEn;
 }
 
@@ -625,17 +764,16 @@ export function formatStepMeta(
   hint: string
 ): string {
   const n = stepIndex + 1;
-  const loc = locale === "fa" ? "fa-IR" : locale === "zh" ? "zh-CN" : "en-US";
+  const loc = localeNumTag(locale);
   return `${t.meta.stepWord} ${n.toLocaleString(loc)} ${t.meta.ofWord} ${totalSteps.toLocaleString(loc)} · ${hint}`;
 }
 
 export function formatBackupDuration(h: number, locale: Locale, t: UpsCalculatorDict): string {
-  if (h === 0.5) return t.time.halfHour;
-  const loc = locale === "fa" ? "fa-IR" : locale === "zh" ? "zh-CN" : "en-US";
-  if (locale === "en") {
+  const loc = localeNumTag(locale);
+  if (locale === "en" || locale === "de") {
     const n = h.toLocaleString(loc);
-    if (h === 1) return "1 hour";
-    return `${n} hours`;
+    if (h === 1) return locale === "de" ? "1 Stunde" : "1 hour";
+    return `${n} ${t.time.hourSuffix}`;
   }
   return `${h.toLocaleString(loc)} ${t.time.hourSuffix}`;
 }

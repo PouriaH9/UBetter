@@ -38,18 +38,21 @@ const BUILDING_TYPES: Record<Locale, string[]> = {
   fa: ["مسکونی (آپارتمان/ویلا)", "تجاری (دفتر/مرکز خرید)", "صنعتی (کارخانه/انبار)", "کشاورزی", "پروژه زیرساختی", "سایر"],
   en: ["Residential (Apartment/Villa)", "Commercial (Office/Mall)", "Industrial (Factory/Warehouse)", "Agricultural", "Infrastructure Project", "Other"],
   zh: ["住宅（公寓/别墅）", "商业（写字楼/商场）", "工业（工厂/仓库）", "农业", "基础设施项目", "其他"],
+  de: ["Wohnen (Wohnung/Villa)", "Gewerbe (Büro/Einkaufszentrum)", "Industrie (Fabrik/Lager)", "Landwirtschaft", "Infrastrukturprojekt", "Sonstiges"],
 };
 
 const TIMELINES: Record<Locale, string[]> = {
   fa: ["فوری (۱–۳ ماه)", "کوتاه مدت (۳–۶ ماه)", "میان مدت (۶–۱۲ ماه)", "بلند مدت (بیش از ۱ سال)"],
   en: ["Urgent (1–3 months)", "Short-term (3–6 months)", "Mid-term (6–12 months)", "Long-term (1+ year)"],
   zh: ["紧急（1–3 个月）", "短期（3–6 个月）", "中期（6–12 个月）", "长期（一年以上）"],
+  de: ["Dringend (1–3 Monate)", "Kurzfristig (3–6 Monate)", "Mittelfristig (6–12 Monate)", "Langfristig (1+ Jahr)"],
 };
 
 const BUDGETS: Record<Locale, string[]> = {
   fa: ["زیر ۵۰۰ میلیون تومان", "۵۰۰ میلیون – ۲ میلیارد", "۲ – ۵ میلیارد", "بیش از ۵ میلیارد", "نیاز به مشاوره دارم"],
   en: ["Under $10K", "$10K – $50K", "$50K – $150K", "Over $150K", "Need consultation"],
   zh: ["10 万元人民币以下", "10–50 万元", "50–150 万元", "150 万元以上", "需要咨询"],
+  de: ["Unter 10.000 €", "10.000 – 50.000 €", "50.000 – 150.000 €", "Über 150.000 €", "Beratung gewünscht"],
 };
 
 function Field({ label, children, required }: { label: string; children: React.ReactNode; required?: boolean }) {
@@ -73,9 +76,10 @@ export default function EnquiryPageClient({ locale }: { locale: Locale }) {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
-  const tx = (s: { fa: string; en: string; zh?: string }) => {
+  const tx = (s: { fa: string; en: string; zh?: string; de?: string }) => {
     if (locale === "fa") return s.fa;
     if (locale === "zh") return s.zh ?? s.en;
+    if (locale === "de") return s.de ?? s.en;
     return s.en;
   };
 

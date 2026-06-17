@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useLayoutEffect, useMemo } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
@@ -10,17 +10,15 @@ import productsHeroMobile from "@/assets/Source/products HERO mobilesize.png";
 import hero1Img from "@/assets/HERO1.png";
 import hero2Img from "@/assets/HERO2.png";
 import hero3Img from "@/assets/HERO3.jpg";
-import hero1MImg from "@/assets/HERO1M.jpg";
+import hero1MImg from "@/assets/HERO1M.png";
 import hero2MImg from "@/assets/HERO2M.png";
 import hero3MImg from "@/assets/HERO3M.png";
 
 import { translations } from "@/i18n/translations";
 import type { Locale } from "@/i18n/config";
-import { CATEGORIES } from "@/data/product-categories";
-import { localeNumber, ui3 } from "@/i18n/locale-ui";
+import { ui, ui3 } from "@/i18n/locale-ui";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
-import { BrandTrustSection } from "@/components/brand-trust-section";
 import { ScrollStackLayer, usePreferStaticScrollLayers } from "@/components/scroll-stack-layers";
 import { UsageCalculatorSection } from "@/components/usage-calculator-section";
 import { GlobePresenceSection } from "@/components/globe-presence-section";
@@ -49,12 +47,10 @@ const easeOut = [0.22, 1, 0.36, 1] as const;
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 
-const PORTFOLIO_PRODUCT_COUNT = CATEGORIES.reduce((sum, c) => sum + c.products.length, 0);
-const PORTFOLIO_CATEGORY_COUNT = CATEGORIES.length;
-
 // ══════════════════════════════════════════════════════════════════════════════
 // 2. HERO
 // ══════════════════════════════════════════════════════════════════════════════
+
 
 function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) {
   // Hero has full-screen photo background, always uses dark/neon accent
@@ -64,19 +60,21 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
 
   const heroImages = [hero1Img, hero2Img, hero3Img];
   const heroMobileImages = [hero1MImg, hero2MImg, hero3MImg];
+  const heroSlideIntervalMs = 3500;
+  const heroCrossfadeDuration = 0.9;
   const [activeImg, setActiveImg] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveImg((i) => (i + 1) % heroImages.length);
-    }, 6000);
+    }, heroSlideIntervalMs);
     return () => clearInterval(timer);
   }, [heroImages.length]);
 
   return (
-    <section className="relative z-0 h-screen min-h-[640px] flex items-center justify-center overflow-hidden">
+    <section className="relative z-0 h-[100dvh] min-h-[100dvh] sm:h-screen sm:min-h-[640px] flex items-center justify-center overflow-hidden">
       {/* Background — crossfading images */}
-      <div className="absolute inset-0 scale-110">
+      <div className="absolute inset-0 sm:scale-110">
         <AnimatePresence mode="sync">
           {/* Desktop images — hidden on mobile */}
           <motion.div
@@ -84,7 +82,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.8, ease: "easeInOut" }}
+            transition={{ duration: heroCrossfadeDuration, ease: "easeInOut" }}
             className="absolute inset-0 hidden sm:block"
           >
             <Image
@@ -104,7 +102,7 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.8, ease: "easeInOut" }}
+            transition={{ duration: heroCrossfadeDuration, ease: "easeInOut" }}
             className="absolute inset-0 block sm:hidden"
           >
             <Image
@@ -114,11 +112,11 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
               priority={activeImg === 0}
               quality={92}
               sizes="100vw"
-              className="object-cover object-center"
+              className="object-cover object-[center_20%] sm:object-center"
             />
           </motion.div>
         </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/75" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-black/80 sm:from-black/40 sm:via-black/20 sm:to-black/75" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/15 via-transparent to-black/15" />
       </div>
 
@@ -133,70 +131,122 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
       />
 
       {/* ── Hero overlay content ─────────────────────────────────────────────── */}
-      <div className="absolute inset-0 z-10 flex flex-col">
-        {/* Text block — vertically centered, responsive horizontal padding */}
-        <div className={`flex-1 flex items-center ${isRTL ? "justify-end pr-8 sm:pr-12 md:pr-16 lg:pr-[6vw] xl:pr-24 2xl:pr-32 ml-8 sm:ml-12 md:ml-16 lg:ml-[6vw] xl:ml-24" : "justify-start pl-8 sm:pl-12 md:pl-16 lg:pl-[6vw] xl:pl-24 2xl:pl-32"}`}>
+      <div className="absolute inset-0 z-10 flex flex-col min-h-0">
+        {/* Text block — top-aligned on mobile, vertically centered on desktop */}
+        <div
+          dir={isRTL ? "rtl" : "ltr"}
+          className={`flex-1 min-h-0 w-full flex items-start sm:items-center px-4 pt-[4.75rem] pb-3 sm:px-0 sm:pt-0 sm:pb-0 ${isRTL ? "justify-center sm:justify-start sm:pl-8 sm:pr-[18vw] md:pl-10 md:pr-[30vw] lg:pl-12 lg:pr-[40vw] xl:pl-16 xl:pr-[44vw] 2xl:pl-20" : "justify-center sm:justify-start sm:pl-12 md:pl-16 lg:pl-[6vw] xl:pl-24 2xl:pl-32"}`}
+        >
           <div
-            className="flex flex-col items-start"
-            style={{ maxWidth: "480px" }}
-            dir={isRTL ? "rtl" : "ltr"}
+            className={`flex flex-col shrink-0 gap-2.5 sm:gap-4 w-full max-w-[min(100%,22rem)] sm:max-w-none ${isRTL ? "sm:max-w-[340px] items-center sm:items-start text-center sm:text-start" : "sm:max-w-[520px] items-center sm:items-start text-center sm:text-start"}`}
           >
             {/* Main title */}
             <motion.h1
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.9, ease: easeOut }}
-              className="text-white leading-none mb-0.5 sm:mb-1"
+              className="text-white leading-snug text-center sm:text-start"
               style={{
                 fontFamily: YK,
-                fontSize: "clamp(28px, 4.2vw, 62px)",
+                fontSize: "clamp(18px, 5vw, 40px)",
                 fontWeight: 800,
-                lineHeight: 1.1,
+                lineHeight: 1.15,
                 textShadow: "0 2px 40px rgba(0,0,0,0.5)",
               }}
             >
-              {ui3(locale, "پاور استیشن", "Power Station", "储能电源")}
+              {locale === "fa" ? (
+                <>
+                  <span>انرژی بدون وقفه،</span>
+                  <br />
+                  <span>نسل جدید</span>
+                  <br />
+                  <span>ذخیره‌ساز انرژی</span>
+                  <br />
+                  <span>هوشمند AI</span>
+                </>
+              ) : (
+                ui(locale, {
+                  en: "Uninterrupted Power — Next-Gen Smart AI Energy Storage",
+                  zh: "不间断能源，新一代智能 AI 储能系统",
+                  de: "Unterbrechungsfreie Energie — KI-Energiespeicher der neuen Generation",
+                })
+              )}
             </motion.h1>
 
-            {/* "ALL IN ONE" — neon green with glow */}
-            <motion.h2
+            {/* ALL IN ONE tagline */}
+            <motion.p
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.55, duration: 0.9, ease: easeOut }}
-              className="leading-none mb-2 sm:mb-5"
+              className="leading-snug text-center sm:text-start"
               style={{
                 fontFamily: YK,
-                fontSize: "clamp(26px, 3.8vw, 56px)",
-                fontWeight: 900,
-                color: ACCENT,
-                textShadow: "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)",
-                lineHeight: 1.1,
-              }}
-            >
-              ALL IN ONE
-            </motion.h2>
-
-            {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.72, duration: 0.85 }}
-              className="text-white mb-4 sm:mb-8"
-              style={{
-                fontFamily: YK,
-                fontSize: "clamp(12px, 1.4vw, 20px)",
-                fontWeight: 400,
-                lineHeight: 1.75,
+                fontSize: "clamp(14px, 3.8vw, 28px)",
+                fontWeight: 700,
+                lineHeight: 1.2,
                 textShadow: "0 1px 20px rgba(0,0,0,0.4)",
-                maxWidth: "400px",
-                color: "rgba(255,255,255,0.88)",
+                maxWidth: isRTL ? undefined : "440px",
               }}
             >
-              {locale === "fa"
-                ? <>تمام انرژی مورد نیاز شما،<br />هر زمان، هر مکان</>
-                : locale === "zh"
-                  ? <>随时随地<br />满足您的用电需求</>
-                  : <>All the energy you need,<br />anytime, anywhere</>}
+              {locale === "fa" ? (
+                <>
+                  <span style={{ color: "rgba(255,255,255,0.88)" }}>نسل جدید</span>
+                  <br />
+                  <span
+                    style={{
+                      color: ACCENT,
+                      fontWeight: 900,
+                      textShadow: "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)",
+                    }}
+                  >
+                    ذخیره‌ساز انرژی
+                    <br className="sm:hidden" />
+                    ALL IN ONE
+                  </span>
+                </>
+              ) : locale === "zh" ? (
+                <>
+                  <span style={{ color: "rgba(255,255,255,0.88)" }}>新一代</span>
+                  <br />
+                  <span
+                    style={{
+                      color: ACCENT,
+                      fontWeight: 900,
+                      textShadow: "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)",
+                    }}
+                  >
+                    ALL IN ONE 储能系统
+                  </span>
+                </>
+              ) : locale === "de" ? (
+                <>
+                  <span style={{ color: "rgba(255,255,255,0.88)" }}>Neue Generation</span>
+                  <br />
+                  <span
+                    style={{
+                      color: ACCENT,
+                      fontWeight: 900,
+                      textShadow: "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)",
+                    }}
+                  >
+                    ALL IN ONE Energiespeicher
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span style={{ color: "rgba(255,255,255,0.88)" }}>Next Generation</span>
+                  <br />
+                  <span
+                    style={{
+                      color: ACCENT,
+                      fontWeight: 900,
+                      textShadow: "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)",
+                    }}
+                  >
+                    ALL IN ONE Energy Storage
+                  </span>
+                </>
+              )}
             </motion.p>
 
             {/* CTA button */}
@@ -207,14 +257,11 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
               transition={{ delay: 0.9, duration: 0.75 }}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-2 text-black font-bold cursor-pointer"
+              className={`inline-flex items-center gap-1.5 sm:gap-2 text-black font-bold cursor-pointer self-center sm:self-start text-[12px] sm:text-[13px] md:text-[15px] lg:text-[18px] px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 rounded-[10px] sm:rounded-[14px]`}
               style={{
                 fontFamily: YK,
-                fontSize: "clamp(12px, 1.1vw, 18px)",
                 fontWeight: 700,
                 background: ACCENT,
-                padding: "clamp(9px, 1.2vw, 14px) clamp(18px, 2.5vw, 34px)",
-                borderRadius: "14px",
                 boxShadow: "0 0 24px rgba(124,255,0,0.32), 0 4px 16px rgba(0,0,0,0.28)",
                 transition: "background 0.25s ease, box-shadow 0.25s ease",
               }}
@@ -228,30 +275,26 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
               }}
             >
               {ui3(locale, "مشاهده محصولات", "Explore Products", "浏览产品")}
-              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+              <svg className="w-3.5 h-3.5 sm:w-[18px] sm:h-[18px] shrink-0" viewBox="0 0 20 20" fill="none">
                 <path d={locale === "fa" ? "M14 10H6M9 6l-4 4 4 4" : "M6 10h8M11 6l4 4-4 4"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </motion.a>
           </div>
         </div>
 
-        {/* ── Features glass panel ─────────────────────────────────────────── */}
+        {/* ── ALL IN ONE system panel ──────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.1, duration: 0.9, ease: easeOut }}
-          className="mb-6 sm:mb-8 mx-4 sm:ml-12 md:ml-16 lg:ml-[6vw] xl:ml-24 sm:mr-28 md:mr-40 lg:mr-56 xl:mr-72"
+          className="mt-auto shrink-0 mb-4 sm:mb-6 mx-4 sm:mx-4 sm:ml-12 md:ml-16 lg:ml-[6vw] xl:ml-24 sm:mr-28 md:mr-40 lg:mr-56 xl:mr-72 bg-[rgba(0,0,0,0.22)] sm:bg-[rgba(0,0,0,0.2)] backdrop-blur-md sm:backdrop-blur-xl rounded-xl sm:rounded-[18px] border border-white/10"
           style={{
-            background: "rgba(0,0,0,0.22)",
-            backdropFilter: "blur(24px) saturate(160%)",
-            WebkitBackdropFilter: "blur(24px) saturate(160%)",
-            borderRadius: "20px",
-            border: "1px solid rgba(255,255,255,0.12)",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
+            WebkitBackdropFilter: "blur(16px) saturate(140%)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
           }}
         >
           <div
-            className="grid grid-cols-2 sm:grid-cols-4 sm:h-[170px]"
+            className="grid grid-cols-2 sm:grid-cols-4"
             dir={isRTL ? "rtl" : "ltr"}
           >
             {[
@@ -263,8 +306,21 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                     <path d="M21 19v8M17 23h8" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" />
                   </svg>
                 ),
-                title: ui3(locale, "ظرفیت بالا", "High Capacity", "大容量"),
-                desc: ui3(locale, "توان بالا برای\nتمام دستگاه‌های شما", "High power for\nall your devices", "为高功耗设备\n提供充沛电力"),
+                title: ui3(locale, "ظرفیت بالا", "High Capacity", "大容量", "Hohe Kapazität"),
+                desc: ui3(
+                  locale,
+                  "توان بالای اینورتر (سانورتر) و باتری لیتیوم فسفات\nبرای همه نیازهای شما",
+                  "High-power inverter (Sunverter) & LiFePO₄ battery\nfor all your needs",
+                  "高功率逆变器与磷酸铁锂电池\n满足各类用电需求",
+                  "Leistungsstarker Wechselrichter & LiFePO₄-Akku\nfür alle Anforderungen",
+                ),
+                mobileDesc: ui3(
+                  locale,
+                  "توان بالا برای همه نیازها",
+                  "High power for all needs",
+                  "满足各类需求",
+                  "Hohe Leistung",
+                ),
               },
               {
                 icon: (
@@ -272,8 +328,21 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                     <path d="M23 8l-8 13h8l-2 13L29 21h-8l2-13z" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ),
-                title: ui3(locale, "شارژ سریع", "Fast Charging", "快速充电"),
-                desc: ui3(locale, "شارژ سریع در\nهر شرایطی", "Fast charging in\nany condition", "多种场景下\n均可快充"),
+                title: ui3(locale, "سویچ فوق سریع", "Ultra-Fast Switch", "超快切换", "Ultraschneller Wechsel"),
+                desc: ui3(
+                  locale,
+                  "قابلیت شارژ از برق شهری به‌تنهایی\nیا همراه با پنل خورشیدی",
+                  "Charge from grid alone\nor combined with solar panels",
+                  "可单独市电充电\n或与太阳能板组合",
+                  "Laden vom Netz allein\noder mit Solarmodulen",
+                ),
+                mobileDesc: ui3(
+                  locale,
+                  "شارژ شهری یا خورشیدی",
+                  "Grid or solar charging",
+                  "市电或太阳能",
+                  "Netz oder Solar",
+                ),
               },
               {
                 icon: (
@@ -283,8 +352,21 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                     <circle cx="21" cy="21" r="2.5" fill={ACCENT} />
                   </svg>
                 ),
-                title: ui3(locale, "باتری با عمر طولانی", "Long Life Battery", "长寿命电池"),
-                desc: ui3(locale, "ساخته شده با سلول‌های\nباکیفیت و بادوام", "Built with premium\nhigh-durability cells", "采用高品质\n耐久电芯"),
+                title: ui3(locale, "باتری با عمر بسیار طولانی", "Ultra Long-Life Battery", "超长寿命电池", "Extra langlebiger Akku"),
+                desc: ui3(
+                  locale,
+                  "سلول‌های لیتیوم فسفات گرید A++\nبا عمر بالای ۸۰۰۰ سیکل و بیش از ۲۰ سال",
+                  "A++ LiFePO₄ cells\n8,000+ cycles & 20+ year lifespan",
+                  "A++ 磷酸铁锂电芯\n8000+ 循环，20+ 年寿命",
+                  "A++ LiFePO₄-Zellen\n8.000+ Zyklen & 20+ Jahre",
+                ),
+                mobileDesc: ui3(
+                  locale,
+                  "A++ · ۸۰۰۰+ سیکل · ۲۰+ سال",
+                  "A++ · 8,000+ cycles · 20+ yrs",
+                  "A++ · 8000+ 循环",
+                  "A++ · 8.000+ Zyklen",
+                ),
               },
               {
                 icon: (
@@ -293,49 +375,75 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                     <path d="M16 21l3.5 3.5L26 18" stroke={ACCENT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ),
-                title: ui3(locale, "ایمن و قابل اعتماد", "Safe & Reliable", "安全可靠"),
-                desc: ui3(locale, "مجهز به سیستم‌های\nحفاظتی پیشرفته", "Equipped with advanced\nprotection systems", "多重保护\n安心运行"),
+                title: ui3(locale, "ایمن و قابل اعتماد", "Safe & Reliable", "安全可靠", "Sicher & zuverlässig"),
+                desc: ui3(
+                  locale,
+                  "مجهز به سیستم‌های حفاظتی\nچندلایه پیشرفته",
+                  "Equipped with advanced\nmulti-layer protection",
+                  "配备先进\n多层保护系统",
+                  "Fortschrittlicher\nMehrschicht-Schutz",
+                ),
+                mobileDesc: ui3(
+                  locale,
+                  "حفاظت چندلایه پیشرفته",
+                  "Multi-layer protection",
+                  "多层保护",
+                  "Mehrschicht-Schutz",
+                ),
               },
-            ].map((feat, i) => (
+            ].map((feat, i) => {
+              const showMobileColSep = i % 2 === 1;
+              const showMobileRowSep = i >= 2;
+
+              return (
               <div
                 key={i}
-                className="relative flex flex-col items-center justify-center text-center px-4 sm:px-4 py-3 sm:py-0 gap-1.5 sm:gap-2.5 group"
+                className="relative flex flex-col items-center justify-center text-center px-2 py-2.5 sm:px-4 sm:py-0 gap-1 sm:gap-2.5 group min-w-0"
               >
-                {/* Vertical separator — desktop only */}
-                {(isRTL ? i > 0 : i < 3) && (
+                {(isRTL ? i % 4 !== 0 : i % 4 !== 3) && (
                   <div
                     className="hidden sm:block absolute right-0 top-8 bottom-8"
                     style={{ width: "1px", background: "rgba(255,255,255,0.1)" }}
                   />
                 )}
-                {/* Horizontal separator — mobile 2×2 grid bottom row divider */}
-                {i < 2 && (
+                {showMobileColSep && (
                   <div
-                    className="sm:hidden absolute bottom-0 left-4 right-4"
-                    style={{ height: "1px", background: "rgba(255,255,255,0.1)" }}
-                  />
-                )}
-                {/* Vertical separator — mobile between 2 columns */}
-                {(i === 0 || i === 2) && (
-                  <div
-                    className="sm:hidden absolute right-0 top-4 bottom-4"
+                    className="sm:hidden absolute right-0 top-2 bottom-2"
                     style={{ width: "1px", background: "rgba(255,255,255,0.1)" }}
                   />
                 )}
+                {showMobileRowSep && (
+                  <div
+                    className="sm:hidden absolute top-0 left-3 right-3"
+                    style={{ height: "1px", background: "rgba(255,255,255,0.1)" }}
+                  />
+                )}
 
-                <div className="transition-transform duration-300 group-hover:scale-110 origin-center scale-75 sm:scale-100">
+                <div className="transition-transform duration-300 group-hover:scale-110 origin-center scale-[0.68] sm:scale-100">
                   {feat.icon}
                 </div>
 
                 <div
-                  className="text-white font-bold"
-                  style={{ fontFamily: YK, fontSize: "clamp(11px, 1.1vw, 15px)", lineHeight: 1.2 }}
+                  className="text-white font-bold leading-tight line-clamp-2"
+                  style={{ fontFamily: YK, fontSize: "clamp(10px, 2.8vw, 15px)" }}
                 >
                   {feat.title}
                 </div>
 
                 <div
-                  className="whitespace-pre-line"
+                  className="whitespace-pre-line leading-tight sm:hidden line-clamp-2"
+                  style={{
+                    fontFamily: YK,
+                    fontSize: "clamp(9px, 2.4vw, 11px)",
+                    color: "rgba(255,255,255,0.55)",
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {feat.mobileDesc}
+                </div>
+
+                <div
+                  className="whitespace-pre-line hidden sm:block"
                   style={{
                     fontFamily: YK,
                     fontSize: "clamp(10px, 0.85vw, 12px)",
@@ -346,9 +454,11 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
                   {feat.desc}
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         </motion.div>
+
       </div>
 
     </section>
@@ -413,7 +523,7 @@ function ProductPortfolioScrollStack({
           <div className="flex-1 flex flex-col items-center justify-start max-w-[1200px] mx-auto px-6 sm:px-10 pt-10 pb-8 text-center w-full">
             <div
               style={{
-                background: "rgba(255,255,255,0.06)",
+                background: "rgba(255,255,255,0.14)",
                 backdropFilter: "blur(4px) saturate(120%)",
                 WebkitBackdropFilter: "blur(4px) saturate(120%)",
                 borderRadius: "24px",
@@ -433,7 +543,7 @@ function ProductPortfolioScrollStack({
                 }}
               >
                 <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.text1 }} />
-                {ui3(locale, "پورتفولیو محصولات", "Product Portfolio", "产品矩阵")}
+                {ui3(locale, "محصولات UBETTER", "UBETTER Products", "UBETTER 产品")}
               </div>
               <h2
                 key={locale}
@@ -446,27 +556,11 @@ function ProductPortfolioScrollStack({
                   textShadow: "0 2px 24px rgba(0,0,0,0.65), 0 4px 48px rgba(0,0,0,0.45)",
                 }}
               >
-                {locale === "fa" ? (
-                  <>
-                    {localeNumber(PORTFOLIO_PRODUCT_COUNT, locale)} محصول در{" "}
-                    <span style={{ color: C.text1 }}>
-                      {localeNumber(PORTFOLIO_CATEGORY_COUNT, locale)} دسته‌بندی
-                    </span>
-                  </>
-                ) : locale === "zh" ? (
-                  <>
-                    <span style={{ color: C.text1 }}>
-                      {localeNumber(PORTFOLIO_CATEGORY_COUNT, locale)} 大类
-                    </span>{" "}
-                    共 {localeNumber(PORTFOLIO_PRODUCT_COUNT, locale)} 款产品
-                  </>
-                ) : (
-                  <>
-                    {localeNumber(PORTFOLIO_PRODUCT_COUNT, locale)} Products across{" "}
-                    <span style={{ color: C.text1 }}>
-                      {localeNumber(PORTFOLIO_CATEGORY_COUNT, locale)} Categories
-                    </span>
-                  </>
+                {ui3(
+                  locale,
+                  "ذخیره ساز انرژی و برق اضطراری با توجه به نیاز شما",
+                  "Energy Storage & Emergency Power Tailored to Your Needs",
+                  "根据您的需求定制储能及应急供电",
                 )}
               </h2>
               <div className="btn-gradient-border" style={{ color: C.text1 }}>
@@ -491,7 +585,12 @@ function ProductPortfolioScrollStack({
                     el.style.color = C.text1;
                   }}
                 >
-                  {ui3(locale, "مشاهده همه محصولات", "View All Products", "查看全部产品")}
+                  {ui(locale, {
+                    fa: "مشاهده محصولات ذخیره‌ساز انرژی هوشمند",
+                    en: "View Smart Energy Storage Products",
+                    zh: "查看智能储能产品",
+                    de: "Intelligente Energiespeicher ansehen",
+                  })}
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path
                       d={locale === "fa" ? "M10 8H4M7 5L4 8l3 3" : "M4 8h8M9 5l3 3-3 3"}
@@ -540,9 +639,6 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
       {/* Products teaser — scrolls up as a sheet over the hero */}
       <ProductPortfolioScrollStack locale={locale} isRTL={isRTL} isDark={isDark} C={C} />
 
-      <ScrollStackLayer zIndex={18} overlapVh={98} plain>
-        <BrandTrustSection locale={locale} />
-      </ScrollStackLayer>
       <ScrollStackLayer zIndex={20} overlapVh={98} plain>
         <UsageCalculatorSection locale={locale} />
       </ScrollStackLayer>

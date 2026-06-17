@@ -783,50 +783,6 @@ export default function ProductsPageClient({ locale }: { locale: Locale }) {
         ))}
       </main>
 
-      <ScrollStackLayer zIndex={40} overlapVh={97}>
-        <div style={{ background: isDark ? "#030303" : "#e8e8e8", borderTop: `1px solid ${C.divider}`, transition: "background 0.35s ease" }}>
-          <div className="max-w-[1280px] mx-auto px-6 sm:px-10 py-16 text-center" dir={localeDir(locale)}>
-            <Reveal>
-              <p
-                className="mb-2"
-                style={{
-                  color: C.text4,
-                  fontSize: "11px",
-                  fontWeight: 700,
-                  letterSpacing: locale === "en" ? "0.2em" : "0.08em",
-                  textTransform: locale === "en" ? "uppercase" : "none",
-                }}
-              >
-                {locale === "fa"
-                  ? "نماینده رسمی UBETTER در ایران"
-                  : locale === "zh"
-                    ? "UBETTER 伊朗官方合作伙伴"
-                    : "Official UBETTER Representative in Iran"}
-              </p>
-              <h3 className="font-bold mb-6" style={{ color: C.text1, fontFamily: YK, fontSize: "clamp(18px, 2vw, 28px)" }}>
-                {locale === "fa"
-                  ? "برای مشاوره رایگان با ما تماس بگیرید"
-                  : locale === "zh"
-                    ? "欢迎联系我们获取免费工程咨询"
-                    : "Get a Free Engineering Consultation"}
-              </h3>
-              <div className="btn-gradient-border" style={{ color: C.text1 }}>
-                <a href={`/${locale}#contact`}
-                  className="btn-gradient-border-inner inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-[14px] sm:text-[15px] transition-all duration-300 hover:scale-105"
-                  style={{ background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)", color: C.text1, fontFamily: YK, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
-                  onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = C.text1; el.style.color = isDark ? "#000" : "#fff"; }}
-                  onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)"; el.style.color = C.text1; }}>
-                  {ui3(locale, "تماس با ما", "Contact Us", "联系我们")}
-                  <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
-                    <path d={locale === "fa" ? "M9 7H3M6 4L3 7l3 3" : "M3 7h8M8 4l3 3-3 3"} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </a>
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </ScrollStackLayer>
-
       <SharedFooter locale={locale} />
 
       {/* Spec Modal */}

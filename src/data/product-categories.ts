@@ -10,6 +10,7 @@ export interface T {
 export function tx(text: T, locale: Locale): string {
   if (locale === "fa") return text.fa;
   if (locale === "zh") return text.zh ?? text.en;
+  if (locale === "de") return text.en; // product copy: DE falls back to EN until translated
   return text.en;
 }
 
@@ -195,8 +196,8 @@ export const CATEGORIES: ProductCategory[] = [
         name: { fa: "باتری ذخیره انرژی قفسه‌ای (Rack-mounted)", en: "Rack-Mounted ESS Battery" },
         category: { fa: "سیستم ذخیره انرژی قفسه‌ای", en: "Rack Energy Storage System" },
         description: {
-          fa: "باتری‌های ذخیره انرژی قفسه‌ای، با طراحی ماژولار، چگالی انرژی بالا، ظاهر مدرن و امکان نصب و توسعه آسان، راهکاری کارآمد و انعطاف‌پذیر برای ذخیره انرژی محسوب می‌شوند. این محصولات به طور گسترده در کاربردهای مختلف از جمله ایستگاه‌های مخابراتی، سیستم‌های ذخیره انرژی تجاری برای کسب‌وکارهای کوچک، سیستم‌های UPS و سیستم‌های ذخیره انرژی خورشیدی خانگی مورد استفاده قرار می‌گیرند.",
-          en: "Rack-mounted energy storage batteries, with their modular design, high energy density, modern appearance, and easy installation capability, represent an efficient and flexible energy storage solution. These products are widely used in telecom stations, commercial energy storage for small businesses, UPS systems, and home solar storage.",
+          fa: "باتری‌های ذخیره انرژی قفسه‌ای، با طراحی ماژولار، چگالی انرژی بالا، ظاهر مدرن و امکان نصب و توسعه آسان، راهکاری کارآمد و انعطاف‌پذیر برای ذخیره انرژی محسوب می‌شوند. این محصولات به طور گسترده در ایستگاه‌های مخابراتی، سیستم‌های ذخیره انرژی تجاری برای کسب‌وکارهای کوچک، ذخیره‌سازهای انرژی هوشمند و سیستم‌های ذخیره انرژی خورشیدی خانگی مورد استفاده قرار می‌گیرند.",
+          en: "Rack-mounted energy storage batteries, with their modular design, high energy density, modern appearance, and easy installation capability, represent an efficient and flexible energy storage solution. These products are widely used in telecom stations, commercial energy storage for small businesses, smart energy storage systems, and home solar storage.",
         },
         features: [
           { fa: "طراحی ماژولار با تعداد دلخواه و کاربری آسان", en: "Modular rack-mounted architecture" },
@@ -209,7 +210,7 @@ export const CATEGORIES: ProductCategory[] = [
         ],
         applications: [
           { fa: "ایستگاه‌های مخابراتی", en: "Telecom stations" },
-          { fa: "سیستم‌های UPS", en: "UPS systems" },
+          { fa: "ذخیره‌سازهای انرژی هوشمند", en: "Smart energy storage systems" },
           { fa: "ذخیره‌سازی خورشیدی", en: "Solar storage" },
           { fa: "سیستم‌های پشتیبان تجاری", en: "Commercial backup systems" },
         ],
@@ -568,11 +569,11 @@ export const CATEGORIES: ProductCategory[] = [
       },
     ],
   },
-  // ── 6. Emergency Power & UPS ──────────────────────────────────────────────
+  // ── 6. Smart Energy Storage ───────────────────────────────────────────────
   {
     id: "ups",
     pill: { fa: "دسته ۶", en: "Category 6" },
-    title: { fa: "برق اضطراری و UPS", en: "Emergency Power & UPS" },
+    title: { fa: "ذخیره‌ساز انرژی هوشمند", en: "Smart Energy Storage" },
     description: {
       fa: "پلتفرم‌های مدیریت انرژی و اینورترهای هیبریدی با کارایی بالا برای تأمین برق اضطراری، سوئیچینگ بی‌وقفه و مدیریت هوشمند میکروگرید.",
       en: "High-performance energy management platforms and hybrid inverters for emergency power supply, seamless switching, and intelligent microgrid management.",

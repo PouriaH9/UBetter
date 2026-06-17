@@ -58,4 +58,19 @@ export const globePresenceCopy: Record<Locale, GlobePresenceCopy> = {
       title: "Lian Sadr Mellal",
     },
   },
+  de: {
+    china: {
+      badge: "China HQ",
+      title: "UBETTER",
+      stats: [
+        { value: "60", unit: "", label: "Patente" },
+        { value: "16", unit: "", label: "Organisationszertifikate" },
+        { value: "39", unit: "", label: "Produktzertifikate" },
+      ],
+    },
+    iran: {
+      badge: "Offizielle Partnerschaft · Iran",
+      title: "Lian Sadr Mellal",
+    },
+  },
 };

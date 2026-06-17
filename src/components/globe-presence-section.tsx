@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import {
-  AnimatePresence,
   motion,
   useMotionValue,
   useSpring,
@@ -30,7 +30,6 @@ import { homeStickyHeaderReservePx } from "@/lib/scroll-to-anchor";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
 import { translations } from "@/i18n/translations";
-import { globePresenceCopy } from "@/i18n/globe-presence.dict";
 
 import {
   GLOBE_PRESENCE_EASE_CSS,
@@ -200,6 +199,7 @@ function PresenceScenePanel({
   textColor,
   reduceMotion,
   children,
+  showCornerBadge = true,
 }: {
   skin: PresenceSceneSkin;
   phase: GlobePresencePhase;
@@ -207,6 +207,7 @@ function PresenceScenePanel({
   textColor: string;
   reduceMotion: boolean;
   children: ReactNode;
+  showCornerBadge?: boolean;
 }) {
   const enter: Transition = {
     duration: reduceMotion ? 0.25 : 0.85,
@@ -274,12 +275,14 @@ function PresenceScenePanel({
           aria-hidden
         />
 
-        <PresenceSceneCornerBadge
-          skin={skin}
-          phase={phase}
-          isDark={isDark}
-          reduceMotion={reduceMotion}
-        />
+        {showCornerBadge ? (
+          <PresenceSceneCornerBadge
+            skin={skin}
+            phase={phase}
+            isDark={isDark}
+            reduceMotion={reduceMotion}
+          />
+        ) : null}
 
         <motion.div
           className="relative z-[1] flex flex-col items-center gap-4 text-center"
@@ -372,7 +375,6 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
   const t = translations[locale];
-  const presenceCopy = globePresenceCopy[locale];
   const globeAriaLabel = t.globe.ariaLabel;
   const journey = useHomeGlobeJourneyOptional();
   const sectionRef = useRef<HTMLElement>(null);
@@ -396,7 +398,6 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
     if (isPinned) setGlobeDocked(true);
   }, [isPinned]);
 
-  const slide = presencePhase === "china" ? presenceCopy.china : presenceCopy.iran;
   const reduceMotion = usePrefersReducedMotion();
   const globeSmoothY = useSpring(globeTargetY, {
     stiffness: reduceMotion ? 2000 : 360,
@@ -498,25 +499,6 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
   const sectionTopBorder = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
 
   const sceneSkin = useMemo((): PresenceSceneSkin => {
-    if (presencePhase === "china") {
-      return {
-        panelGradient: isDark
-          ? "linear-gradient(165deg, rgba(80,12,12,0.55) 0%, rgba(20,6,6,0.35) 45%, rgba(8,4,4,0.2) 100%)"
-          : "linear-gradient(165deg, rgba(255,220,220,0.85) 0%, rgba(255,248,248,0.6) 50%, rgba(255,255,255,0.4) 100%)",
-        meshGlow: isDark ? "rgba(255,90,90,0.35)" : "rgba(224,49,49,0.25)",
-        glassBg: isDark ? "rgba(28,8,8,0.72)" : "rgba(255,250,250,0.88)",
-        glassBorder: isDark ? "rgba(255,120,120,0.4)" : "rgba(210,70,70,0.35)",
-        glassShadow: isDark
-          ? "inset 0 1px 0 rgba(255,150,150,0.12), 0 20px 60px rgba(40,0,0,0.5), 0 0 0 1px rgba(255,80,80,0.08)"
-          : "inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px rgba(180,50,50,0.12), 0 0 40px rgba(224,49,49,0.08)",
-        badgeBg: isDark ? "rgba(90,20,20,0.55)" : "rgba(255,210,210,0.5)",
-        badgeBorder: isDark ? "rgba(255,140,140,0.45)" : "rgba(200,80,80,0.32)",
-        pulse: isDark ? "#ff6b6b" : "#e03131",
-        pulseGlow: isDark ? "0 0 20px rgba(255,90,90,0.85)" : "0 0 16px rgba(224,49,49,0.5)",
-        statNum: isDark ? "#ff8787" : "#c92a2a",
-        divider: isDark ? "rgba(255,130,130,0.5)" : "rgba(210,70,70,0.4)",
-      };
-    }
     return {
       panelGradient: isDark
         ? "linear-gradient(165deg, rgba(20,40,8,0.5) 0%, rgba(8,12,6,0.35) 50%, rgba(4,6,4,0.15) 100%)"
@@ -534,7 +516,7 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
       statNum: C.accent,
       divider: isDark ? "rgba(124,255,0,0.45)" : "rgba(74,156,0,0.35)",
     };
-  }, [presencePhase, isDark, C.accent]);
+  }, [isDark, C.accent]);
 
   const globePinVisible = globeDocked && isPinned;
   const globePinFade: Transition = reduceMotion
@@ -600,119 +582,53 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
           className="relative mx-auto w-full max-w-3xl pointer-events-auto"
           aria-live="polite"
         >
-          <AnimatePresence mode="wait" initial={false}>
-            <PresenceScenePanel
-              key={presencePhase}
-              skin={sceneSkin}
-              phase={presencePhase}
-              isDark={isDark}
-              textColor={C.text1}
-              reduceMotion={reduceMotion}
-            >
-              <PresenceSceneHeader
-                skin={sceneSkin}
-                locale={locale}
-                badge={slide.badge}
-                reduceMotion={reduceMotion}
-              />
+          <PresenceScenePanel
+            skin={sceneSkin}
+            phase="iran"
+            isDark={isDark}
+            textColor={C.text1}
+            reduceMotion
+            showCornerBadge={false}
+          >
+            <motion.div className="flex w-full flex-col items-center gap-4" variants={itemVariants}>
+              <motion.p
+                className="font-black leading-[1.5] px-2"
+                style={{
+                  fontFamily: locale === "fa" ? YK : undefined,
+                  fontSize: "clamp(1.05rem, 2.4vw, 1.55rem)",
+                }}
+                dir="rtl"
+              >
+                نمایندگی انحصاری ایران، شرکت لیان صدر ملل
+              </motion.p>
 
-              <PresenceSceneDivider skin={sceneSkin} />
-
-              {presencePhase === "china" ? (
-                <>
-                  <motion.h2
-                    className="font-black leading-[1.08]"
-                    style={{
-                      fontSize: "clamp(1.35rem, 3vw, 2.2rem)",
-                      letterSpacing: locale === "en" ? "-0.02em" : "0",
-                    }}
-                    variants={itemVariants}
-                  >
-                    {globeChinaHeading(slide.title)}
-                  </motion.h2>
-                  <motion.div
-                    className="grid w-full max-w-xl grid-cols-3 gap-3 pt-1 sm:gap-4"
-                    dir="ltr"
-                    initial="hidden"
-                    animate="visible"
-                    variants={{
-                      visible: { transition: { staggerChildren: reduceMotion ? 0 : 0.08, delayChildren: 0.04 } },
-                    }}
-                  >
-                    {presenceCopy.china.stats.map((row, i) => {
-                      const StatIcon = CHINA_STAT_ICONS[i] ?? IconPresenceCertProduct;
-                      return (
-                        <motion.div
-                          key={row.label}
-                          className="flex flex-col items-center gap-2 rounded-xl px-1 py-2"
-                          style={{
-                            background: isDark ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.45)",
-                            border: `1px solid ${sceneSkin.badgeBorder}`,
-                          }}
-                          variants={itemVariants}
-                        >
-                          <motion.div
-                            className="flex h-9 w-9 items-center justify-center rounded-xl"
-                            style={{
-                              background: sceneSkin.badgeBg,
-                              color: sceneSkin.pulse,
-                            }}
-                            animate={reduceMotion ? undefined : { scale: [1, 1.06, 1] }}
-                            transition={
-                              reduceMotion
-                                ? undefined
-                                : {
-                                    duration: 3 + i * 0.35,
-                                    repeat: Infinity,
-                                    ease: "easeInOut",
-                                    delay: i * 0.2,
-                                  }
-                            }
-                          >
-                            <StatIcon className="h-4 w-4" />
-                          </motion.div>
-                          <motion.div
-                            className="flex flex-wrap items-baseline justify-center gap-0.5 font-black tabular-nums leading-none"
-                            style={{
-                              color: sceneSkin.statNum,
-                              fontSize: "clamp(1.4rem, 3.8vw, 2rem)",
-                            }}
-                          >
-                            <span>{row.value}</span>
-                            {row.unit ? (
-                              <span
-                                className="text-[10px] font-bold opacity-90 sm:text-[11px]"
-                                style={{ color: C.text2 }}
-                              >
-                                {row.unit}
-                              </span>
-                            ) : null}
-                          </motion.div>
-                          <p
-                            className="text-[10px] leading-snug sm:text-[11px]"
-                            style={{ color: C.text2 }}
-                          >
-                            {row.label}
-                          </p>
-                        </motion.div>
-                      );
-                    })}
-                  </motion.div>
-                </>
-              ) : (
-                <motion.h2
-                  className="font-black leading-[1.1] px-2"
+              <div className="btn-gradient-border" style={{ color: C.text1 }}>
+                <Link
+                  href={`/${locale}/about`}
+                  className="btn-gradient-border-inner inline-flex items-center justify-center gap-2.5 px-7 py-3.5 font-bold text-[14px] sm:text-[15px] transition-all duration-300 hover:scale-105"
                   style={{
-                    fontSize: "clamp(1.3rem, 3.5vw, 2.15rem)",
-                    letterSpacing: locale === "fa" ? "0" : locale === "en" ? "-0.02em" : "0",
+                    background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)",
+                    color: C.text1,
+                    fontFamily: locale === "fa" ? YK : undefined,
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
                   }}
-                  variants={itemVariants}
+                  dir="rtl"
                 >
-                  {slide.title}
-                </motion.h2>
-              )}
-            </PresenceScenePanel>
-          </AnimatePresence>
+                  درباره ما
+                </Link>
+              </div>
+
+              <motion.p
+                className="text-[12px] sm:text-[13px] leading-relaxed px-2"
+                style={{ color: C.text2, fontFamily: locale === "fa" ? YK : undefined }}
+                variants={itemVariants}
+                dir="rtl"
+              >
+                تحت لیسانس تکنولوژی آلمان، ساخت چین
+              </motion.p>
+            </motion.div>
+          </PresenceScenePanel>
         </div>
       </motion.div>
     </section>

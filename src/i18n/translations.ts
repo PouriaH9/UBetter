@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import type { UpsCalculatorDict } from "@/i18n/ups-calculator.dict";
-import { upsCalculatorEn, upsCalculatorFa, upsCalculatorZh } from "@/i18n/ups-calculator.dict";
+import { upsCalculatorEn, upsCalculatorFa, upsCalculatorZh, upsCalculatorDe } from "@/i18n/ups-calculator.dict";
 
 type Translation = {
   dir: "ltr" | "rtl";
@@ -313,6 +313,96 @@ export const translations: Record<Locale, Translation> = {
     globe: {
       ariaLabel:
         "装饰性地球示意图，突出伊朗；请正常滚动页面浏览网站。",
+    },
+  },
+  de: {
+    dir: "ltr",
+    nav: {
+      home: "Startseite",
+      products: "Produkte",
+      features: "Funktionen",
+      technology: "Technologie",
+      about: "Über uns",
+      contact: "Kontakt",
+      quote: "💬 Kostenloses Angebot",
+    },
+    hero: {
+      badge: "⚡ Eine grünere Zukunft",
+      title: "Intelligente Lithium-Energie für Wohn-, Gewerbe- und Industrieanwendungen 🔋",
+      p1: "UBETTER entwickelt fortschrittliche LiFePO4-Systeme von 2,5 kWh Heimspeicher bis zu 1–2 MWh Containerlösungen — für geringere Spitzenkosten und zuverlässige Notstromversorgung.",
+      p2: "Maßgeschneiderte Lösungen, professionelle Ingenieurunterstützung und weltweite Lieferung für langfristige Energieunabhängigkeit. 🌍",
+      ctaProducts: "🚀 Produkte entdecken",
+      ctaConsultation: "📩 Beratung anfragen",
+      stats: [
+        { label: "Werkfläche", value: "10848m²", icon: "🏭" },
+        { label: "Anlagenwert", value: "60 Mio. Yuan", icon: "💰" },
+        { label: "Ingenieurteam", value: "30+ Experten", icon: "👷" },
+      ],
+    },
+    products: {
+      title: "Unser Produktportfolio 🧰",
+      subtitle:
+        "Das offizielle UBETTER-Sortiment umfasst Wand-, Stand-, Rack- und stapelbare All-in-One-Systeme sowie Gewerbe- und Industriespeicher von 60 kWh bis 261 kWh und mehr.",
+    },
+    about: {
+      title: "Über UBETTER 🧠",
+      p1: "Ubetter Technology Co., Ltd. ist ein nationales High-Tech-Unternehmen mit Fokus auf maßgeschneiderte F&E, professionelle Fertigung und starke Lieferkette.",
+      p2: "Mit ISO 9001 und ISO 14001 steht UBETTER für Sicherheit, lange Zyklenlebensdauer und Nachhaltigkeit durch LiFePO4-Chemie. 🌱",
+      kpis: [
+        "💼 Stammkapital: 10 Mio. Yuan",
+        "🏗️ Anlagenwert: 60 Mio. Yuan",
+        "🏭 Werkgebäude: 10848m²",
+        "👨‍🔬 Team: Professoren + 30+ Ingenieure",
+      ],
+    },
+    projects: {
+      title1: "Indonesien, Jiangxi, Resort- und Fabrikprojekte",
+      p1: "Reale Installationen zeigen integrierte Photovoltaik- und Speicherlösungen für Gewerbe und Industrie.",
+      title2: "🏆 UBETTER auf der 138. Canton Fair",
+      p2: "Internationale Präsenz stärkt globale Partnerschaften und Vertrauen in OEM/ODM-Fertigung.",
+    },
+    gallery: {
+      title: "Bildergalerie & Produktions-Highlights 📸",
+      subtitle: "Scroll-Animation",
+      exportReady: "🚢 Exportbereit / Direkt ab Werk",
+      slide: "Folie",
+    },
+    applications: {
+      title: "Gewerbe- & Industrieanwendungen 🏢",
+      items: [
+        "🏭 Fabriken und Produktionsanlagen",
+        "📦 Lager und Logistikzentren",
+        "🏢 Bürogebäude und Einkaufszentren",
+        "🌾 Landwirtschaft und Bewässerung",
+        "☀️ Solar + Speicher",
+        "🏥 Krankenhäuser, Telekom-Basisstationen und Serverräume",
+      ],
+    },
+    services: {
+      title: "Unser Serviceversprechen 🤝",
+      items: [
+        "🛠️ Maßgeschneiderte Energiespeichersysteme",
+        "👩‍💻 Professioneller technischer Support",
+        "🚀 Schnelle Lieferung mit globalem Lager",
+        "✅ Strenge QC, lange Garantie, reaktionsschneller Service",
+      ],
+    },
+    contact: {
+      title: "Kostenloses Angebot 📬",
+      subtitle:
+        "Heim-, Gewerbe- oder Industriespeicher? Senden Sie Ihre Projektdetails — wir erstellen ein passendes Angebot.",
+      name: "Ihr Name",
+      email: "Ihre E-Mail",
+      phone: "Telefonnummer",
+      company: "Firma",
+      message: "Gewünschte Kapazität, Anwendung und Zeitplan...",
+      send: "✉️ Anfrage senden",
+    },
+    brandTagline: "🔋 Zuverlässiger LiFePO4- & Solar-Speicherhersteller",
+    upsCalculator: upsCalculatorDe,
+    globe: {
+      ariaLabel:
+        "Dekorative Globuskarte mit Iran im Fokus; scrollen Sie normal, um die Website zu erkunden.",
     },
   },
 };

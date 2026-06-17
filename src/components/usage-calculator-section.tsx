@@ -15,7 +15,8 @@ import {
 } from "@/i18n/ups-device-data";
 import type { UpsCategoryId } from "@/i18n/ups-device-data";
 import { formatBackupDuration, formatStepMeta } from "@/i18n/ups-calculator.dict";
-import type { UpsCalculatorDict } from "@/i18n/ups-calculator.dict";
+import type { UpsCalculatorDict, UpsTypeId } from "@/i18n/ups-calculator.dict";
+import { localeHtmlLang, localeNumTag } from "@/i18n/locale-ui";
 import calculatorHeroDesktop from "@/assets/CALCULATOR DESKTOP SIZE.png";
 import calculatorHeroMobile from "@/assets/CALCULATOR MOBILE SIZE.png";
 
@@ -24,13 +25,9 @@ import type { ComponentType, SVGProps } from "react";
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
-/** Sales line — `href` must be E.164 digits only after `tel:` */
-const UPS_CALC_SALES_PHONE_TEL = "tel:+989120000000";
-const UPS_CALC_SALES_PHONE_DISPLAY = "+98 912 000 0000";
+type UPSType = UpsTypeId;
 
-type UPSType = "online" | "line-interactive" | "offline";
-
-const UPS_TYPE_ORDER = ["online", "line-interactive", "offline"] as const;
+const UPS_TYPE_ORDER: UPSType[] = ["all-in-one-lv", "separate-lv", "hv", "commercial-hv"];
 
 function IconGauge(props: SVGProps<SVGSVGElement>) {
   return (
@@ -155,32 +152,23 @@ function IconPhone(props: SVGProps<SVGSVGElement>) {
 const WIZARD_ICONS = [IconGauge, IconUpsBox, IconCalc, IconReport] as const;
 
 const UPS_TYPE_ICONS: Record<UPSType, ComponentType<SVGProps<SVGSVGElement>>> = {
-  online: IconShieldZap,
-  "line-interactive": IconWave,
-  offline: IconBolt,
+  "all-in-one-lv": IconShieldZap,
+  "separate-lv": IconWave,
+  hv: IconBolt,
+  "commercial-hv": IconStack,
 };
 
-const UPS_SIZES = [500, 650, 800, 1000, 1500, 2000, 3000, 5000, 6000, 10000, 15000, 20000];
-const BACKUP_TIMES = [0.5, 1, 2, 3, 4, 6, 8];
+const BACKUP_TIMES = [2, 4, 8, 12, 24];
 
-function recommendUPS(totalW: number, upsType: UPSType) {
-  const pf = upsType === "online" ? 0.9 : upsType === "line-interactive" ? 0.75 : 0.65;
-  const requiredVA = Math.ceil((totalW / pf) * 1.25);
-  const recVA = UPS_SIZES.find((s) => s >= requiredVA) ?? UPS_SIZES[UPS_SIZES.length - 1];
-
-  let battQty = 1, battAh = 7;
-  if      (recVA <= 800)   { battQty = 1;  battAh = 7;  }
-  else if (recVA <= 1500)  { battQty = 1;  battAh = 9;  }
-  else if (recVA <= 3000)  { battQty = 2;  battAh = 9;  }
-  else if (recVA <= 6000)  { battQty = 4;  battAh = 9;  }
-  else if (recVA <= 10000) { battQty = 8;  battAh = 9;  }
-  else                     { battQty = 16; battAh = 9;  }
-
-  return { requiredVA, recommendedVA: recVA, battQty, battAh };
+function recommendESS(totalW: number) {
+  // Inverter VA rating = connected load (W) × 1.25 headroom (rounded up).
+  const inverterVA = Math.ceil(totalW * 1.25);
+  const inverterKW = inverterVA / 1000;
+  return { inverterVA, inverterKW };
 }
 
-function calcRuntime(totalW: number, battQty: number, battAh: number): number {
-  return Math.min(Math.round((battQty * 12 * battAh * 0.85 * 60) / Math.max(totalW, 1)), 240);
+function calcCapacityKwh(inverterKW: number, backupHours: number) {
+  return Math.round(inverterKW * backupHours * 10) / 10;
 }
 
 /** Black / white only (with alpha) — calculator section, both themes. */
@@ -222,7 +210,7 @@ export function getCalcMonochrome(isDark: boolean) {
       subtitle: "rgba(255,255,255,0.88)",
       titleShadow: "0 2px 24px rgba(0,0,0,0.65)",
       subtitleShadow: "0 1px 16px rgba(0,0,0,0.35)",
-      glassBg: "rgba(255,255,255,0.06)",
+      glassBg: "rgba(255,255,255,0.12)",
       glassBorder: "rgba(255,255,255,0.18)",
       glassShadow: "inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.06), 0 8px 40px rgba(0,0,0,0.12)",
       sectionTopBorder: "rgba(255,255,255,0.08)",
@@ -264,7 +252,7 @@ export function getCalcMonochrome(isDark: boolean) {
     subtitle: "rgba(0,0,0,0.72)",
     titleShadow: "0 2px 20px rgba(255,255,255,0.75)",
     subtitleShadow: "0 1px 12px rgba(255,255,255,0.45)",
-    glassBg: "rgba(255,255,255,0.5)",
+    glassBg: "rgba(255,255,255,0.2)",
     glassBorder: "rgba(0,0,0,0.12)",
     glassShadow: "inset 0 1px 0 rgba(255,255,255,0.75), 0 8px 28px rgba(0,0,0,0.06)",
     sectionTopBorder: "rgba(0,0,0,0.08)",
@@ -329,7 +317,7 @@ function StepIntro({
 
 function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
   const u = translations[locale].upsCalculator;
-  const nLoc = locale === "fa" ? "fa-IR" : locale === "zh" ? "zh-CN" : "en-US";
+  const nLoc = localeNumTag(locale);
   const [step, setStep]             = useState(1);
   const [knowLoad, setKnowLoad]     = useState<boolean | null>(null);
   const [directWatt, setDirectWatt] = useState(1000);
@@ -342,12 +330,12 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
   const [selWatt,     setSelWatt]     = useState(firstDev.watt);
   const [selQty,      setSelQty]      = useState(1);
 
-  const [upsType,        setUpsType]        = useState<UPSType>("line-interactive");
-  const [targetHours,    setTargetHours]    = useState(1);
+  const [upsType,        setUpsType]        = useState<UPSType>("all-in-one-lv");
+  const [targetHours,    setTargetHours]    = useState(2);
 
   const totalW  = knowLoad ? directWatt : devices.reduce((s, d) => s + d.watt * d.qty, 0);
-  const rec     = totalW > 0 ? recommendUPS(totalW, upsType) : null;
-  const runtime = rec ? calcRuntime(totalW, rec.battQty, rec.battAh) : 0;
+  const rec     = totalW > 0 ? recommendESS(totalW) : null;
+  const capacityKwh = rec ? calcCapacityKwh(rec.inverterKW, targetHours) : 0;
 
   const reportCardRef = useRef<HTMLDivElement | null>(null);
   const EXPORT_PNG_CLASS = "ups-export-png-active";
@@ -689,7 +677,7 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
         subtitle={u.step2.subtitle}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {UPS_TYPE_ORDER.map((tid) => {
           const tinfo = u.upsTypes[tid];
           const TypeIcon = UPS_TYPE_ICONS[tid];
@@ -704,10 +692,7 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
                 border: `2px solid ${upsType === tid ? M.fg : M.border}`,
               }}
             >
-              <div className="flex items-start justify-between gap-2">
-                <span className="text-[15px] font-bold leading-tight text-start min-w-0 flex-1" style={{ color: M.fg }}>
-                  {tinfo.title}
-                </span>
+              <div className="flex items-start gap-3">
                 <span
                   className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
                   style={{
@@ -721,15 +706,21 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
                     style={{ color: upsType === tid ? M.stepActiveFg : M.fg }}
                   />
                 </span>
+                <div className="flex flex-col gap-2 flex-1 min-w-0 text-start">
+                  <h3
+                    className="text-[14px] sm:text-[15px] font-black leading-snug"
+                    style={{ color: M.fg }}
+                  >
+                    {tinfo.title}
+                  </h3>
+                  <p
+                    className="text-[12px] sm:text-[13px] font-normal leading-relaxed"
+                    style={{ color: M.fgMuted }}
+                  >
+                    {tinfo.desc}
+                  </p>
+                </div>
               </div>
-              <span className="text-[12px] leading-relaxed flex-1 text-start" style={{ color: M.fgMuted }}>{tinfo.desc}</span>
-              <span
-                className="text-[10px] px-2.5 py-1.5 rounded-full self-start flex items-center gap-1.5"
-                style={{ background: M.chipIdle, color: M.fgMuted, border: `1px solid ${M.border}` }}
-              >
-                <IconStack className="w-3 h-3 flex-shrink-0 opacity-70" style={{ color: M.fg }} />
-                {u.step2.suitablePrefix} {tinfo.suitable}
-              </span>
             </button>
           );
         })}
@@ -801,37 +792,51 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
         subtitle={u.step3.subtitle}
       />
 
-      {/* Result grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+      {/* Primary result — suggested inverter VA */}
+      <div
+        className="rounded-2xl p-5 sm:p-6 text-center flex flex-col items-center"
+        style={{
+          background: M.chipIdle,
+          border: `2px solid ${M.fg}`,
+          boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+        }}
+      >
+        <IconStack className="w-6 h-6 mb-2.5" style={{ color: M.fg }} aria-hidden />
+        <div className="text-[11px] sm:text-[12px] font-bold mb-2 leading-tight" style={{ color: M.fgMuted }}>
+          {u.step3.statInverter}
+        </div>
+        <div
+          className="text-[28px] sm:text-[36px] font-black leading-none tabular-nums tracking-tight"
+          style={{ color: M.fg }}
+        >
+          {rec.inverterVA.toLocaleString(nLoc)} VA
+        </div>
+        <div className="text-[11px] sm:text-[12px] font-semibold mt-2" style={{ color: M.fgFaint }}>
+          {u.step3.subInverter}
+        </div>
+      </div>
+
+      {/* Supporting stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         {(
           [
             {
               label: u.step3.statTotalLoad,
               value: `${totalW.toLocaleString(nLoc)} W`,
               sub: u.step3.subWatts,
-              hl: false,
               Icon: IconBolt,
             },
             {
-              label: u.step3.statMinVa,
-              value: `${rec.requiredVA.toLocaleString(nLoc)} VA`,
-              sub: u.step3.subVa,
-              hl: false,
-              Icon: IconStack,
-            },
-            {
-              label: u.step3.statNominal,
-              value: `${rec.recommendedVA.toLocaleString(nLoc)} VA`,
-              sub: u.step3.subNominal,
-              hl: true,
-              Icon: IconCertificate,
-            },
-            {
               label: u.step3.statBackup,
-              value: `~${(runtime / 60).toLocaleString(nLoc, { maximumFractionDigits: 1 })} ${locale === "en" ? "hrs" : u.time.hourSuffix}`,
-              sub: u.step3.subStdBattery,
-              hl: false,
+              value: formatBackupDuration(targetHours, locale, u),
+              sub: u.step3.subSelectedBackup,
               Icon: IconClock,
+            },
+            {
+              label: u.step3.capacityTitle,
+              value: `${capacityKwh.toLocaleString(nLoc)} kWh`,
+              sub: u.step3.capacityNote,
+              Icon: IconBattery,
             },
           ] as const
         ).map((item) => {
@@ -841,45 +846,21 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
             key={item.label}
             className="rounded-2xl p-3.5 sm:p-4 text-center flex flex-col items-center"
             style={{
-              background: item.hl ? M.chipIdle : M.tileIdle,
-              border: `1px solid ${item.hl ? M.fg : M.border}`,
+              background: M.tileIdle,
+              border: `1px solid ${M.border}`,
             }}
           >
             <StatIcon
               className="w-5 h-5 mb-2 opacity-90"
-              style={{ color: item.hl ? M.fg : M.fgMuted }}
+              style={{ color: M.fgMuted }}
               aria-hidden
             />
             <div className="text-[9px] sm:text-[10px] mb-1.5 leading-tight" style={{ color: M.fgFaint }}>{item.label}</div>
-            <div className="text-[15px] sm:text-[18px] font-black leading-tight" style={{ color: M.fg }}>{item.value}</div>
+            <div className="text-[15px] sm:text-[18px] font-black leading-tight tabular-nums" style={{ color: M.fg }}>{item.value}</div>
             <div className="text-[9px] sm:text-[10px] mt-1" style={{ color: M.fgGhost }}>{item.sub}</div>
           </div>
           );
         })}
-      </div>
-
-      {/* Battery info */}
-      <div className="rounded-2xl p-5" style={{ background: M.innerCardBg, border: `1px solid ${M.border}` }}>
-        <div className="flex items-center gap-2.5 mb-4">
-          <IconBattery className="w-5 h-5 flex-shrink-0" style={{ color: M.fg }} aria-hidden />
-          <h4 className="text-[14px] font-bold text-start" style={{ color: M.fg }}>{u.step3.batteryTitle}</h4>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-[13px] text-start">
-          <div>
-            <span style={{ color: M.fgFaint }}>{u.step3.battCount} </span>
-            <span className="font-bold" style={{ color: M.fg }}>
-              {rec.battQty.toLocaleString(nLoc)} {u.step3.battUnit}
-            </span>
-          </div>
-          <div>
-            <span style={{ color: M.fgFaint }}>{u.step3.battEach} </span>
-            <span className="font-bold" style={{ color: M.fg }}>12V {rec.battAh}Ah</span>
-          </div>
-          <div>
-            <span style={{ color: M.fgFaint }}>{u.step3.battTotal} </span>
-            <span className="font-bold" style={{ color: M.fg }}>{(rec.battQty * 12 * rec.battAh).toLocaleString(nLoc)} Wh</span>
-          </div>
-        </div>
       </div>
 
       {/* UBETTER product hint */}
@@ -889,9 +870,9 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
           <h4 className="text-[14px] font-bold text-start" style={{ color: M.promoTitle }}>{u.step3.promoTitle}</h4>
         </div>
         <p className="text-[13px] mb-4 leading-relaxed text-start" style={{ color: M.fgMuted }}>
-          {rec.recommendedVA >= 5000
+          {rec.inverterVA >= 5000
             ? u.step3.promoLarge
-            : rec.recommendedVA >= 2000
+            : rec.inverterVA >= 2000
             ? u.step3.promoMid
             : u.step3.promoSmall}
         </p>
@@ -973,7 +954,7 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
             <div className="text-end ms-auto min-w-[120px]">
               <IconUpsBox className="w-8 h-8 flex-shrink-0 opacity-90 hidden sm:block ms-auto mb-1" style={{ color: M.fgMuted }} aria-hidden />
               <div>
-                <div className="text-[26px] font-black tabular-nums" style={{ color: M.fg }}>{rec.recommendedVA.toLocaleString(nLoc)} VA</div>
+                <div className="text-[26px] font-black tabular-nums" style={{ color: M.fg }}>{rec.inverterVA.toLocaleString(nLoc)} VA</div>
                 <div className="text-[11px]" style={{ color: M.fgFaint }}>{u.step4.suggestedUps}</div>
               </div>
             </div>
@@ -987,9 +968,8 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
               [u.step4.rowTotalLoad,      `${totalW.toLocaleString(nLoc)} W`],
               [u.step4.rowUpsType,        u.upsTypes[upsType].title],
               [u.step4.rowTarget,         formatBackupDuration(targetHours, locale, u)],
-              [u.step4.rowActual,         `~${(runtime / 60).toLocaleString(nLoc, { maximumFractionDigits: 1 })} ${locale === "en" ? "hrs" : u.time.hourSuffix}`],
-              [u.step4.rowBattery,        `${rec.battQty.toLocaleString(nLoc)} × 12V ${rec.battAh}Ah`],
-              [u.step4.rowWh,            `${(rec.battQty * 12 * rec.battAh).toLocaleString(nLoc)} Wh`],
+              [u.step4.rowInverter,       `${rec.inverterVA.toLocaleString(nLoc)} VA`],
+              [u.step4.rowCapacity,       `${capacityKwh.toLocaleString(nLoc)} kWh`],
             ].map(([label, val]) => (
               <Fragment key={String(label)}>
                 <div style={{ color: M.fgFaint }}>{label}:</div>
@@ -1126,7 +1106,7 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
     <section
       id={UPS_CALCULATOR_SECTION_ID}
       dir={t.dir}
-      lang={locale === "fa" ? "fa" : locale === "zh" ? "zh" : "en"}
+      lang={localeHtmlLang(locale)}
       className={`relative scroll-mt-[88px] sm:scroll-mt-[96px] pt-12 pb-16 sm:pt-14 sm:pb-24 overflow-hidden ${locale !== "fa" ? "font-sans" : ""}`}
       style={{
         borderTop: `1px solid ${M.sectionTopBorder}`,
@@ -1157,8 +1137,8 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
           className="absolute inset-0"
           style={{
             background: isDark
-              ? "linear-gradient(to bottom, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.62) 45%, rgba(0,0,0,0.75) 100%), linear-gradient(90deg, rgba(0,0,0,0.2) 0%, transparent 55%)"
-              : "linear-gradient(to bottom, rgba(255,250,252,0.38) 0%, rgba(255,240,246,0.28) 50%, rgba(252,230,240,0.34) 100%)",
+              ? "linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.48) 45%, rgba(0,0,0,0.58) 100%), linear-gradient(90deg, rgba(0,0,0,0.12) 0%, transparent 55%)"
+              : "linear-gradient(to bottom, rgba(255,250,252,0.22) 0%, rgba(255,240,246,0.16) 50%, rgba(252,230,240,0.2) 100%)",
           }}
         />
       </div>
@@ -1194,7 +1174,7 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
               {u.section.badge}
             </div>
             <h2
-              className="font-black leading-[1.08]"
+              className="font-black leading-[1.08] flex flex-col items-center gap-1"
               style={{
                 color: M.h2Color,
                 fontFamily: locale === "fa" ? YK : "inherit",
@@ -1203,7 +1183,7 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
                 textShadow: M.titleShadow,
               }}
             >
-              {u.section.titleBefore}{" "}
+              <span>{u.section.titleBefore}</span>
               <span
                 style={{
                   color: M.h2SpanFg,
@@ -1244,21 +1224,23 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
             className="mt-8 sm:mt-10 pt-6 sm:pt-7 flex flex-col items-center gap-3 text-center"
             style={{ borderTop: `1px solid ${M.divider}` }}
           >
-            <p className="text-[13px] sm:text-[14px] max-w-md leading-relaxed px-1" style={{ color: M.fgMuted }}>
+            <p className="text-[13px] sm:text-[14px] max-w-lg leading-relaxed px-1" style={{ color: M.fgMuted }}>
               {u.panelCall.hint}
             </p>
-            <a
-              href={UPS_CALC_SALES_PHONE_TEL}
-              className="inline-flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 px-6 py-3 rounded-xl font-bold text-[13px] sm:text-[14px] transition-all duration-200 hover:scale-[1.02]"
-              style={{ background: M.btnBg, color: M.btnFg }}
-              dir="ltr"
-            >
-              <IconPhone className="w-[18px] h-[18px] shrink-0" />
-              <span style={{ fontFamily: locale === "fa" ? YK : "inherit" }}>{u.panelCall.button}</span>
-              <span className="font-semibold tabular-nums text-[12px] sm:text-[13px] opacity-90">
-                {UPS_CALC_SALES_PHONE_DISPLAY}
-              </span>
-            </a>
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+              {u.panelCall.phones.map((phone) => (
+                <a
+                  key={phone}
+                  href={`tel:+98${phone.replace(/^0/, "")}`}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-[12px] sm:text-[13px] transition-all duration-200 hover:scale-[1.02]"
+                  style={{ background: M.btnBg, color: M.btnFg }}
+                  dir="ltr"
+                >
+                  <IconPhone className="w-4 h-4 shrink-0" />
+                  <span className="tabular-nums">{phone}</span>
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 

@@ -15,6 +15,30 @@ import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
 import { homeSectionsCopy } from "@/i18n/home-sections.dict";
 import { translations } from "@/i18n/translations";
+import { localeHtmlLang } from "@/i18n/locale-ui";
+
+const CERT_HIGHLIGHTS: Record<Locale, { n: string; label: string }[]> = {
+  fa: [
+    { n: "۱۶", label: "گواهی بین‌المللی" },
+    { n: "ISO", label: "مدیریت کیفیت" },
+    { n: "CE/UL", label: "ایمنی صادراتی" },
+  ],
+  en: [
+    { n: "16", label: "International certs" },
+    { n: "ISO", label: "Quality mgmt" },
+    { n: "CE/UL", label: "Export safety" },
+  ],
+  zh: [
+    { n: "16", label: "国际认证" },
+    { n: "ISO", label: "质量管理" },
+    { n: "CE/UL", label: "出口安全" },
+  ],
+  de: [
+    { n: "16", label: "Internationale Zertifikate" },
+    { n: "ISO", label: "Qualitätsmanagement" },
+    { n: "CE/UL", label: "Exportsicherheit" },
+  ],
+};
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -236,7 +260,7 @@ function CertMobileBadge({
   const tipId = useId();
 
   return (
-    <div className="relative flex flex-col items-center gap-2" data-cert-badge>
+    <div className="relative flex w-full min-w-0 flex-col items-center gap-2" data-cert-badge>
       <button
         type="button"
         className="flex flex-col items-center gap-2 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(124,255,0,0.55)]"
@@ -281,7 +305,7 @@ function CertMobileBadge({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.96 }}
             transition={{ duration: 0.18, ease: easeOut }}
-            className="absolute top-[calc(100%+6px)] left-1/2 z-30 w-[min(148px,calc(100vw-2rem))] -translate-x-1/2 rounded-xl px-2.5 py-2 text-center shadow-lg pointer-events-none"
+            className="absolute top-[calc(100%+6px)] inset-x-0 z-30 w-full max-w-full rounded-xl px-2 py-2 text-center shadow-lg pointer-events-none"
             style={{
               background: isDark ? "rgba(12,14,10,0.96)" : "rgba(255,255,255,0.97)",
               border: `1px solid ${isDark ? "rgba(124,255,0,0.28)" : "rgba(124,255,0,0.22)"}`,
@@ -383,24 +407,7 @@ export function HomeCertificatesSection({ locale }: { locale: Locale }) {
   const copy = homeSectionsCopy[locale].certificates;
   const t = translations[locale];
   const showGlobeThrough = useHomeGlobeJourneyOptional()?.showGlobeBackdrop ?? false;
-  const highlights =
-    locale === "fa"
-      ? [
-          { n: "۶+", label: "گواهی بین‌المللی" },
-          { n: "ISO", label: "مدیریت کیفیت" },
-          { n: "CE/UL", label: "ایمنی صادراتی" },
-        ]
-      : locale === "zh"
-        ? [
-            { n: "6+", label: "国际认证" },
-            { n: "ISO", label: "质量管理" },
-            { n: "CE/UL", label: "出口安全" },
-          ]
-        : [
-            { n: "6+", label: "Global certs" },
-            { n: "ISO", label: "Quality mgmt" },
-            { n: "CE/UL", label: "Export safety" },
-          ];
+  const highlights = CERT_HIGHLIGHTS[locale];
 
   const panelSkin = buildAccentGlassSkin(isDark, C.accent, C.accentGlow);
   const contentGlass = sectionGlassSkin(isDark, "panel");
@@ -420,7 +427,7 @@ export function HomeCertificatesSection({ locale }: { locale: Locale }) {
   return (
     <section
       dir={t.dir}
-      lang={locale === "fa" ? "fa" : locale === "zh" ? "zh" : "en"}
+      lang={localeHtmlLang(locale)}
       className={`relative overflow-hidden min-h-[100svh] w-full flex flex-col justify-center pt-10 pb-10 sm:pt-14 sm:pb-14 ${locale !== "fa" ? "font-sans" : ""}`}
       style={{
         fontFamily: locale === "fa" ? YK : undefined,
