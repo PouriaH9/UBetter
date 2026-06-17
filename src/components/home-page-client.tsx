@@ -16,7 +16,8 @@ import hero3MImg from "@/assets/HERO3M.png";
 
 import { translations } from "@/i18n/translations";
 import type { Locale } from "@/i18n/config";
-import { ui, ui3 } from "@/i18n/locale-ui";
+import { localeDir, ui, ui3 } from "@/i18n/locale-ui";
+import { heroOverlayCopy } from "@/i18n/hero-overlay.dict";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
 import { ScrollStackLayer, usePreferStaticScrollLayers } from "@/components/scroll-stack-layers";
@@ -47,14 +48,121 @@ const easeOut = [0.22, 1, 0.36, 1] as const;
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 
+const HERO_ACCENT = "#7CFF00";
+const HERO_ACCENT_GLOW =
+  "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)";
+
+function HeroOverlayContent({ locale }: { locale: Locale }) {
+  const copy = heroOverlayCopy[locale];
+  const dir = localeDir(locale);
+
+  return (
+    <div
+      dir={dir}
+      className="flex flex-col shrink-0 gap-2.5 sm:gap-4 max-w-[min(100%,48vw)] sm:max-w-[min(340px,42vw)] items-start text-start"
+    >
+      <motion.h1
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.9, ease: easeOut }}
+        className="text-white leading-snug"
+        style={{
+          fontFamily: YK,
+          fontSize: "clamp(18px, 5vw, 40px)",
+          fontWeight: 800,
+          lineHeight: 1.15,
+          textShadow: "0 2px 40px rgba(0,0,0,0.5)",
+        }}
+      >
+        {copy.titleLines.map((line, i) => (
+          <span key={line}>
+            {i > 0 && <br />}
+            {line}
+          </span>
+        ))}
+      </motion.h1>
+
+      <motion.p
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.55, duration: 0.9, ease: easeOut }}
+        className="leading-snug"
+        style={{
+          fontFamily: YK,
+          fontSize: "clamp(14px, 3.8vw, 28px)",
+          fontWeight: 700,
+          lineHeight: 1.2,
+          textShadow: "0 1px 20px rgba(0,0,0,0.4)",
+          maxWidth: dir === "rtl" ? undefined : "440px",
+        }}
+      >
+        <span style={{ color: "rgba(255,255,255,0.88)" }}>{copy.taglinePrefix}</span>
+        <br />
+        <span
+          style={{
+            color: HERO_ACCENT,
+            fontWeight: 900,
+            textShadow: HERO_ACCENT_GLOW,
+          }}
+        >
+          {copy.taglineAccent}
+          {copy.taglineBrand && (
+            <>
+              <br className="sm:hidden" />
+              {copy.taglineBrand}
+            </>
+          )}
+        </span>
+      </motion.p>
+
+      <motion.a
+        href={`/${locale}/products`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9, duration: 0.75 }}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.98 }}
+        className="inline-flex items-center gap-1.5 sm:gap-2 self-start text-black font-bold cursor-pointer text-[12px] sm:text-[13px] md:text-[15px] lg:text-[18px] px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 rounded-[10px] sm:rounded-[14px]"
+        style={{
+          fontFamily: YK,
+          fontWeight: 700,
+          background: HERO_ACCENT,
+          boxShadow: "0 0 24px rgba(124,255,0,0.32), 0 4px 16px rgba(0,0,0,0.28)",
+          transition: "background 0.25s ease, box-shadow 0.25s ease",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.background = "#90ff1a";
+          (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+            "0 0 44px rgba(124,255,0,0.52), 0 4px 20px rgba(0,0,0,0.3)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.background = HERO_ACCENT;
+          (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+            "0 0 24px rgba(124,255,0,0.32), 0 4px 16px rgba(0,0,0,0.28)";
+        }}
+      >
+        {copy.ctaProducts}
+        <svg className="w-3.5 h-3.5 sm:w-[18px] sm:h-[18px] shrink-0" viewBox="0 0 20 20" fill="none">
+          <path
+            d={dir === "rtl" ? "M14 10H6M9 6l-4 4 4 4" : "M6 10h8M11 6l4 4-4 4"}
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </motion.a>
+    </div>
+  );
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // 2. HERO
 // ══════════════════════════════════════════════════════════════════════════════
 
 
-function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] }) {
-  // Hero has full-screen photo background, always uses dark/neon accent
-  const ACCENT = "#7CFF00";
+function Hero({ locale }: { locale: Locale }) {
+  const ACCENT = HERO_ACCENT;
 
   const isRTL = locale === "fa";
 
@@ -132,154 +240,12 @@ function Hero({ locale, t }: { locale: Locale; t: (typeof translations)["en"] })
 
       {/* ── Hero overlay content ─────────────────────────────────────────────── */}
       <div className="absolute inset-0 z-10 flex flex-col min-h-0">
-        {/* Text block — top-aligned on mobile, vertically centered on desktop */}
+        {/* Layout wrapper: dir=ltr so justify-start is physical LEFT (page is rtl for fa). */}
         <div
-          dir={isRTL ? "rtl" : "ltr"}
-          className={`flex-1 min-h-0 w-full flex items-start sm:items-center px-4 pt-[4.75rem] pb-3 sm:px-0 sm:pt-0 sm:pb-0 ${isRTL ? "justify-center sm:justify-start sm:pl-8 sm:pr-[18vw] md:pl-10 md:pr-[30vw] lg:pl-12 lg:pr-[40vw] xl:pl-16 xl:pr-[44vw] 2xl:pl-20" : "justify-center sm:justify-start sm:pl-12 md:pl-16 lg:pl-[6vw] xl:pl-24 2xl:pl-32"}`}
+          dir="ltr"
+          className="flex-1 min-h-0 w-full flex items-center justify-start pl-5 pr-4 sm:pl-8 sm:pr-[42vw] md:pl-10 md:pr-[38vw] lg:pl-12 lg:pr-[42vw] xl:pl-16 xl:pr-[46vw]"
         >
-          <div
-            className={`flex flex-col shrink-0 gap-2.5 sm:gap-4 w-full max-w-[min(100%,22rem)] sm:max-w-none ${isRTL ? "sm:max-w-[340px] items-center sm:items-start text-center sm:text-start" : "sm:max-w-[520px] items-center sm:items-start text-center sm:text-start"}`}
-          >
-            {/* Main title */}
-            <motion.h1
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.9, ease: easeOut }}
-              className="text-white leading-snug text-center sm:text-start"
-              style={{
-                fontFamily: YK,
-                fontSize: "clamp(18px, 5vw, 40px)",
-                fontWeight: 800,
-                lineHeight: 1.15,
-                textShadow: "0 2px 40px rgba(0,0,0,0.5)",
-              }}
-            >
-              {locale === "fa" ? (
-                <>
-                  <span>انرژی بدون وقفه،</span>
-                  <br />
-                  <span>نسل جدید</span>
-                  <br />
-                  <span>ذخیره‌ساز انرژی</span>
-                  <br />
-                  <span>هوشمند AI</span>
-                </>
-              ) : (
-                ui(locale, {
-                  en: "Uninterrupted Power — Next-Gen Smart AI Energy Storage",
-                  zh: "不间断能源，新一代智能 AI 储能系统",
-                  de: "Unterbrechungsfreie Energie — KI-Energiespeicher der neuen Generation",
-                })
-              )}
-            </motion.h1>
-
-            {/* ALL IN ONE tagline */}
-            <motion.p
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55, duration: 0.9, ease: easeOut }}
-              className="leading-snug text-center sm:text-start"
-              style={{
-                fontFamily: YK,
-                fontSize: "clamp(14px, 3.8vw, 28px)",
-                fontWeight: 700,
-                lineHeight: 1.2,
-                textShadow: "0 1px 20px rgba(0,0,0,0.4)",
-                maxWidth: isRTL ? undefined : "440px",
-              }}
-            >
-              {locale === "fa" ? (
-                <>
-                  <span style={{ color: "rgba(255,255,255,0.88)" }}>نسل جدید</span>
-                  <br />
-                  <span
-                    style={{
-                      color: ACCENT,
-                      fontWeight: 900,
-                      textShadow: "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)",
-                    }}
-                  >
-                    ذخیره‌ساز انرژی
-                    <br className="sm:hidden" />
-                    ALL IN ONE
-                  </span>
-                </>
-              ) : locale === "zh" ? (
-                <>
-                  <span style={{ color: "rgba(255,255,255,0.88)" }}>新一代</span>
-                  <br />
-                  <span
-                    style={{
-                      color: ACCENT,
-                      fontWeight: 900,
-                      textShadow: "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)",
-                    }}
-                  >
-                    ALL IN ONE 储能系统
-                  </span>
-                </>
-              ) : locale === "de" ? (
-                <>
-                  <span style={{ color: "rgba(255,255,255,0.88)" }}>Neue Generation</span>
-                  <br />
-                  <span
-                    style={{
-                      color: ACCENT,
-                      fontWeight: 900,
-                      textShadow: "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)",
-                    }}
-                  >
-                    ALL IN ONE Energiespeicher
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span style={{ color: "rgba(255,255,255,0.88)" }}>Next Generation</span>
-                  <br />
-                  <span
-                    style={{
-                      color: ACCENT,
-                      fontWeight: 900,
-                      textShadow: "0 0 32px rgba(124,255,0,0.45), 0 0 64px rgba(124,255,0,0.18)",
-                    }}
-                  >
-                    ALL IN ONE Energy Storage
-                  </span>
-                </>
-              )}
-            </motion.p>
-
-            {/* CTA button */}
-            <motion.a
-              href={`/${locale}/products`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.75 }}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className={`inline-flex items-center gap-1.5 sm:gap-2 text-black font-bold cursor-pointer self-center sm:self-start text-[12px] sm:text-[13px] md:text-[15px] lg:text-[18px] px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 rounded-[10px] sm:rounded-[14px]`}
-              style={{
-                fontFamily: YK,
-                fontWeight: 700,
-                background: ACCENT,
-                boxShadow: "0 0 24px rgba(124,255,0,0.32), 0 4px 16px rgba(0,0,0,0.28)",
-                transition: "background 0.25s ease, box-shadow 0.25s ease",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.background = "#90ff1a";
-                (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 44px rgba(124,255,0,0.52), 0 4px 20px rgba(0,0,0,0.3)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.background = ACCENT;
-                (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 24px rgba(124,255,0,0.32), 0 4px 16px rgba(0,0,0,0.28)";
-              }}
-            >
-              {ui3(locale, "مشاهده محصولات", "Explore Products", "浏览产品")}
-              <svg className="w-3.5 h-3.5 sm:w-[18px] sm:h-[18px] shrink-0" viewBox="0 0 20 20" fill="none">
-                <path d={locale === "fa" ? "M14 10H6M9 6l-4 4 4 4" : "M6 10h8M11 6l4 4-4 4"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </motion.a>
-          </div>
+          <HeroOverlayContent locale={locale} />
         </div>
 
         {/* ── ALL IN ONE system panel ──────────────────────────────────────── */}
@@ -634,7 +600,7 @@ export default function HomePageClient({ locale }: { locale: Locale }) {
       dir={t.dir}
       style={{ background: C.pageBg, color: C.text1, transition: "background 0.35s ease, color 0.35s ease" }}>
       <SharedNavbar locale={locale} activePage="home" />
-      <Hero locale={locale} t={t} />
+      <Hero locale={locale} />
 
       {/* Products teaser — scrolls up as a sheet over the hero */}
       <ProductPortfolioScrollStack locale={locale} isRTL={isRTL} isDark={isDark} C={C} />

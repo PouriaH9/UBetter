@@ -159,3 +159,49 @@ img { image-rendering: -webkit-optimize-contrast; }
 .ups-export-png-active svg [fill]:not([fill="none"]) {
   fill: #0a0a0a !important;
 }
+
+/* ── Jalali date picker (warranty form) ───────────────────────────────────── */
+.jalali-date-field {
+  display: block;
+}
+
+.jalali-date-field .rmdp-input {
+  width: 100%;
+  cursor: pointer;
+}
+
+.rmdp-wrapper {
+  background: var(--surface) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12) !important;
+  font-family: "YekanBakh", "IRANSansX", system-ui, sans-serif !important;
+}
+
+[data-theme="dark"] .rmdp-wrapper {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45) !important;
+}
+
+.rmdp-day.rmdp-selected span:not(.highlight) {
+  background-color: var(--accent) !important;
+  color: #000 !important;
+}
+
+.rmdp-day:not(.rmdp-disabled):not(.rmdp-day-hidden) span:hover {
+  background-color: var(--accent-dim) !important;
+  color: var(--text) !important;
+}
+
+.rmdp-arrow {
+  border-color: var(--accent) !important;
+}
+
+.rmdp-header-values,
+.rmdp-week-day {
+  color: var(--text) !important;
+}
+
+.rmdp-day span {
+  color: var(--text);
+}

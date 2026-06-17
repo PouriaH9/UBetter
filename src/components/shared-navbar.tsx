@@ -100,7 +100,7 @@ export default function SharedNavbar({
   activePage = "home",
 }: {
   locale: Locale;
-  activePage?: "home" | "products" | "warranty";
+  activePage?: "home" | "products" | "warranty" | "contact";
 }) {
   const [open, setOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
@@ -208,6 +208,7 @@ export default function SharedNavbar({
   const upsCalculatorHref = `${homePath}#${UPS_CALCULATOR_SECTION_ID}`;
 
   const warrantyPath = `/${locale}/warranty`;
+  const contactPath = `/${locale}/contact`;
 
   const faLinks = [
     { href: homePath, label: "خانه", page: "home" as const },
@@ -220,7 +221,7 @@ export default function SharedNavbar({
     },
     { href: warrantyPath, label: "گارانتی", page: "warranty" as const },
     { href: `/${locale}/about`, label: "درباره ما", page: "home" as const },
-    { href: `${homePath}#contact`, label: "تماس با ما", page: "home" as const },
+    { href: contactPath, label: "تماس با ما", page: "contact" as const },
   ];
   const enLinks = [
     { href: homePath, label: "Home", page: "home" as const },
@@ -233,7 +234,7 @@ export default function SharedNavbar({
     },
     { href: warrantyPath, label: "Warranty", page: "warranty" as const },
     { href: `/${locale}/about`, label: "About", page: "home" as const },
-    { href: `${homePath}#contact`, label: "Contact", page: "home" as const },
+    { href: contactPath, label: "Contact", page: "contact" as const },
   ];
   const zhLinks = [
     { href: homePath, label: "首页", page: "home" as const },
@@ -246,7 +247,7 @@ export default function SharedNavbar({
     },
     { href: warrantyPath, label: "保修服务", page: "warranty" as const },
     { href: `/${locale}/about`, label: "关于我们", page: "home" as const },
-    { href: `${homePath}#contact`, label: "联系我们", page: "home" as const },
+    { href: contactPath, label: "联系我们", page: "contact" as const },
   ];
   const navLinks = locale === "fa" ? faLinks : locale === "zh" ? zhLinks : enLinks;
 
@@ -330,6 +331,7 @@ export default function SharedNavbar({
             const isActive =
               (l.page === "products" && activePage === "products") ||
               (l.page === "warranty" && activePage === "warranty") ||
+              (l.page === "contact" && activePage === "contact") ||
               (l.page === "home" && l.label === homeNavLabel && activePage === "home");
             const isProducts = l.href === `/${locale}/products`;
 
@@ -532,6 +534,7 @@ export default function SharedNavbar({
               const isProducts = l.href === `/${locale}/products`;
               const isMobileLinkActive =
                 (l.page === "warranty" && activePage === "warranty") ||
+                (l.page === "contact" && activePage === "contact") ||
                 (l.page === "home" && l.label === homeNavLabel && activePage === "home");
               return (
                 <div key={l.label} style={{ borderBottom: `1px solid ${C.divider}` }}>

@@ -63,11 +63,10 @@ export default function SharedFooter({ locale }: { locale: Locale }) {
     de: "Lian Sadr Melal — exklusiver Vertreter von Ubetter Technology Co., Ltd. Unter deutscher Technologielizenz, hergestellt in China",
   });
 
-  const rightsReserved = ui(locale, {
-    fa: "تمام حقوق محفوظ است.",
-    en: "All rights reserved.",
-    zh: "保留所有权利。",
-    de: "Alle Rechte vorbehalten.",
+  const copyrightLine = ui(locale, {
+    en: "© 2025 Lian Sadr Melal / UBETTER. All rights reserved.",
+    zh: "© 2025 Lian Sadr Melal / UBETTER. 保留所有权利。",
+    de: "© 2025 Lian Sadr Melal / UBETTER. Alle Rechte vorbehalten.",
   });
 
   const privacyLabel = ui(locale, {
@@ -141,7 +140,13 @@ export default function SharedFooter({ locale }: { locale: Locale }) {
           style={{ borderTop: `1px solid ${C.divider}` }}
         >
           <div className="text-[12px] text-center sm:text-start" style={{ color: C.text4 }}>
-            © 2025 Lian Sadr Melal / UBETTER. {rightsReserved}
+            {locale === "fa" ? (
+              <>
+                <span className="font-semibold">لیان صدر ملل</span> تمامی حقوق محفوظ است
+              </>
+            ) : (
+              copyrightLine
+            )}
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5">
             <a

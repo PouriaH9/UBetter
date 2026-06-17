@@ -13,12 +13,18 @@ export type WarrantyPageCopy = {
     warrantyCodePlaceholder: string;
     serialNumber: string;
     serialNumberPlaceholder: string;
+    installationDate: string;
+    installationDatePlaceholder: string;
+    deviceModel: string;
+    deviceModelPlaceholder: string;
     fullName: string;
     fullNamePlaceholder: string;
     phone: string;
     phonePlaceholder: string;
     email: string;
     emailPlaceholder: string;
+    address: string;
+    addressPlaceholder: string;
     notes: string;
     notesPlaceholder: string;
   };
@@ -41,22 +47,28 @@ export const warrantyPageCopy: Record<Locale, WarrantyPageCopy> = {
     breadcrumbCurrent: "ثبت کد گارانتی",
     title: "ثبت کد گارانتی دستگاه",
     subtitle:
-      "کد گارانتی درج‌شده روی محصول یا داخل بسته‌بندی را وارد کنید. پس از بررسی، وضعیت گارانتی شما تأیید می‌شود.",
+      "شماره سریال درج شده روی محصول را وارد کنید، پس از بررسی، وضعیت گارانتی شما تأیید می‌شود.",
     sectionDevice: "اطلاعات دستگاه",
     sectionContact: "اطلاعات تماس",
     fields: {
-      warrantyCode: "کد گارانتی",
+      warrantyCode: "شماره سریال دستگاه",
       warrantyCodePlaceholder: "مثال: UB-2026-XXXX-XXXX",
-      serialNumber: "شماره سریال دستگاه",
-      serialNumberPlaceholder: "در صورت وجود روی برچسب دستگاه",
+      serialNumber: "تاریخ فاکتور دستگاه",
+      serialNumberPlaceholder: "مثال: ۱۴۰۳/۰۳/۱۵",
+      installationDate: "تاریخ نصب دستگاه",
+      installationDatePlaceholder: "مثال: ۱۴۰۳/۰۴/۰۱",
+      deviceModel: "مدل دستگاه",
+      deviceModelPlaceholder: "مثال: UB Power 5000",
       fullName: "نام و نام خانوادگی",
       fullNamePlaceholder: "مثال: علی محمدی",
       phone: "شماره تماس",
       phonePlaceholder: "مثال: ۰۹۱۲۰۰۰۰۰۰۰",
       email: "ایمیل",
       emailPlaceholder: "example@email.com",
+      address: "آدرس شما",
+      addressPlaceholder: "تهران ، خیابان ولیعصر ، کوچه معتمدی ، پلاک ۱۲",
       notes: "توضیحات (اختیاری)",
-      notesPlaceholder: "مدل دستگاه، تاریخ خرید یا سایر توضیحات",
+      notesPlaceholder: "انتقادات و پیشنهادات",
     },
     submit: "ثبت کد گارانتی",
     successTitle: "کد گارانتی ثبت شد",
@@ -82,14 +94,20 @@ export const warrantyPageCopy: Record<Locale, WarrantyPageCopy> = {
     fields: {
       warrantyCode: "Warranty code",
       warrantyCodePlaceholder: "e.g. UB-2026-XXXX-XXXX",
-      serialNumber: "Device serial number",
-      serialNumberPlaceholder: "If shown on the device label",
+      serialNumber: "Invoice date",
+      serialNumberPlaceholder: "e.g. 2024-06-15",
+      installationDate: "Installation date",
+      installationDatePlaceholder: "e.g. 2024-07-01",
+      deviceModel: "Device model",
+      deviceModelPlaceholder: "e.g. UB Power 5000",
       fullName: "Full name",
       fullNamePlaceholder: "e.g. John Smith",
       phone: "Phone number",
       phonePlaceholder: "e.g. +1 555 000 0000",
       email: "Email",
       emailPlaceholder: "example@email.com",
+      address: "Your address",
+      addressPlaceholder: "e.g. 123 Main St, City",
       notes: "Notes (optional)",
       notesPlaceholder: "Model, purchase date, or other details",
     },
@@ -116,14 +134,20 @@ export const warrantyPageCopy: Record<Locale, WarrantyPageCopy> = {
     fields: {
       warrantyCode: "保修码",
       warrantyCodePlaceholder: "例如：UB-2026-XXXX-XXXX",
-      serialNumber: "设备序列号",
-      serialNumberPlaceholder: "如有，请填写机身标签上的序列号",
+      serialNumber: "发票日期",
+      serialNumberPlaceholder: "例如：2024-06-15",
+      installationDate: "安装日期",
+      installationDatePlaceholder: "例如：2024-07-01",
+      deviceModel: "设备型号",
+      deviceModelPlaceholder: "例如：UB Power 5000",
       fullName: "姓名",
       fullNamePlaceholder: "例如：张三",
       phone: "电话",
       phonePlaceholder: "例如：+86 138 0000 0000",
       email: "电子邮箱",
       emailPlaceholder: "example@email.com",
+      address: "您的地址",
+      addressPlaceholder: "例如：北京市朝阳区某某路123号",
       notes: "备注（选填）",
       notesPlaceholder: "型号、购买日期或其他说明",
     },
@@ -150,14 +174,20 @@ export const warrantyPageCopy: Record<Locale, WarrantyPageCopy> = {
     fields: {
       warrantyCode: "Garantiecode",
       warrantyCodePlaceholder: "z. B. UB-2026-XXXX-XXXX",
-      serialNumber: "Seriennummer",
-      serialNumberPlaceholder: "Falls auf dem Geräteetikett angegeben",
+      serialNumber: "Rechnungsdatum",
+      serialNumberPlaceholder: "z. B. 2024-06-15",
+      installationDate: "Installationsdatum",
+      installationDatePlaceholder: "z. B. 2024-07-01",
+      deviceModel: "Gerätemodell",
+      deviceModelPlaceholder: "z. B. UB Power 5000",
       fullName: "Vollständiger Name",
       fullNamePlaceholder: "z. B. Max Mustermann",
       phone: "Telefonnummer",
       phonePlaceholder: "z. B. +49 170 000 0000",
       email: "E-Mail",
       emailPlaceholder: "example@email.com",
+      address: "Ihre Adresse",
+      addressPlaceholder: "z. B. Musterstraße 12, Berlin",
       notes: "Anmerkungen (optional)",
       notesPlaceholder: "Modell, Kaufdatum oder weitere Details",
     },

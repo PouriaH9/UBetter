@@ -30,67 +30,60 @@ export default function AboutPageClient({ locale }: { locale: Locale }) {
     >
       <SharedNavbar locale={locale} activePage="home" />
 
-      <div className="flex-1 max-w-[900px] mx-auto w-full px-6 sm:px-10 pt-28 pb-16">
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
+      <div className="flex-1 max-w-[820px] mx-auto w-full px-6 sm:px-10 pt-28 pb-20">
+        <motion.nav
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: easeOut }}
-          className="mb-10"
+          transition={{ duration: 0.5, ease: easeOut }}
+          className="flex items-center gap-2 mb-8 text-[12px] flex-wrap"
+          style={{ color: C.text3 }}
         >
-          <nav className="flex items-center gap-2 mb-4 text-[12px] flex-wrap" style={{ color: C.text3 }}>
-            <Link href={`/${locale}`} className="transition-colors hover:opacity-80" style={{ color: C.text3 }}>
-              {ui(locale, { fa: "خانه", en: "Home", zh: "首页", de: "Startseite" })}
-            </Link>
-            <Chevron isRTL={isRTL} />
-            <span style={{ color: C.text1 }}>
-              {ui(locale, { fa: "درباره ما", en: "About", zh: "关于我们", de: "Über uns" })}
-            </span>
-          </nav>
+          <Link href={`/${locale}`} className="transition-colors hover:opacity-80" style={{ color: C.text3 }}>
+            {ui(locale, { fa: "خانه", en: "Home", zh: "首页", de: "Startseite" })}
+          </Link>
+          <Chevron isRTL={isRTL} />
+          <span style={{ color: C.text1 }}>
+            {ui(locale, { fa: "درباره ما", en: "About", zh: "关于我们", de: "Über uns" })}
+          </span>
+        </motion.nav>
 
-          <h1
-            className="font-black mb-3 leading-tight"
-            style={{ fontFamily: locale === "fa" ? YK : undefined, fontSize: "clamp(26px, 3.2vw, 42px)" }}
-          >
-            {t.about.title}
-          </h1>
-          <p style={{ color: C.text3, fontSize: "15px", lineHeight: 1.9, fontFamily: locale === "fa" ? YK : undefined }}>
-            {t.about.p1}
-          </p>
-        </motion.div>
-
-        <motion.div
+        <motion.article
           initial={{ opacity: 0, y: 22 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: easeOut, delay: 0.06 }}
-          className="rounded-3xl p-6 sm:p-8 space-y-6"
+          transition={{ duration: 0.65, ease: easeOut, delay: 0.05 }}
+          className="rounded-3xl px-6 py-8 sm:px-10 sm:py-11"
           style={{
             background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
             border: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)"}`,
+            boxShadow: isDark ? "0 24px 60px rgba(0,0,0,0.22)" : "0 20px 50px rgba(0,0,0,0.04)",
           }}
         >
-          <p style={{ color: C.text2, fontSize: "14px", lineHeight: 1.9, fontFamily: locale === "fa" ? YK : undefined }}>
-            {t.about.p2}
-          </p>
-
-          <div style={{ height: "1px", background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }} />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {t.about.kpis.map((kpi) => (
-              <div
-                key={kpi}
-                className="rounded-2xl px-4 py-3 text-[13px] font-semibold"
+          <div className="space-y-7 sm:space-y-8">
+            {t.about.paragraphs.map((paragraph, index) => (
+              <motion.p
+                key={index}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, ease: easeOut, delay: 0.08 + index * 0.05 }}
+                className={index === 0 ? "font-semibold" : ""}
                 style={{
-                  border: `1px solid ${isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.08)"}`,
-                  background: isDark ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.6)",
-                  color: C.text2,
+                  color: index === 0 ? C.text1 : C.text2,
+                  fontSize: index === 0 ? "clamp(15px, 1.6vw, 17px)" : "clamp(14px, 1.45vw, 15.5px)",
+                  lineHeight: index === 0 ? 2.05 : 2,
+                  textAlign: "justify",
                   fontFamily: locale === "fa" ? YK : undefined,
+                  paddingBottom: index < t.about.paragraphs.length - 1 ? "0.25rem" : undefined,
+                  borderBottom:
+                    index < t.about.paragraphs.length - 1
+                      ? `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`
+                      : undefined,
                 }}
               >
-                {kpi}
-              </div>
+                {paragraph}
+              </motion.p>
             ))}
           </div>
-        </motion.div>
+        </motion.article>
       </div>
 
       <SharedFooter locale={locale} />

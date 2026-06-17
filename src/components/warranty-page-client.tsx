@@ -10,6 +10,7 @@ import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
 import { localeDir } from "@/i18n/locale-ui";
 import { warrantyPageCopy } from "@/i18n/warranty.dict";
+import JalaliDateInput from "@/components/jalali-date-input";
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -17,18 +18,24 @@ const easeOut = [0.22, 1, 0.36, 1] as const;
 type FormData = {
   warrantyCode: string;
   serialNumber: string;
+  installationDate: string;
+  deviceModel: string;
   fullName: string;
   phone: string;
   email: string;
+  address: string;
   notes: string;
 };
 
 const INITIAL: FormData = {
   warrantyCode: "",
   serialNumber: "",
+  installationDate: "",
+  deviceModel: "",
   fullName: "",
   phone: "",
   email: "",
+  address: "",
   notes: "",
 };
 
@@ -69,6 +76,42 @@ export default function WarrantyPageClient({ locale }: { locale: Locale }) {
       setForm((f) => ({ ...f, [key]: e.target.value }));
       setErrors((er) => ({ ...er, [key]: undefined }));
     };
+
+  const setDate = (key: "serialNumber" | "installationDate") => (value: string) => {
+    setForm((f) => ({ ...f, [key]: value }));
+    setErrors((er) => ({ ...er, [key]: undefined }));
+  };
+
+  const renderDateField = (
+    key: "serialNumber" | "installationDate",
+    label: string,
+    placeholder: string,
+  ) => (
+    <Field label={label}>
+      {locale === "fa" ? (
+        <JalaliDateInput
+          value={form[key]}
+          onChange={setDate(key)}
+          placeholder={placeholder}
+          isDark={isDark}
+          textColor={C.text1}
+          accentColor={C.accent}
+          hasError={Boolean(errors[key])}
+        />
+      ) : (
+        <input
+          value={form[key]}
+          onChange={set(key)}
+          type="date"
+          style={inputStyle}
+          placeholder={placeholder}
+          dir="ltr"
+          onFocus={onFocus}
+          onBlur={onBlur(key)}
+        />
+      )}
+    </Field>
+  );
 
   const inputStyle: React.CSSProperties = {
     background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
@@ -234,15 +277,20 @@ export default function WarrantyPageClient({ locale }: { locale: Locale }) {
               />
               {errors.warrantyCode ? <span className="text-[11px] text-red-400">{errors.warrantyCode}</span> : null}
             </Field>
-            <Field label={copy.fields.serialNumber}>
+            {renderDateField("serialNumber", copy.fields.serialNumber, copy.fields.serialNumberPlaceholder)}
+            {renderDateField(
+              "installationDate",
+              copy.fields.installationDate,
+              copy.fields.installationDatePlaceholder,
+            )}
+            <Field label={copy.fields.deviceModel}>
               <input
-                value={form.serialNumber}
-                onChange={set("serialNumber")}
+                value={form.deviceModel}
+                onChange={set("deviceModel")}
                 style={inputStyle}
-                placeholder={copy.fields.serialNumberPlaceholder}
-                dir="ltr"
+                placeholder={copy.fields.deviceModelPlaceholder}
                 onFocus={onFocus}
-                onBlur={onBlur("serialNumber")}
+                onBlur={onBlur("deviceModel")}
               />
             </Field>
           </div>
@@ -297,6 +345,17 @@ export default function WarrantyPageClient({ locale }: { locale: Locale }) {
                 {errors.email ? <span className="text-[11px] text-red-400">{errors.email}</span> : null}
               </Field>
             </div>
+            <Field label={copy.fields.address}>
+              <textarea
+                value={form.address}
+                onChange={set("address")}
+                rows={2}
+                style={{ ...inputStyle, resize: "vertical" as const, minHeight: "64px" }}
+                placeholder={copy.fields.addressPlaceholder}
+                onFocus={onFocus}
+                onBlur={onBlur("address")}
+              />
+            </Field>
             <Field label={copy.fields.notes}>
               <textarea
                 value={form.notes}
