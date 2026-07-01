@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   title: "UBETTER Energy | Advanced LiFePO4 Battery & Solar Storage Systems",
   description:
     "Advanced LiFePO4 battery systems for home, commercial and industrial applications. From 2.5kWh residential storage to 2MWh containerized industrial projects.",
+  other: {
+    enamad: "46846627",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
