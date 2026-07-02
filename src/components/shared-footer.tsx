@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UbetterLogoWithAiBadge } from "@/components/brand-logo";
 import type { Locale } from "@/i18n/config";
-import { locales, localizedPath } from "@/i18n/config";
+import { locales, localizedPath, localePath } from "@/i18n/config";
 import {
   LocaleFlagMark,
   localeNavLabel,
@@ -96,7 +96,7 @@ export default function SharedFooter({ locale }: { locale: Locale }) {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-2 md:col-span-1">
-            <Link href={`/${locale}`} className="inline-flex mb-5">
+            <Link href={localePath(locale, "/")} className="inline-flex mb-5">
               <UbetterLogoWithAiBadge size="sm" />
             </Link>
             <p className="text-[13px] leading-relaxed mb-5" style={{ color: C.text3 }}>

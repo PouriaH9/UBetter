@@ -4,6 +4,7 @@ import Link from "next/link";
 import SharedNavbar from "@/components/shared-navbar";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { localeDir, ui3 } from "@/i18n/locale-ui";
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
@@ -30,14 +31,14 @@ export default function CheckoutCancelClient({ locale }: { locale: Locale }) {
         </p>
         <div className="flex gap-3 justify-center">
           <Link
-            href={`/${locale}/checkout`}
+            href={localePath(locale, "/checkout")}
             className="px-6 py-3 rounded-2xl font-bold"
             style={{ background: C.accent, color: isDark ? "#000" : "#fff", fontFamily: YK }}
           >
             {ui3(locale, "تلاش مجدد", "Try again", "重试")}
           </Link>
           <Link
-            href={`/${locale}/enquiry`}
+            href={localePath(locale, "/enquiry")}
             className="px-6 py-3 rounded-2xl font-bold border"
             style={{ borderColor: C.cardBorder, fontFamily: YK }}
           >

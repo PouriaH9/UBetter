@@ -8,6 +8,7 @@ import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import { formatPrice } from "@/lib/products";
 import { medusa, MEDUSA_ENABLED } from "@/lib/medusa";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { localeDir, ui3 } from "@/i18n/locale-ui";
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
@@ -230,7 +231,7 @@ export default function CheckoutPageClient({ locale }: { locale: Locale }) {
                   : ui3(locale, "پرداخت با زرین‌پال", "Pay with Zarinpal", "Zarinpal 支付")}
               </button>
               <Link
-                href={`/${locale}/enquiry`}
+                href={localePath(locale, "/enquiry")}
                 className="px-5 py-3.5 rounded-2xl font-bold border text-center"
                 style={{ borderColor: C.cardBorder, fontFamily: YK }}
               >

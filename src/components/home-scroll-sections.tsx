@@ -16,6 +16,7 @@ import {
 import { useHomeGlobeJourneyOptional } from "@/contexts/home-globe-journey-context";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { homeSectionsCopy, type HomeSectionBlock } from "@/i18n/home-sections.dict";
 import { translations } from "@/i18n/translations";
 import { localeHtmlLang } from "@/i18n/locale-ui";
@@ -736,7 +737,7 @@ export function HomeServicesSection({ locale }: { locale: Locale }) {
           <ServicesFeatureCard key={card.title} locale={locale} {...card} index={i} />
         ))}
       </div>
-      {copy.cta ? <SectionCta locale={locale} label={copy.cta} href={`/${locale}/warranty`} /> : null}
+      {copy.cta ? <SectionCta locale={locale} label={copy.cta} href={localePath(locale, "/warranty")} /> : null}
     </SectionShell>
   );
 }

@@ -8,6 +8,7 @@ import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { localeDir } from "@/i18n/locale-ui";
 import { warrantyPageCopy } from "@/i18n/warranty.dict";
 import JalaliDateInput from "@/components/jalali-date-input";
@@ -196,7 +197,7 @@ export default function WarrantyPageClient({ locale }: { locale: Locale }) {
             </h1>
             <p style={{ color: C.text3, fontSize: "15px", lineHeight: 1.8, fontFamily: YK }}>{copy.successBody}</p>
             <Link
-              href={`/${locale}`}
+              href={localePath(locale, "/")}
               className="mt-2 px-8 py-3 rounded-2xl font-bold text-[14px] transition-all duration-200 hover:scale-105"
               style={{ background: C.accent, color: "#000", fontFamily: YK }}
             >
@@ -227,7 +228,7 @@ export default function WarrantyPageClient({ locale }: { locale: Locale }) {
           className="mb-10"
         >
           <nav className="flex items-center gap-2 mb-4 text-[12px] flex-wrap" style={{ color: C.text3 }}>
-            <Link href={`/${locale}`} className="transition-colors hover:opacity-80" style={{ color: C.text3 }}>
+            <Link href={localePath(locale, "/")} className="transition-colors hover:opacity-80" style={{ color: C.text3 }}>
               {copy.breadcrumbHome}
             </Link>
             <Chevron isRTL={isRTL} />

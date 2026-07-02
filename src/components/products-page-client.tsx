@@ -15,6 +15,7 @@ import { useTheme, DARK_C, LIGHT_C, type ColorPalette } from "@/contexts/theme-c
 import { useCart } from "@/contexts/cart-context";
 import { useProductCommerceMap, type ProductCommerceInfo } from "@/hooks/use-product-commerce";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { localeDir, ui3 } from "@/i18n/locale-ui";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -206,7 +207,7 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart, co
         }}
       >
         <Link
-          href={`/${locale}/products/${productNum}`}
+          href={localePath(locale, `/products/${productNum}`)}
           className="flex items-center justify-center"
           style={{ height: "200px", background: "#ffffff", position: "relative", borderBottom: `1px solid rgba(0,0,0,0.06)` }}
         >
@@ -235,7 +236,7 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart, co
             {tx(product.category, locale)}
           </span>
 
-          <Link href={`/${locale}/products/${productNum}`} className="block group/title">
+          <Link href={localePath(locale, `/products/${productNum}`)} className="block group/title">
             <h3 className="font-bold mb-3 leading-snug transition-opacity duration-200 group-hover/title:opacity-85"
               style={{ color: C.text1, fontFamily: YK, fontSize: "15px", lineHeight: 1.4, minHeight: "42px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
               {tx(product.name, locale)}
@@ -273,7 +274,7 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart, co
           <div className="flex flex-col gap-2">
             <div className="grid grid-cols-2 gap-2">
               <Link
-                href={`/${locale}/products/${productNum}`}
+                href={localePath(locale, `/products/${productNum}`)}
                 className="py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 text-center"
                 style={{ background: C.accent, color: isDark ? "#000" : "#fff", border: `1px solid ${C.accentBorder}`, fontFamily: YK }}
               >
@@ -624,7 +625,7 @@ function PageHeader({
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: easeOut }}>
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 mb-4 sm:mb-5 text-[12px]" style={{ color: "rgba(255,255,255,0.5)" }}>
-            <a href={`/${locale}`} className="transition-colors duration-200" style={{ color: "rgba(255,255,255,0.5)" }}
+            <a href={localePath(locale, "/")} className="transition-colors duration-200" style={{ color: "rgba(255,255,255,0.5)" }}
               onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#ffffff"; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.5)"; }}>
               {ui3(locale, "خانه", "Home", "首页")}

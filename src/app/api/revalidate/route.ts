@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache"
 import { NextRequest, NextResponse } from "next/server"
+import { defaultLocale } from "@/i18n/config"
 
 export async function POST(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get("secret")
@@ -16,14 +17,16 @@ export async function POST(req: NextRequest) {
     const trimmed = tag.trim()
     if (trimmed.startsWith("product-")) {
       const productNum = trimmed.replace("product-", "")
-      revalidatePath(`/fa/products/${productNum}`)
+      revalidatePath(`/products/${productNum}`)
+      revalidatePath(`/${defaultLocale}/products/${productNum}`)
       revalidatePath(`/en/products/${productNum}`)
       revalidatePath(`/zh/products/${productNum}`)
       revalidatePath(`/de/products/${productNum}`)
     }
   }
 
-  revalidatePath("/fa/products")
+  revalidatePath("/products")
+  revalidatePath(`/${defaultLocale}/products`)
   revalidatePath("/en/products")
   revalidatePath("/zh/products")
   revalidatePath("/de/products")

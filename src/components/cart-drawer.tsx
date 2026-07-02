@@ -8,6 +8,7 @@ import { formatPrice } from "@/lib/products";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import { PRODUCT_IMAGES } from "@/assets/productImages";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { localeDir, ui3 } from "@/i18n/locale-ui";
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
@@ -202,7 +203,7 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
                   </button>
                 </div>
                 <Link
-                  href={`/${locale}/checkout`}
+                  href={localePath(locale, "/checkout")}
                   onClick={closeCart}
                   className="w-full py-3.5 rounded-2xl font-bold text-[14px] transition-all duration-200 flex items-center justify-center gap-2"
                   style={{ background: C.accent, color: isDark ? "#000" : "#fff", fontFamily: YK }}
@@ -211,7 +212,7 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
                   {ui3(locale, "تسویه حساب", "Checkout", "结账")}
                 </Link>
                 <Link
-                  href={`/${locale}/enquiry`}
+                  href={localePath(locale, "/enquiry")}
                   onClick={closeCart}
                   className="w-full py-3 rounded-2xl font-semibold text-[13px] transition-all duration-200 flex items-center justify-center gap-2 border"
                   style={{ borderColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)", color: C.text2, fontFamily: YK }}

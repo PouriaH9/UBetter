@@ -1,6 +1,7 @@
 "use client";
 
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { ui3 } from "@/i18n/locale-ui";
 
 import { useState, useEffect, useCallback } from "react";
@@ -327,7 +328,7 @@ function FeaturedProductBlock({ product, globalIndex, imageLeft, locale, onOpenS
             <Reveal delay={0.35}>
               <div className={`flex flex-wrap gap-3 ${isRTL ? "justify-end" : "justify-start"}`}>
                 <Link
-                  href={`/${locale}/products/${productNum}`}
+                  href={localePath(locale, `/products/${productNum}`)}
                   className="inline-flex items-center gap-3 px-6 py-3.5 rounded-xl font-semibold text-[13px] transition-all duration-300"
                   style={{ background: ACCENT, color: "#000", fontFamily: YK, letterSpacing: isRTL ? "0" : "0.02em", boxShadow: "0 0 24px rgba(124,255,0,0.22)" }}
                 >
@@ -455,7 +456,7 @@ function CompactProductCard({ product, globalIndex, locale, onOpenSpecs }: { pro
 
           <div className="grid grid-cols-2 gap-2">
             <Link
-              href={`/${locale}/products/${productNum}`}
+              href={localePath(locale, `/products/${productNum}`)}
               className="py-2.5 rounded-xl text-[12px] font-semibold transition-all duration-300 flex items-center justify-center gap-1.5"
               style={{ background: ACCENT, color: "#000", fontFamily: YK }}
             >

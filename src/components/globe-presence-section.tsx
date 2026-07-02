@@ -29,6 +29,7 @@ import { homeStickyHeaderReservePx } from "@/lib/scroll-to-anchor";
 
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { translations } from "@/i18n/translations";
 
 import {
@@ -604,7 +605,7 @@ export function GlobePresenceSection({ locale }: { locale: Locale }) {
 
               <div className="btn-gradient-border" style={{ color: C.text1 }}>
                 <Link
-                  href={`/${locale}/about`}
+                  href={localePath(locale, "/about")}
                   className="btn-gradient-border-inner inline-flex items-center justify-center gap-2.5 px-7 py-3.5 font-bold text-[14px] sm:text-[15px] transition-all duration-300 hover:scale-105"
                   style={{
                     background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)",

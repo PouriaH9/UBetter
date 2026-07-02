@@ -9,6 +9,7 @@ import SharedFooter from "@/components/shared-footer";
 import CartDrawer from "@/components/cart-drawer";
 import { getProductEntryByNum, tx } from "@/data/product-categories";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { PRODUCT_IMAGES, DETAIL_IMAGES } from "@/assets/productImages";
 import { useTheme, DARK_C, LIGHT_C, type ColorPalette } from "@/contexts/theme-context";
 import { useCart } from "@/contexts/cart-context";
@@ -473,7 +474,7 @@ export default function ProductDetailPageClient({ locale, productNum }: { locale
       <main className="pt-[88px] sm:pt-[92px] pb-16">
         <div className="max-w-[1100px] mx-auto px-6 sm:px-10">
           <nav className="flex flex-wrap items-center gap-2 text-[12px] mb-8" style={{ color: C.text4 }} aria-label="Breadcrumb">
-            <Link href={`/${locale}`} className="inline-flex items-center gap-2 transition-colors duration-200 hover:opacity-100" style={{ color: C.text3 }}>
+            <Link href={localePath(locale, "/")} className="inline-flex items-center gap-2 transition-colors duration-200 hover:opacity-100" style={{ color: C.text3 }}>
               <FantasyGlow size={28} accent={C.accent}>
                 <IconCrystalHome stroke={C.accent} />
               </FantasyGlow>
@@ -487,7 +488,7 @@ export default function ProductDetailPageClient({ locale, productNum }: { locale
             >
               ✦
             </motion.span>
-            <Link href={`/${locale}/products`} className="inline-flex items-center gap-2 transition-colors duration-200 hover:opacity-100" style={{ color: C.text3 }}>
+            <Link href={localePath(locale, "/products")} className="inline-flex items-center gap-2 transition-colors duration-200 hover:opacity-100" style={{ color: C.text3 }}>
               <FantasyGlow size={28} accent={C.accent}>
                 <IconMagicGrid stroke={C.accent} />
               </FantasyGlow>
@@ -510,7 +511,7 @@ export default function ProductDetailPageClient({ locale, productNum }: { locale
           </nav>
 
           <Link
-            href={`/${locale}/products#cat-${category.id}`}
+            href={`${localePath(locale, "/products")}#cat-${category.id}`}
             className="inline-flex items-center gap-2.5 text-[12px] font-medium mb-10 transition-opacity hover:opacity-80"
             style={{ color: C.accent, fontFamily: YK }}
           >
@@ -694,7 +695,7 @@ export default function ProductDetailPageClient({ locale, productNum }: { locale
                 />
                 {commerce?.priceLabel && (
                   <Link
-                    href={`/${locale}/checkout`}
+                    href={localePath(locale, "/checkout")}
                     className="w-full sm:w-auto min-w-[160px] py-3 rounded-xl text-[13px] font-semibold transition-all duration-200 inline-flex items-center justify-center gap-2"
                     style={{ background: C.accent, color: isDark ? "#000" : "#fff", fontFamily: YK }}
                   >

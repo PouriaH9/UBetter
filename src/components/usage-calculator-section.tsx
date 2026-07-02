@@ -7,6 +7,7 @@ import Link from "next/link";
 import { toPng } from "html-to-image";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { UPS_CALCULATOR_SECTION_ID } from "@/lib/scroll-to-anchor";
 import { translations } from "@/i18n/translations";
 import {
@@ -876,7 +877,7 @@ function UPSSelector({ M, locale }: { M: CalcMonochrome; locale: Locale }) {
             : u.step3.promoSmall}
         </p>
         <Link
-          href={`/${locale}/products`}
+          href={localePath(locale, "/products")}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-[13px] transition-all duration-200 hover:scale-105"
           style={{ background: M.btnBg, color: M.btnFg }}
         >

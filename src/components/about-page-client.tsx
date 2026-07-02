@@ -7,6 +7,7 @@ import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { localeDir, ui } from "@/i18n/locale-ui";
 import { translations } from "@/i18n/translations";
 
@@ -38,7 +39,7 @@ export default function AboutPageClient({ locale }: { locale: Locale }) {
           className="flex items-center gap-2 mb-8 text-[12px] flex-wrap"
           style={{ color: C.text3 }}
         >
-          <Link href={`/${locale}`} className="transition-colors hover:opacity-80" style={{ color: C.text3 }}>
+          <Link href={localePath(locale, "/")} className="transition-colors hover:opacity-80" style={{ color: C.text3 }}>
             {ui(locale, { fa: "خانه", en: "Home", zh: "首页", de: "Startseite" })}
           </Link>
           <Chevron isRTL={isRTL} />

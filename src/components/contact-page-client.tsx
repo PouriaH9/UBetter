@@ -7,6 +7,7 @@ import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { localeDir } from "@/i18n/locale-ui";
 import { contactPageCopy } from "@/i18n/contact.dict";
 
@@ -42,7 +43,7 @@ export default function ContactPageClient({ locale }: { locale: Locale }) {
           className="mb-10"
         >
           <nav className="flex items-center gap-2 mb-4 text-[12px] flex-wrap" style={{ color: C.text3 }}>
-            <Link href={`/${locale}`} className="transition-colors hover:opacity-80" style={{ color: C.text3 }}>
+            <Link href={localePath(locale, "/")} className="transition-colors hover:opacity-80" style={{ color: C.text3 }}>
               {copy.breadcrumbHome}
             </Link>
             <Chevron isRTL={isRTL} />

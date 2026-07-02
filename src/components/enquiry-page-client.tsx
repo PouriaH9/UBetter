@@ -10,6 +10,7 @@ import { MEDUSA_ENABLED } from "@/lib/medusa";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import { PRODUCT_IMAGES } from "@/assets/productImages";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { localeDir, ui3 } from "@/i18n/locale-ui";
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
@@ -195,7 +196,7 @@ export default function EnquiryPageClient({ locale }: { locale: Locale }) {
                 "我们的专家将尽快与您联系。",
               )}
             </p>
-            <Link href={`/${locale}/products`}
+            <Link href={localePath(locale, "/products")}
               className="mt-2 px-8 py-3 rounded-2xl font-bold text-[14px] transition-all duration-200 hover:scale-105"
               style={{ background: C.accent, color: isDark ? "#000" : "#fff", fontFamily: YK }}>
               {ui3(locale, "بازگشت به محصولات", "Back to Products", "返回产品页")}
@@ -213,9 +214,9 @@ export default function EnquiryPageClient({ locale }: { locale: Locale }) {
       <div className="max-w-[1100px] mx-auto px-6 sm:px-10 pt-28 pb-20">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: easeOut }} className="mb-10">
           <div className="flex items-center gap-2 mb-4 text-[12px]" style={{ color: C.text3 }}>
-            <Link href={`/${locale}`} style={{ color: C.text3 }} className="transition-colors hover:text-white">{ui3(locale, "صفحه اصلی", "Home", "首页")}</Link>
+            <Link href={localePath(locale, "/")} style={{ color: C.text3 }} className="transition-colors hover:text-white">{ui3(locale, "صفحه اصلی", "Home", "首页")}</Link>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={isRTL ? "rotate-180" : ""}><path d="M4.5 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            <Link href={`/${locale}/products`} style={{ color: C.text3 }} className="transition-colors hover:text-white">{ui3(locale, "محصولات", "Products", "产品")}</Link>
+            <Link href={localePath(locale, "/products")} style={{ color: C.text3 }} className="transition-colors hover:text-white">{ui3(locale, "محصولات", "Products", "产品")}</Link>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={isRTL ? "rotate-180" : ""}><path d="M4.5 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             <span style={{ color: C.text1 }}>{ui3(locale, "ثبت درخواست", "Enquiry", "项目询价")}</span>
           </div>

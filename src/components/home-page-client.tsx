@@ -9,6 +9,7 @@ import { HERO_IMAGES } from "@/assets/productImages";
 
 import { translations } from "@/i18n/translations";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { localeDir, ui, ui3 } from "@/i18n/locale-ui";
 import { heroOverlayCopy } from "@/i18n/hero-overlay.dict";
 import SharedNavbar from "@/components/shared-navbar";
@@ -109,7 +110,7 @@ function HeroOverlayContent({ locale }: { locale: Locale }) {
       </motion.p>
 
       <motion.a
-        href={`/${locale}/products`}
+        href={localePath(locale, "/products")}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9, duration: 0.75 }}
@@ -524,7 +525,7 @@ function ProductPortfolioScrollStack({
               </h2>
               <div className="btn-gradient-border" style={{ color: C.text1 }}>
                 <Link
-                  href={`/${locale}/products`}
+                  href={localePath(locale, "/products")}
                   className="btn-gradient-border-inner inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-[14px] sm:text-[15px] transition-all duration-300 hover:scale-105"
                   style={{
                     background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.55)",

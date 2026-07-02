@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import { useCart } from "@/contexts/cart-context";
 import type { Locale } from "@/i18n/config";
-import { locales, localizedPath } from "@/i18n/config";
+import { locales, localizedPath, localePath } from "@/i18n/config";
 import {
   LocaleFlagMark,
   localeNavLabel,
@@ -204,15 +204,15 @@ export default function SharedNavbar({
   const pathForLocale = pathname ?? "/";
   const alternateLocales = locales.filter((l) => l !== locale);
 
-  const homePath = `/${locale}`;
+  const homePath = localePath(locale, "/");
   const upsCalculatorHref = `${homePath}#${UPS_CALCULATOR_SECTION_ID}`;
 
-  const warrantyPath = `/${locale}/warranty`;
-  const contactPath = `/${locale}/contact`;
+  const warrantyPath = localePath(locale, "/warranty");
+  const contactPath = localePath(locale, "/contact");
 
   const faLinks = [
     { href: homePath, label: "خانه", page: "home" as const },
-    { href: `/${locale}/products`, label: "محصولات", page: "products" as const },
+    { href: localePath(locale, "/products"), label: "محصولات", page: "products" as const },
     {
       href: upsCalculatorHref,
       label: "ماشین حساب",
@@ -220,12 +220,12 @@ export default function SharedNavbar({
       scrollTargetId: UPS_CALCULATOR_SECTION_ID,
     },
     { href: warrantyPath, label: "گارانتی", page: "warranty" as const },
-    { href: `/${locale}/about`, label: "درباره ما", page: "home" as const },
+    { href: localePath(locale, "/about"), label: "درباره ما", page: "home" as const },
     { href: contactPath, label: "تماس با ما", page: "contact" as const },
   ];
   const enLinks = [
     { href: homePath, label: "Home", page: "home" as const },
-    { href: `/${locale}/products`, label: "Products", page: "products" as const },
+    { href: localePath(locale, "/products"), label: "Products", page: "products" as const },
     {
       href: upsCalculatorHref,
       label: "Calculator",
@@ -233,12 +233,12 @@ export default function SharedNavbar({
       scrollTargetId: UPS_CALCULATOR_SECTION_ID,
     },
     { href: warrantyPath, label: "Warranty", page: "warranty" as const },
-    { href: `/${locale}/about`, label: "About", page: "home" as const },
+    { href: localePath(locale, "/about"), label: "About", page: "home" as const },
     { href: contactPath, label: "Contact", page: "contact" as const },
   ];
   const zhLinks = [
     { href: homePath, label: "首页", page: "home" as const },
-    { href: `/${locale}/products`, label: "产品", page: "products" as const },
+    { href: localePath(locale, "/products"), label: "产品", page: "products" as const },
     {
       href: upsCalculatorHref,
       label: "计算器",
@@ -246,7 +246,7 @@ export default function SharedNavbar({
       scrollTargetId: UPS_CALCULATOR_SECTION_ID,
     },
     { href: warrantyPath, label: "保修服务", page: "warranty" as const },
-    { href: `/${locale}/about`, label: "关于我们", page: "home" as const },
+    { href: localePath(locale, "/about"), label: "关于我们", page: "home" as const },
     { href: contactPath, label: "联系我们", page: "contact" as const },
   ];
   const navLinks = locale === "fa" ? faLinks : locale === "zh" ? zhLinks : enLinks;
@@ -306,7 +306,7 @@ export default function SharedNavbar({
         transition={{ duration: 0.35, ease: easeOut }}
       >
         {/* Logo */}
-        <Link href={`/${locale}`} className="shrink-0 flex items-center gap-1.5 select-none" dir="ltr">
+        <Link href={homePath} className="shrink-0 flex items-center gap-1.5 select-none" dir="ltr">
           <motion.span
             className="font-black tracking-tight leading-none block"
             animate={{ fontSize: logoFontPx }}
@@ -333,7 +333,7 @@ export default function SharedNavbar({
               (l.page === "warranty" && activePage === "warranty") ||
               (l.page === "contact" && activePage === "contact") ||
               (l.page === "home" && l.label === homeNavLabel && activePage === "home");
-            const isProducts = l.href === `/${locale}/products`;
+            const isProducts = l.href === localePath(locale, "/products");
 
             if (isProducts) {
               return (
@@ -381,7 +381,7 @@ export default function SharedNavbar({
                           {PRODUCT_CATS.map((cat) => (
                             <Link
                               key={cat.id}
-                              href={`/${locale}/products#cat-${cat.id}`}
+                              href={`${localePath(locale, "/products")}#cat-${cat.id}`}
                               className="flex items-center gap-3 px-4 py-2.5 transition-colors duration-150 group"
                               style={{ fontFamily: YK, fontSize: "13px", color: C.text2 }}
                               onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = C.accent; }}
@@ -394,7 +394,7 @@ export default function SharedNavbar({
                           ))}
                           <div style={{ height: "1px", margin: "6px 16px", background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }} />
                           <Link
-                            href={`/${locale}/products`}
+                            href={localePath(locale, "/products")}
                             className="flex items-center gap-2 px-4 py-2.5 text-[12px] font-semibold transition-colors duration-150"
                             style={{ fontFamily: YK, color: C.accent }}
                             onClick={() => setDesktopDropdown(false)}
@@ -531,7 +531,7 @@ export default function SharedNavbar({
             dir={isRTL ? "rtl" : "ltr"}
           >
             {navLinks.map((l) => {
-              const isProducts = l.href === `/${locale}/products`;
+              const isProducts = l.href === localePath(locale, "/products");
               const isMobileLinkActive =
                 (l.page === "warranty" && activePage === "warranty") ||
                 (l.page === "contact" && activePage === "contact") ||
@@ -571,7 +571,7 @@ export default function SharedNavbar({
                             {PRODUCT_CATS.map((cat) => (
                               <Link
                                 key={cat.id}
-                                href={`/${locale}/products#cat-${cat.id}`}
+                                href={`${localePath(locale, "/products")}#cat-${cat.id}`}
                                 onClick={() => { setOpen(false); setProductsOpen(false); }}
                                 className="flex items-center gap-3 px-8 py-3 transition-colors duration-200"
                                 style={{ fontFamily: YK, fontSize: "13px", color: C.text3 }}
@@ -583,7 +583,7 @@ export default function SharedNavbar({
                               </Link>
                             ))}
                             <Link
-                              href={`/${locale}/products`}
+                              href={localePath(locale, "/products")}
                               onClick={() => { setOpen(false); setProductsOpen(false); }}
                               className="flex items-center gap-2 px-8 py-3 text-[12px] font-semibold transition-colors duration-200"
                               style={{ fontFamily: YK, color: C.accent }}

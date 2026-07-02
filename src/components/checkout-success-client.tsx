@@ -4,6 +4,7 @@ import Link from "next/link";
 import SharedNavbar from "@/components/shared-navbar";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import type { Locale } from "@/i18n/config";
+import { localePath } from "@/i18n/config";
 import { localeDir, ui3 } from "@/i18n/locale-ui";
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
@@ -29,7 +30,7 @@ export default function CheckoutSuccessClient({ locale }: { locale: Locale }) {
           )}
         </p>
         <Link
-          href={`/${locale}/products`}
+          href={localePath(locale, "/products")}
           className="inline-block px-6 py-3 rounded-2xl font-bold"
           style={{ background: C.accent, color: isDark ? "#000" : "#fff", fontFamily: YK }}
         >
