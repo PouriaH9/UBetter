@@ -10,12 +10,10 @@ import SharedFooter from "@/components/shared-footer";
 import { ScrollSheetOverHero, ScrollStackLayer } from "@/components/scroll-stack-layers";
 import CartDrawer from "@/components/cart-drawer";
 import { CATEGORIES, tx } from "@/components/products-section";
-import { PRODUCT_IMAGES, DETAIL_IMAGES } from "@/assets/productImages";
+import { PRODUCT_IMAGES, DETAIL_IMAGES, HERO_IMAGES } from "@/assets/productImages";
 import { useTheme, DARK_C, LIGHT_C, type ColorPalette } from "@/contexts/theme-context";
 import { useCart } from "@/contexts/cart-context";
 import { useProductCommerceMap, type ProductCommerceInfo } from "@/hooks/use-product-commerce";
-import productsHeroDesktop from "@/assets/Source/products HERO desktopsize.png";
-import productsHeroMobile from "@/assets/Source/products HERO mobilesize.png";
 import type { Locale } from "@/i18n/config";
 import { localeDir, ui3 } from "@/i18n/locale-ui";
 
@@ -612,8 +610,8 @@ function PageHeader({
     <div className="relative z-0 overflow-hidden min-h-screen flex flex-col justify-start pt-[92px] sm:pt-[96px]">
       {/* Background images */}
       <div className="absolute inset-0">
-        <Image src={productsHeroDesktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority />
-        <Image src={productsHeroMobile} alt="" fill className="object-cover object-top sm:hidden" sizes="100vw" priority />
+        <Image src={HERO_IMAGES.products.desktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority />
+        <Image src={HERO_IMAGES.products.mobile} alt="" fill className="object-cover object-top sm:hidden" sizes="100vw" priority />
         {/* Gradient overlay */}
         <div className="absolute inset-0" style={{ background:
           "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.32) 50%, rgba(0,0,0,0.52) 100%)"

@@ -5,14 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 
-import productsHeroDesktop from "@/assets/Source/products HERO desktopsize.png";
-import productsHeroMobile from "@/assets/Source/products HERO mobilesize.png";
-import hero1Img from "@/assets/HERO1.png";
-import hero2Img from "@/assets/HERO2.png";
-import hero3Img from "@/assets/HERO3.jpg";
-import hero1MImg from "@/assets/HERO1M.png";
-import hero2MImg from "@/assets/HERO2M.png";
-import hero3MImg from "@/assets/HERO3M.png";
+import { HERO_IMAGES } from "@/assets/productImages";
 
 import { translations } from "@/i18n/translations";
 import type { Locale } from "@/i18n/config";
@@ -166,8 +159,8 @@ function Hero({ locale }: { locale: Locale }) {
 
   const isRTL = locale === "fa";
 
-  const heroImages = [hero1Img, hero2Img, hero3Img];
-  const heroMobileImages = [hero1MImg, hero2MImg, hero3MImg];
+  const heroImages = HERO_IMAGES.home.map((slide) => slide.desktop);
+  const heroMobileImages = HERO_IMAGES.home.map((slide) => slide.mobile);
   const heroSlideIntervalMs = 3500;
   const heroCrossfadeDuration = 0.9;
   const [activeImg, setActiveImg] = useState(0);
@@ -473,8 +466,8 @@ function ProductPortfolioScrollStack({
           style={{ scale: bgScale }}
           aria-hidden
         >
-          <Image src={productsHeroDesktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority={false} />
-          <Image src={productsHeroMobile} alt="" fill className="object-cover object-top sm:hidden" sizes="100vw" priority={false} />
+          <Image src={HERO_IMAGES.products.desktop} alt="" fill className="object-cover object-center hidden sm:block" sizes="100vw" priority={false} />
+          <Image src={HERO_IMAGES.products.mobile} alt="" fill className="object-cover object-top sm:hidden" sizes="100vw" priority={false} />
           <div
             className="absolute inset-0"
             style={{

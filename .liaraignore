@@ -1,0 +1,9 @@
+backend/
+docker-compose*.yml
+nginx/
+.vercel/
+.next/
+node_modules/
+backend/node_modules/
+*.md
+.git/

@@ -1,9 +1,9 @@
 "use client";
 
-import Image, { type StaticImageData } from "next/image";
+import Image from "next/image";
 import type { CSSProperties } from "react";
 
-import { brandAssets } from "@/assets/brand-assets";
+import { brandAssets, type PublicImage } from "@/assets/brand-assets";
 import type { Locale } from "@/i18n/config";
 import { ui3 } from "@/i18n/locale-ui";
 
@@ -64,23 +64,21 @@ export function BrandImagePlaceholder({
 
 /** Crops the left or right half of a side-by-side composite image. */
 function CroppedHalfImage({
-  src,
-  alt,
+  asset,
   side,
   height,
   responsive,
   className = "",
   priority,
 }: {
-  src: StaticImageData;
-  alt: string;
+  asset: PublicImage;
   side: "left" | "right";
   height: number;
   responsive?: boolean;
   className?: string;
   priority?: boolean;
 }) {
-  const aspect = src.width / (src.height * 2);
+  const aspect = asset.width / (asset.height * 2);
   const width = height * aspect;
 
   return (
@@ -99,8 +97,8 @@ function CroppedHalfImage({
       }}
     >
       <Image
-        src={src}
-        alt={alt}
+        src={asset.src}
+        alt={asset.alt}
         fill
         priority={priority}
         sizes={`${Math.round(width)}px`}
@@ -119,7 +117,7 @@ function CroppedHalfImage({
 export function UbetterLogo({ size = "md", className = "", priority }: BaseProps) {
   const asset = brandAssets.ubetter;
   const h = HEIGHT[size];
-  const aspect = asset.src.width / asset.src.height;
+  const aspect = asset.width / asset.height;
   const w = h * aspect;
 
   return (
@@ -145,7 +143,7 @@ export function UbetterLogo({ size = "md", className = "", priority }: BaseProps
 /** Responsive UBETTER logo — scales between sm and lg bounds. */
 export function UbetterLogoResponsive({ className = "", priority }: Omit<BaseProps, "size">) {
   const asset = brandAssets.ubetter;
-  const aspect = asset.src.width / asset.src.height;
+  const aspect = asset.width / asset.height;
 
   return (
     <div
@@ -173,7 +171,7 @@ export function AiBadge({ size = "sm", className = "" }: Omit<BaseProps, "priori
   const h = HEIGHT[size];
 
   if (asset.available && asset.src) {
-    const aspect = asset.src.width / asset.src.height;
+    const aspect = asset.width / asset.height;
     return (
       <div className={`relative shrink-0 ${className}`} style={{ height: h, width: h * aspect }}>
         <Image src={asset.src} alt={asset.alt} fill sizes={`${Math.round(h * aspect)}px`} className="object-contain" />
@@ -239,7 +237,7 @@ export function GermanyTechnologyBadge({
 
   return (
     <div className={`flex flex-col items-center gap-1 ${className}`}>
-      <CroppedHalfImage src={asset.src} alt={asset.alt} side="right" height={h} />
+      <CroppedHalfImage asset={asset} side="right" height={h} />
       {showLabel && (
         <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide opacity-70 whitespace-nowrap">
           {label}
@@ -264,8 +262,7 @@ export function LianSadrMelalLogo({
   return (
     <div className={`flex flex-col items-center gap-1 ${className}`}>
       <CroppedHalfImage
-        src={asset.src}
-        alt={asset.alt}
+        asset={asset}
         side={side}
         height={h}
       />

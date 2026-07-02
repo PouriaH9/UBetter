@@ -1,0 +1,8 @@
+node_modules
+.medusa
+.yarn
+.git
+.github
+integration-tests
+*.md
+.env*

@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import type { StaticImageData } from "next/image";
 import SharedNavbar from "@/components/shared-navbar";
 import SharedFooter from "@/components/shared-footer";
 import CartDrawer from "@/components/cart-drawer";
@@ -448,7 +447,7 @@ export default function ProductDetailPageClient({ locale, productNum }: { locale
   }, [productNum, locale]);
 
   const gallery = useMemo(() => {
-    const items: { key: string; src: StaticImageData; label: string }[] = [];
+    const items: { key: string; src: string; label: string }[] = [];
     const main = PRODUCT_IMAGES[productNum];
     const detail = DETAIL_IMAGES[productNum];
     if (main) items.push({ key: "hero", src: main, label: ui3(locale, "نمای محصول", "Product view", "产品图") });

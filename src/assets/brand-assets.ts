@@ -1,38 +1,43 @@
-import type { StaticImageData } from "next/image";
-
-import ubetterLogo from "@/assets/ubetter logo.png";
-import flagShieldImage from "@/assets/Flag.png";
-import lianSadrMelalLogo from "@/assets/6--.jpg";
+export type PublicImage = {
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+};
 
 /** Central registry for brand / trust image assets. */
 export const brandAssets = {
   ubetter: {
-    src: ubetterLogo,
+    src: "/brand/ubetter-logo.webp",
+    width: 3583,
+    height: 2152,
     alt: "UBETTER",
-    /** Expected file: src/assets/ubetter logo.png */
-    file: "src/assets/ubetter logo.png",
+    file: "public/brand/ubetter-logo.webp",
     available: true,
   },
   aiBadge: {
-    src: null as StaticImageData | null,
+    src: null as string | null,
+    width: 0,
+    height: 0,
     alt: "AI Powered",
-    /** Expected file: src/assets/ai-badge.png */
-    file: "src/assets/ai-badge.png",
+    file: "public/brand/ai-badge.webp",
     available: false,
   },
   germanyTechnology: {
-    src: flagShieldImage,
+    src: "/brand/flag.webp",
+    width: 957,
+    height: 725,
     alt: "German Technology",
-    /** Right half of src/assets/Flag.png (Germany shield). Dedicated crop optional: src/assets/germany-technology-badge.png */
-    file: "src/assets/Flag.png",
-    dedicatedFile: "src/assets/germany-technology-badge.png",
+    file: "public/brand/flag.webp",
+    dedicatedFile: "public/brand/germany-technology-badge.webp",
     available: true,
   },
   lianSadrMelal: {
-    src: lianSadrMelalLogo,
+    src: "/brand/lian-sadr-melal.webp",
+    width: 3508,
+    height: 2480,
     alt: "Lian Sadr Melal",
-    /** Expected file: src/assets/6--.jpg (EN left / FA right) */
-    file: "src/assets/6--.jpg",
+    file: "public/brand/lian-sadr-melal.webp",
     available: true,
   },
 } as const;

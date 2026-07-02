@@ -17,8 +17,7 @@ import type { UpsCategoryId } from "@/i18n/ups-device-data";
 import { formatBackupDuration, formatStepMeta } from "@/i18n/ups-calculator.dict";
 import type { UpsCalculatorDict, UpsTypeId } from "@/i18n/ups-calculator.dict";
 import { localeHtmlLang, localeNumTag } from "@/i18n/locale-ui";
-import calculatorHeroDesktop from "@/assets/CALCULATOR DESKTOP SIZE.png";
-import calculatorHeroMobile from "@/assets/CALCULATOR MOBILE SIZE.png";
+import { HERO_IMAGES } from "@/assets/productImages";
 
 import type { ComponentType, SVGProps } from "react";
 
@@ -1116,7 +1115,7 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
       {/* Background — desktop / mobile art */}
       <div className="absolute inset-0 pointer-events-none z-10" aria-hidden>
         <Image
-          src={calculatorHeroDesktop}
+          src={HERO_IMAGES.calculator.desktop}
           alt=""
           fill
           className="object-cover object-center hidden sm:block"
@@ -1125,7 +1124,7 @@ export function UsageCalculatorSection({ locale }: { locale: Locale }) {
           priority={false}
         />
         <Image
-          src={calculatorHeroMobile}
+          src={HERO_IMAGES.calculator.mobile}
           alt=""
           fill
           className="object-cover object-top sm:hidden"

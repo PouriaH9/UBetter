@@ -1,0 +1,404 @@
+{
+  "products-1": {
+    "path": "/products/1.webp",
+    "width": 560,
+    "height": 700,
+    "bytes": 9442
+  },
+  "products-2": {
+    "path": "/products/2.webp",
+    "width": 560,
+    "height": 700,
+    "bytes": 8938
+  },
+  "products-3": {
+    "path": "/products/3.webp",
+    "width": 560,
+    "height": 700,
+    "bytes": 10412
+  },
+  "products-4": {
+    "path": "/products/4.webp",
+    "width": 512,
+    "height": 689,
+    "bytes": 8006
+  },
+  "products-5": {
+    "path": "/products/5.webp",
+    "width": 554,
+    "height": 740,
+    "bytes": 12692
+  },
+  "products-6": {
+    "path": "/products/6.webp",
+    "width": 496,
+    "height": 740,
+    "bytes": 6108
+  },
+  "products-7": {
+    "path": "/products/7.webp",
+    "width": 560,
+    "height": 740,
+    "bytes": 24276
+  },
+  "products-8": {
+    "path": "/products/8.webp",
+    "width": 560,
+    "height": 740,
+    "bytes": 32256
+  },
+  "products-9": {
+    "path": "/products/9.webp",
+    "width": 560,
+    "height": 740,
+    "bytes": 30356
+  },
+  "products-10": {
+    "path": "/products/10.webp",
+    "width": 520,
+    "height": 740,
+    "bytes": 40392
+  },
+  "products-11": {
+    "path": "/products/11.webp",
+    "width": 606,
+    "height": 930,
+    "bytes": 25362
+  },
+  "products-12": {
+    "path": "/products/12.webp",
+    "width": 606,
+    "height": 930,
+    "bytes": 31552
+  },
+  "products-13": {
+    "path": "/products/13.webp",
+    "width": 606,
+    "height": 942,
+    "bytes": 40268
+  },
+  "products-14": {
+    "path": "/products/14.webp",
+    "width": 560,
+    "height": 942,
+    "bytes": 41444
+  },
+  "products-15": {
+    "path": "/products/15.webp",
+    "width": 594,
+    "height": 748,
+    "bytes": 23120
+  },
+  "products-16": {
+    "path": "/products/16.webp",
+    "width": 594,
+    "height": 770,
+    "bytes": 31558
+  },
+  "products-17": {
+    "path": "/products/17.webp",
+    "width": 594,
+    "height": 834,
+    "bytes": 37338
+  },
+  "products-18": {
+    "path": "/products/18.webp",
+    "width": 638,
+    "height": 946,
+    "bytes": 29268
+  },
+  "products-19": {
+    "path": "/products/19.webp",
+    "width": 734,
+    "height": 946,
+    "bytes": 41884
+  },
+  "products-20": {
+    "path": "/products/20.webp",
+    "width": 1204,
+    "height": 506,
+    "bytes": 51972
+  },
+  "products-21": {
+    "path": "/products/21.webp",
+    "width": 1118,
+    "height": 506,
+    "bytes": 34854
+  },
+  "products-1-1": {
+    "path": "/products/1-1.webp",
+    "width": 1130,
+    "height": 794,
+    "bytes": 46714
+  },
+  "products-2-2": {
+    "path": "/products/2-2.webp",
+    "width": 1130,
+    "height": 912,
+    "bytes": 47530
+  },
+  "products-3-3": {
+    "path": "/products/3-3.webp",
+    "width": 1164,
+    "height": 848,
+    "bytes": 38496
+  },
+  "products-4-4": {
+    "path": "/products/4-4.webp",
+    "width": 1164,
+    "height": 1438,
+    "bytes": 76082
+  },
+  "products-5-5": {
+    "path": "/products/5-5.webp",
+    "width": 1164,
+    "height": 988,
+    "bytes": 62560
+  },
+  "products-6-6": {
+    "path": "/products/6-6.webp",
+    "width": 1164,
+    "height": 762,
+    "bytes": 43952
+  },
+  "products-7-7": {
+    "path": "/products/7-7.webp",
+    "width": 1164,
+    "height": 842,
+    "bytes": 48720
+  },
+  "products-8-8": {
+    "path": "/products/8-8.webp",
+    "width": 1164,
+    "height": 1226,
+    "bytes": 62886
+  },
+  "products-9-9": {
+    "path": "/products/9-9.webp",
+    "width": 1164,
+    "height": 1226,
+    "bytes": 62944
+  },
+  "products-10-10": {
+    "path": "/products/10-10.webp",
+    "width": 1164,
+    "height": 1118,
+    "bytes": 47612
+  },
+  "products-11-11": {
+    "path": "/products/11-11.webp",
+    "width": 1164,
+    "height": 1452,
+    "bytes": 77056
+  },
+  "products-12-12": {
+    "path": "/products/12-12.webp",
+    "width": 1164,
+    "height": 1452,
+    "bytes": 75906
+  },
+  "products-13-13": {
+    "path": "/products/13-13.webp",
+    "width": 1164,
+    "height": 1546,
+    "bytes": 102694
+  },
+  "products-14-14": {
+    "path": "/products/14-14.webp",
+    "width": 1138,
+    "height": 1404,
+    "bytes": 76494
+  },
+  "products-15-15": {
+    "path": "/products/15-15.webp",
+    "width": 1138,
+    "height": 1440,
+    "bytes": 106722
+  },
+  "products-16-16": {
+    "path": "/products/16-16.webp",
+    "width": 1036,
+    "height": 1580,
+    "bytes": 90954
+  },
+  "products-17-17": {
+    "path": "/products/17-17.webp",
+    "width": 1140,
+    "height": 1296,
+    "bytes": 58344
+  },
+  "products-18-18": {
+    "path": "/products/18-18.webp",
+    "width": 1140,
+    "height": 1248,
+    "bytes": 60006
+  },
+  "products-19-19": {
+    "path": "/products/19-19.webp",
+    "width": 1140,
+    "height": 1248,
+    "bytes": 70750
+  },
+  "products-20-20": {
+    "path": "/products/20-20.webp",
+    "width": 1140,
+    "height": 582,
+    "bytes": 38422
+  },
+  "products-21-21": {
+    "path": "/products/21-21.webp",
+    "width": 1140,
+    "height": 582,
+    "bytes": 38626
+  },
+  "products-inventor": {
+    "path": "/products/inventor.webp",
+    "width": 2198,
+    "height": 1450,
+    "bytes": 142554
+  },
+  "products-inventor-hybrid": {
+    "path": "/products/inventor-hybrid.webp",
+    "width": 2198,
+    "height": 1450,
+    "bytes": 154706
+  },
+  "products-lofi": {
+    "path": "/products/lofi.webp",
+    "width": 2198,
+    "height": 1450,
+    "bytes": 182884
+  },
+  "hero-products-desktop": {
+    "path": "/hero/products-desktop.webp",
+    "width": 1672,
+    "height": 941,
+    "bytes": 237854
+  },
+  "hero-products-mobile": {
+    "path": "/hero/products-mobile.webp",
+    "width": 941,
+    "height": 1672,
+    "bytes": 210242
+  },
+  "hero-home-1-desktop": {
+    "path": "/hero/home-1-desktop.webp",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 107510
+  },
+  "hero-home-1-mobile": {
+    "path": "/hero/home-1-mobile.webp",
+    "width": 941,
+    "height": 1672,
+    "bytes": 79676
+  },
+  "hero-home-2-desktop": {
+    "path": "/hero/home-2-desktop.webp",
+    "width": 1916,
+    "height": 821,
+    "bytes": 70618
+  },
+  "hero-home-2-mobile": {
+    "path": "/hero/home-2-mobile.webp",
+    "width": 941,
+    "height": 1672,
+    "bytes": 62996
+  },
+  "hero-home-3-desktop": {
+    "path": "/hero/home-3-desktop.webp",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 196434
+  },
+  "hero-home-3-mobile": {
+    "path": "/hero/home-3-mobile.webp",
+    "width": 864,
+    "height": 1821,
+    "bytes": 172650
+  },
+  "hero-calculator-desktop": {
+    "path": "/hero/calculator-desktop.webp",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 114106
+  },
+  "hero-calculator-mobile": {
+    "path": "/hero/calculator-mobile.webp",
+    "width": 1086,
+    "height": 1448,
+    "bytes": 108810
+  },
+  "hero-garanty-desktop": {
+    "path": "/hero/garanty-desktop.webp",
+    "width": 1700,
+    "height": 1550,
+    "bytes": 44620
+  },
+  "hero-garanty-mobile": {
+    "path": "/hero/garanty-mobile.webp",
+    "width": 706,
+    "height": 1772,
+    "bytes": 24924
+  },
+  "brand-ubetter-logo": {
+    "path": "/brand/ubetter-logo.webp",
+    "width": 3583,
+    "height": 2152,
+    "bytes": 87256
+  },
+  "brand-flag": {
+    "path": "/brand/flag.webp",
+    "width": 957,
+    "height": 725,
+    "bytes": 41010
+  },
+  "brand-lian-sadr-melal": {
+    "path": "/brand/lian-sadr-melal.webp",
+    "width": 3508,
+    "height": 2480,
+    "bytes": 205058
+  },
+  "casestudy-1": {
+    "path": "/casestudy/1.webp",
+    "width": 4000,
+    "height": 3000,
+    "bytes": 1279876
+  },
+  "casestudy-2": {
+    "path": "/casestudy/2.webp",
+    "width": 1122,
+    "height": 1402,
+    "bytes": 35742
+  },
+  "casestudy-3": {
+    "path": "/casestudy/3.webp",
+    "width": 941,
+    "height": 1672,
+    "bytes": 123180
+  },
+  "casestudy-4": {
+    "path": "/casestudy/4.webp",
+    "width": 941,
+    "height": 1672,
+    "bytes": 150792
+  },
+  "casestudy-5": {
+    "path": "/casestudy/5.webp",
+    "width": 941,
+    "height": 1672,
+    "bytes": 146586
+  },
+  "casestudy-6": {
+    "path": "/casestudy/6.webp",
+    "width": 1086,
+    "height": 1448,
+    "bytes": 173938
+  },
+  "casestudy-7": {
+    "path": "/casestudy/7.webp",
+    "width": 1086,
+    "height": 1448,
+    "bytes": 120080
+  }
+}

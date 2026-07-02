@@ -19,6 +19,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/medusa-config.ts ./medusa-config.ts
 COPY --from=builder /app/src ./src
+RUN npm prune --omit=dev
 RUN mkdir -p /app/uploads /app/static
 EXPOSE 9000
 CMD ["npx", "medusa", "start"]

@@ -1,6 +1,6 @@
 "use client";
 
-import Image, { type StaticImageData } from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
@@ -192,8 +192,8 @@ function SectionHeroBackground({
   isDark,
   variant = "default",
 }: {
-  desktop: StaticImageData;
-  mobile: StaticImageData;
+  desktop: string;
+  mobile: string;
   isDark: boolean;
   variant?: "default" | "garanty";
 }) {
@@ -266,7 +266,7 @@ function SectionShell({
   copy: HomeSectionBlock;
   children: ReactNode;
   className?: string;
-  heroArt?: { desktop: StaticImageData; mobile: StaticImageData; variant?: "default" | "garanty" };
+  heroArt?: { desktop: string; mobile: string; variant?: "default" | "garanty" };
   /** Transparent over pinned globe when journey is active. */
   globeBackdrop?: boolean;
   /** Use glass header panel layout for scroll-stack sections. */
@@ -752,7 +752,7 @@ function CaseStudyCarousel({
   sectionKey,
   isDark,
 }: {
-  images: StaticImageData[];
+  images: string[];
   sectionKey: number;
   isDark: boolean;
 }) {

@@ -1,20 +1,18 @@
-import type { StaticImageData } from "next/image";
-
-import cs1 from "@/assets/casestudy/1.jpg";
-import cs2 from "@/assets/casestudy/2.png";
-import cs3 from "@/assets/casestudy/3.png";
-import cs4 from "@/assets/casestudy/4.png";
-import cs5 from "@/assets/casestudy/5.png";
-import cs6 from "@/assets/casestudy/6.png";
-import cs7 from "@/assets/casestudy/7.png";
-
-export const CASE_STUDY_IMAGES: StaticImageData[] = [cs1, cs2, cs3, cs4, cs5, cs6, cs7];
+export const CASE_STUDY_IMAGES: string[] = [
+  "/casestudy/1.webp",
+  "/casestudy/2.webp",
+  "/casestudy/3.webp",
+  "/casestudy/4.webp",
+  "/casestudy/5.webp",
+  "/casestudy/6.webp",
+  "/casestudy/7.webp",
+];
 
 /** Stable pseudo-random order per section index (does not reshuffle on re-render). */
 export function caseStudyImagesForSection(
   sectionIndex: number,
   count = CASE_STUDY_IMAGES.length,
-): StaticImageData[] {
+): string[] {
   if (CASE_STUDY_IMAGES.length === 0) return [];
 
   const pool = [...CASE_STUDY_IMAGES];
