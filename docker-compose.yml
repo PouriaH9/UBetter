@@ -1,0 +1,114 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: medusa
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medusa_prod}
+      POSTGRES_DB: medusa
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medusa"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medusa
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - medusa
+
+  medusa-server:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      NODE_ENV: production
+      WORKER_MODE: server
+      DATABASE_URL: postgres://medusa:${POSTGRES_PASSWORD:-medusa_prod}@postgres:5432/medusa
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      COOKIE_SECRET: ${COOKIE_SECRET}
+      STORE_CORS: ${STORE_CORS}
+      ADMIN_CORS: ${ADMIN_CORS}
+      AUTH_CORS: ${AUTH_CORS}
+      ZARINPAL_MERCHANT_ID: ${ZARINPAL_MERCHANT_ID}
+      ZARINPAL_SANDBOX: ${ZARINPAL_SANDBOX:-false}
+      ZARINPAL_CURRENCY: ${ZARINPAL_CURRENCY:-IRT}
+      ZARINPAL_CALLBACK_URL: ${ZARINPAL_CALLBACK_URL}
+      STOREFRONT_URL: ${STOREFRONT_URL}
+      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL}
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+    volumes:
+      - medusa-uploads:/app/uploads
+      - medusa-static:/app/static
+    networks:
+      - medusa
+
+  medusa-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      NODE_ENV: production
+      WORKER_MODE: worker
+      DISABLE_MEDUSA_ADMIN: "true"
+      DATABASE_URL: postgres://medusa:${POSTGRES_PASSWORD:-medusa_prod}@postgres:5432/medusa
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      COOKIE_SECRET: ${COOKIE_SECRET}
+      ZARINPAL_MERCHANT_ID: ${ZARINPAL_MERCHANT_ID}
+      ZARINPAL_SANDBOX: ${ZARINPAL_SANDBOX:-false}
+      ZARINPAL_CURRENCY: ${ZARINPAL_CURRENCY:-IRT}
+      ZARINPAL_CALLBACK_URL: ${ZARINPAL_CALLBACK_URL}
+      STOREFRONT_URL: ${STOREFRONT_URL}
+      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL}
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+    volumes:
+      - medusa-uploads:/app/uploads
+      - medusa-static:/app/static
+    networks:
+      - medusa
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:
+      - medusa-server
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - medusa
+
+volumes:
+  postgres-data:
+  redis-data:
+  medusa-uploads:
+  medusa-static:
+
+networks:
+  medusa:
+    driver: bridge

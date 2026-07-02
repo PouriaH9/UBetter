@@ -13,6 +13,7 @@ import { CATEGORIES, tx } from "@/components/products-section";
 import { PRODUCT_IMAGES, DETAIL_IMAGES } from "@/assets/productImages";
 import { useTheme, DARK_C, LIGHT_C, type ColorPalette } from "@/contexts/theme-context";
 import { useCart } from "@/contexts/cart-context";
+import { useProductCommerceMap, type ProductCommerceInfo } from "@/hooks/use-product-commerce";
 import productsHeroDesktop from "@/assets/Source/products HERO desktopsize.png";
 import productsHeroMobile from "@/assets/Source/products HERO mobilesize.png";
 import type { Locale } from "@/i18n/config";
@@ -178,12 +179,13 @@ function AddToCartButton({ onAdd, isInCart, locale, C, isDark }: {
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
 
-function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: {
+function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart, commerce }: {
   productNum: number;
   product: { name: { fa: string; en: string }; category: { fa: string; en: string }; description: { fa: string; en: string }; features: { fa: string; en: string }[]; applications: { fa: string; en: string }[] };
   locale: Locale;
   onOpenSpecs: () => void;
   onAddToCart: () => void;
+  commerce?: ProductCommerceInfo;
 }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
@@ -241,6 +243,12 @@ function ProductCard({ productNum, product, locale, onOpenSpecs, onAddToCart }: 
               {tx(product.name, locale)}
             </h3>
           </Link>
+
+          {commerce?.priceLabel && (
+            <p className="mb-2 font-bold text-[13px]" style={{ color: C.accent, fontFamily: YK }}>
+              {commerce.priceLabel}
+            </p>
+          )}
 
           <div className="mb-3 h-px" style={{ background: C.divider }} />
 
@@ -516,8 +524,9 @@ function CategorySideNav({
 
 // ─── Category Section ─────────────────────────────────────────────────────────
 
-function CategorySection({ cat, catIndex, startIndex, locale, onOpenSpecs }: {
+function CategorySection({ cat, catIndex, startIndex, locale, onOpenSpecs, commerceMap }: {
   cat: typeof CATEGORIES[0]; catIndex: number; startIndex: number; locale: Locale; onOpenSpecs: (num: number) => void;
+  commerceMap: Record<number, ProductCommerceInfo>;
 }) {
   const { addItem, openCart } = useCart();
   const { isDark } = useTheme();
@@ -558,9 +567,17 @@ function CategorySection({ cat, catIndex, startIndex, locale, onOpenSpecs }: {
                   productNum={productNum}
                   product={product}
                   locale={locale}
+                  commerce={commerceMap[productNum]}
                   onOpenSpecs={() => onOpenSpecs(productNum)}
                   onAddToCart={() => {
-                    addItem({ productNum, name: product.name, category: product.category });
+                    const info = commerceMap[productNum];
+                    addItem({
+                      productNum,
+                      name: product.name,
+                      category: product.category,
+                      variantId: info?.variantId,
+                      unitPriceIrr: info?.priceIrr,
+                    });
                     openCart();
                   }}
                 />
@@ -677,6 +694,7 @@ function PageHeader({
 export default function ProductsPageClient({ locale }: { locale: Locale }) {
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
+  const { map: commerceMap } = useProductCommerceMap(locale);
   const [activeTab, setActiveTab] = useState(CATEGORIES[0].id);
   const [specModal, setSpecModal] = useState<number | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -766,6 +784,7 @@ export default function ProductsPageClient({ locale }: { locale: Locale }) {
             catIndex={0}
             startIndex={catStartIndices[0]}
             locale={locale}
+            commerceMap={commerceMap}
             onOpenSpecs={(num) => setSpecModal(num)}
           />
         </ScrollSheetOverHero>
@@ -777,6 +796,7 @@ export default function ProductsPageClient({ locale }: { locale: Locale }) {
               catIndex={i + 1}
               startIndex={catStartIndices[i + 1]}
               locale={locale}
+              commerceMap={commerceMap}
               onOpenSpecs={(num) => setSpecModal(num)}
             />
           </ScrollStackLayer>

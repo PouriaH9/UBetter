@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import SharedNavbar from "@/components/shared-navbar";
 import { useCart } from "@/contexts/cart-context";
+import { MEDUSA_ENABLED } from "@/lib/medusa";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import { PRODUCT_IMAGES } from "@/assets/productImages";
 import type { Locale } from "@/i18n/config";
@@ -74,6 +75,8 @@ export default function EnquiryPageClient({ locale }: { locale: Locale }) {
   const dir = localeDir(locale);
   const [form, setForm] = useState<FormData>(INITIAL);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
   const tx = (s: { fa: string; en: string; zh?: string; de?: string }) => {
@@ -99,11 +102,49 @@ export default function EnquiryPageClient({ locale }: { locale: Locale }) {
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    setSubmitted(true);
-    clearCart();
+
+    setSubmitting(true);
+    setSubmitError("");
+
+    const payload = {
+      ...form,
+      locale,
+      items: items.map((item) => ({
+        productNum: item.productNum,
+        name: locale === "fa" ? item.name.fa : item.name.en,
+        category: locale === "fa" ? item.category.fa : item.category.en,
+        qty: item.qty,
+      })),
+    };
+
+    try {
+      if (MEDUSA_ENABLED) {
+        const baseUrl = process.env.NEXT_PUBLIC_MEDUSA_URL!;
+        const res = await fetch(`${baseUrl}/store/enquiry`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.message || "Submission failed");
+        }
+      }
+
+      setSubmitted(true);
+      await clearCart();
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error
+          ? err.message
+          : ui3(locale, "خطا در ارسال", "Submission failed", "提交失败")
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputStyle = {
@@ -310,15 +351,21 @@ export default function EnquiryPageClient({ locale }: { locale: Locale }) {
                 </div>
               </div>
 
-              <motion.button type="submit" whileTap={{ scale: 0.98 }}
-                className="w-full py-4 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2.5 transition-all duration-200"
+              {submitError && (
+                <p className="text-red-400 text-sm mb-3" style={{ fontFamily: YK }}>{submitError}</p>
+              )}
+
+              <motion.button type="submit" disabled={submitting} whileTap={{ scale: 0.98 }}
+                className="w-full py-4 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2.5 transition-all duration-200 disabled:opacity-60"
                 style={{ background: C.accent, color: isDark ? "#000" : "#fff", fontFamily: YK }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.88"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M2 8h12M9 3l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                {ui3(locale, "ارسال و ثبت نهایی درخواست", "Submit Project Enquiry", "提交询价")}
+                {submitting
+                  ? ui3(locale, "در حال ارسال...", "Submitting...", "提交中...")
+                  : ui3(locale, "ارسال و ثبت نهایی درخواست", "Submit Project Enquiry", "提交询价")}
               </motion.button>
             </motion.div>
 

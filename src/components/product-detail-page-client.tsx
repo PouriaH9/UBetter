@@ -13,6 +13,7 @@ import type { Locale } from "@/i18n/config";
 import { PRODUCT_IMAGES, DETAIL_IMAGES } from "@/assets/productImages";
 import { useTheme, DARK_C, LIGHT_C, type ColorPalette } from "@/contexts/theme-context";
 import { useCart } from "@/contexts/cart-context";
+import { fetchMedusaProductByNum, formatPrice, type MergedProduct } from "@/lib/products";
 import { localeDir, ui3 } from "@/i18n/locale-ui";
 
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
@@ -431,7 +432,20 @@ export default function ProductDetailPageClient({ locale, productNum }: { locale
   const dir = localeDir(locale);
   const { addItem, openCart } = useCart();
   const [specOpen, setSpecOpen] = useState(false);
+  const [commerce, setCommerce] = useState<MergedProduct | null>(null);
   const closeSpec = useCallback(() => setSpecOpen(false), []);
+
+  useEffect(() => {
+    fetchMedusaProductByNum(productNum)
+      .then((p) => {
+        setCommerce({
+          ...p,
+          priceLabel:
+            p.priceIrr !== undefined ? formatPrice(p.priceIrr, locale) : undefined,
+        });
+      })
+      .catch(() => setCommerce(null));
+  }, [productNum, locale]);
 
   const gallery = useMemo(() => {
     const items: { key: string; src: StaticImageData; label: string }[] = [];
@@ -666,14 +680,34 @@ export default function ProductDetailPageClient({ locale, productNum }: { locale
                 </motion.button>
                 <AddToCartButton
                   onAdd={() => {
-                    addItem({ productNum, name: product.name, category: product.category });
+                    addItem({
+                      productNum,
+                      name: product.name,
+                      category: product.category,
+                      variantId: commerce?.variantId,
+                      unitPriceIrr: commerce?.priceIrr,
+                    });
                     openCart();
                   }}
                   locale={locale}
                   C={C}
                   isDark={isDark}
                 />
+                {commerce?.priceLabel && (
+                  <Link
+                    href={`/${locale}/checkout`}
+                    className="w-full sm:w-auto min-w-[160px] py-3 rounded-xl text-[13px] font-semibold transition-all duration-200 inline-flex items-center justify-center gap-2"
+                    style={{ background: C.accent, color: isDark ? "#000" : "#fff", fontFamily: YK }}
+                  >
+                    {ui3(locale, "خرید آنلاین", "Buy now", "立即购买")}
+                  </Link>
+                )}
               </div>
+              {commerce?.priceLabel && (
+                <p className="mt-3 text-lg font-bold" style={{ color: C.accent, fontFamily: YK }}>
+                  {commerce.priceLabel}
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/contexts/cart-context";
+import { formatPrice } from "@/lib/products";
 import { useTheme, DARK_C, LIGHT_C } from "@/contexts/theme-context";
 import { PRODUCT_IMAGES } from "@/assets/productImages";
 import type { Locale } from "@/i18n/config";
@@ -12,7 +13,7 @@ import { localeDir, ui3 } from "@/i18n/locale-ui";
 const YK = "'YekanBakh', 'IRANSansX', system-ui, sans-serif";
 
 export default function CartDrawer({ locale }: { locale: Locale }) {
-  const { items, totalQty, open, closeCart, removeItem, setQty, clearCart } = useCart();
+  const { items, totalQty, totalIrr, open, closeCart, removeItem, setQty, clearCart } = useCart();
   const { isDark } = useTheme();
   const C = isDark ? DARK_C : LIGHT_C;
   const isRTL = locale === "fa";
@@ -187,6 +188,13 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
                         ? `已选 ${totalQty} 件商品`
                         : `${totalQty} item${totalQty !== 1 ? "s" : ""} selected`}
                   </span>
+                  {totalIrr > 0 && (
+                    <span className="font-bold text-[13px]" style={{ color: C.accent, fontFamily: YK }}>
+                      {formatPrice(totalIrr, locale)}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center justify-end">
                   <button onClick={clearCart} className="text-[11px] transition-colors duration-150" style={{ color: C.text3, fontFamily: YK }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#ef4444"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = C.text3; }}>
@@ -194,16 +202,21 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
                   </button>
                 </div>
                 <Link
-                  href={`/${locale}/enquiry`}
+                  href={`/${locale}/checkout`}
                   onClick={closeCart}
                   className="w-full py-3.5 rounded-2xl font-bold text-[14px] transition-all duration-200 flex items-center justify-center gap-2"
                   style={{ background: C.accent, color: isDark ? "#000" : "#fff", fontFamily: YK }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.88"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; }}>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M1 8h14M9 2l6 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  {ui3(locale, "ادامه و ثبت درخواست", "Proceed to Enquiry", "前往询价")}
+                  {ui3(locale, "تسویه حساب", "Checkout", "结账")}
+                </Link>
+                <Link
+                  href={`/${locale}/enquiry`}
+                  onClick={closeCart}
+                  className="w-full py-3 rounded-2xl font-semibold text-[13px] transition-all duration-200 flex items-center justify-center gap-2 border"
+                  style={{ borderColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)", color: C.text2, fontFamily: YK }}
+                >
+                  {ui3(locale, "درخواست قیمت", "Request quote", "询价")}
                 </Link>
               </div>
             )}

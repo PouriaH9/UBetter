@@ -1,0 +1,540 @@
+[
+  {
+    "productNum": 1,
+    "categoryId": "residential",
+    "categoryTitle": "Residential & Villa",
+    "name": "Wall-Mounted & Floor-Standing ESS Battery",
+    "subcategory": "Residential ESS Battery",
+    "description": "Wall-mounted and floor-standing energy storage batteries are designed as smart and efficient energy managers for various spaces. These products provide advanced and optimized solutions for energy management and maximum use of installation space, offering high flexibility in execution with both wall-mounted and floor-standing installation methods.",
+    "features": [
+      "Lightweight and compact dimensions",
+      "Very long lifespan",
+      "Smart BMS battery management system",
+      "Extremely high safety — resistant to fire, explosion, and leakage",
+      "Compatible with multiple inverter brands",
+      "RS232 / RS485 / CAN communication"
+    ],
+    "applications": [
+      "Home & apartment backup power",
+      "Solar energy systems",
+      "Office backup systems",
+      "Villas and farms"
+    ],
+    "imageFile": "1.png"
+  },
+  {
+    "productNum": 2,
+    "categoryId": "residential",
+    "categoryTitle": "Residential & Villa",
+    "name": "Wheeled Energy Storage Battery",
+    "subcategory": "Portable Residential ESS",
+    "description": "Wheeled energy storage batteries are a new generation of energy storage solutions designed for easy mobility. The most important feature is the mobile caster wheels at the base, which, in addition to high energy storage capacity, enables quick and easy transport.",
+    "features": [
+      "Portable wheeled structure",
+      "Smart BMS system",
+      "High safety standards",
+      "Compact and lightweight",
+      "Long operational life",
+      "Multi-inverter compatibility",
+      "RS232 / RS485 / CAN communication"
+    ],
+    "applications": [
+      "Mobile backup power",
+      "Residential backup",
+      "Temporary energy supply",
+      "Office energy systems"
+    ],
+    "imageFile": "2.png"
+  },
+  {
+    "productNum": 3,
+    "categoryId": "residential",
+    "categoryTitle": "Residential & Villa",
+    "name": "Vertical ESS Battery with Touchscreen",
+    "subcategory": "Smart Residential Energy Storage",
+    "description": "Vertical energy storage batteries with touchscreen are advanced energy storage solutions that, in addition to modern design and smart user interface, also offer easy mobility with mobile caster wheels at the base.",
+    "features": [
+      "Interactive touchscreen display",
+      "Smart BMS management",
+      "Modern vertical design",
+      "Long lifecycle",
+      "Portable wheeled structure",
+      "RS232 / RS485 / CAN communication"
+    ],
+    "applications": [
+      "Smart homes",
+      "Residential solar systems",
+      "Energy monitoring systems",
+      "Backup electricity systems"
+    ],
+    "imageFile": "3.png"
+  },
+  {
+    "productNum": 4,
+    "categoryId": "residential",
+    "categoryTitle": "Residential & Villa",
+    "name": "All-in-One Integrated ESS Cabinet",
+    "subcategory": "Integrated Residential ESS",
+    "description": "The integrated energy storage system is a comprehensive and advanced solution that consolidates energy storage batteries, inverter, and intelligent control into a single unit. This integrated design minimizes the complexities of traditional systems and provides users with a complete clean energy management experience in an All-in-One solution.",
+    "features": [
+      "Intelligent BMS system",
+      "User-friendly warning system",
+      "Complete online protection mechanisms",
+      "Integrated design with fast installation",
+      "User-friendly interactive HMI display",
+      "Extremely high safety"
+    ],
+    "applications": [
+      "Smart residential systems",
+      "Home solar integration",
+      "Backup power systems",
+      "Energy optimization"
+    ],
+    "imageFile": "4.png"
+  },
+  {
+    "productNum": 5,
+    "categoryId": "residential",
+    "categoryTitle": "Residential & Villa",
+    "name": "Stacked Modular All-in-One ESS",
+    "subcategory": "Modular Residential ESS",
+    "description": "The Stacked All-in-One modular energy storage system is an advanced energy management solution that brings together key components including PV inverter, DC charging module, Power Conversion System (PCS), energy storage battery, and Energy Management System (EMS) in one integrated package.",
+    "features": [
+      "Modular expandable design with easy scalability",
+      "LED monitoring display",
+      "Extremely high safety",
+      "RS232 / RS485 / CAN communication",
+      "Modular structure with fast installation",
+      "Very long lifecycle",
+      "Smart BMS system"
+    ],
+    "applications": [
+      "Residential energy systems",
+      "Commercial backup power",
+      "Solar integration",
+      "Smart energy management"
+    ],
+    "imageFile": "5.png"
+  },
+  {
+    "productNum": 6,
+    "categoryId": "commercial",
+    "categoryTitle": "Commercial & Office",
+    "name": "High-Voltage Modular All-in-One ESS",
+    "subcategory": "High-Voltage Energy Storage",
+    "description": "The High-Voltage Modular All-in-One ESS is an advanced and fully integrated solution combining PV inverter, energy storage battery, Power Conversion System (PCS), and Energy Management System (EMS) in one cohesive structure. This integrated design simplifies installation and maintenance while significantly increasing system flexibility and expandability.",
+    "features": [
+      "High-voltage architecture",
+      "Expandable modular system",
+      "Smart energy management",
+      "LED monitoring system",
+      "Long operational lifespan",
+      "Smart BMS system"
+    ],
+    "applications": [
+      "Residential energy systems",
+      "Commercial facilities",
+      "Industrial backup power",
+      "Renewable energy integration"
+    ],
+    "imageFile": "6.png"
+  },
+  {
+    "productNum": 7,
+    "categoryId": "commercial",
+    "categoryTitle": "Commercial & Office",
+    "name": "Rack-Mounted ESS Battery",
+    "subcategory": "Rack Energy Storage System",
+    "description": "Rack-mounted energy storage batteries, with their modular design, high energy density, modern appearance, and easy installation capability, represent an efficient and flexible energy storage solution. These products are widely used in telecom stations, commercial energy storage for small businesses, smart energy storage systems, and home solar storage.",
+    "features": [
+      "Modular rack-mounted architecture",
+      "Lightweight and compact",
+      "Extremely high safety",
+      "Multi-inverter compatibility",
+      "Very long lifecycle",
+      "Smart BMS management",
+      "RS232 / RS485 / CAN communication"
+    ],
+    "applications": [
+      "Telecom stations",
+      "Smart energy storage systems",
+      "Solar storage",
+      "Commercial backup systems"
+    ],
+    "imageFile": "7.png"
+  },
+  {
+    "productNum": 8,
+    "categoryId": "commercial",
+    "categoryTitle": "Commercial & Office",
+    "name": "C1 High-Voltage Modular ESS (20–87 kWh)",
+    "subcategory": "Commercial High-Voltage ESS",
+    "description": "Each unit includes a battery module and a high-voltage module, developed on the basis of a 'safe and reliable' design concept. This approach enables safe, reliable, cost-effective, high-quality, easy-to-install, and expandable products. This system simplifies energy storage project implementation, operation, and maintenance.",
+    "features": [
+      "High-voltage battery modules",
+      "Expandable architecture",
+      "Smart BMS system",
+      "Easy and fast installation",
+      "Advanced safety engineering",
+      "Multi-inverter compatibility",
+      "Long lifecycle",
+      "Modular scalability"
+    ],
+    "applications": [
+      "Commercial energy projects",
+      "Industrial facilities",
+      "Solar energy storage",
+      "Smart grid systems"
+    ],
+    "imageFile": "8.png"
+  },
+  {
+    "productNum": 9,
+    "categoryId": "commercial",
+    "categoryTitle": "Commercial & Office",
+    "name": "C0.5 High-Voltage Modular ESS (64–272 kWh)",
+    "subcategory": "Industrial High-Capacity ESS",
+    "description": "Each unit includes a battery module and a high-voltage module, developed on the basis of a 'safe and reliable' design concept, enabling high safety, outstanding reliability, superior quality, cost-effectiveness, easy installation, and high expandability. This system simplifies project implementation, operation, and maintenance for professional energy management at various scales.",
+    "features": [
+      "High-capacity modular system",
+      "Industrial safety design",
+      "Long operational lifespan",
+      "Easy scalability",
+      "Smart BMS management",
+      "Fast installation",
+      "Multi-layer protection",
+      "High efficiency"
+    ],
+    "applications": [
+      "Industrial facilities",
+      "Renewable energy plants",
+      "Large-scale backup systems",
+      "Commercial infrastructure"
+    ],
+    "imageFile": "9.png"
+  },
+  {
+    "productNum": 10,
+    "categoryId": "industrial",
+    "categoryTitle": "Industrial",
+    "name": "High-Voltage Rack ESS",
+    "subcategory": "Industrial Rack Energy Storage",
+    "description": "The high-voltage rack ESS is a standard, integrated, and advanced energy storage solution specifically designed for industrial and commercial energy storage, data centers, telecom stations, and microgrids. With integrated architecture and high-voltage design, it improves efficiency and enables easy installation, expansion, and maintenance.",
+    "features": [
+      "High-voltage rack system",
+      "Advanced modular structure",
+      "High efficiency",
+      "Easy maintenance",
+      "Long lifecycle",
+      "Smart monitoring",
+      "Industrial-grade safety",
+      "Expandable deployment"
+    ],
+    "applications": [
+      "Data centers",
+      "Telecom infrastructure",
+      "Industrial power systems",
+      "Microgrids"
+    ],
+    "imageFile": "10.png"
+  },
+  {
+    "productNum": 11,
+    "categoryId": "industrial",
+    "categoryTitle": "Industrial",
+    "name": "ESS 60 kWh",
+    "subcategory": "Commercial ESS Cabinet",
+    "description": "This professional energy storage system for industrial and commercial applications uses intelligent software to automatically manage energy production and consumption. Surplus energy is intelligently stored in lithium batteries for use when needed. With high capacity, long lifespan, and excellent safety, it is a reliable solution for energy optimization.",
+    "features": [
+      "Grid-On and Grid-Off support",
+      "Fire protection system",
+      "Internal climate control",
+      "Plastic-insulated electrode design to prevent leakage",
+      "Multi-layer safety protection"
+    ],
+    "applications": [
+      "Commercial buildings",
+      "Factories",
+      "Industrial workshops",
+      "Backup power systems"
+    ],
+    "imageFile": "11.png"
+  },
+  {
+    "productNum": 12,
+    "categoryId": "industrial",
+    "categoryTitle": "Industrial",
+    "name": "ESS 100 kWh",
+    "subcategory": "Commercial ESS Cabinet",
+    "description": "This professional industrial and commercial energy storage system uses intelligent software to automatically manage energy production and consumption. With high capacity, long lifespan, and excellent safety, it is a reliable and efficient solution for energy optimization and reducing operational costs.",
+    "features": [
+      "Grid-connected and off-grid operation",
+      "Advanced fire protection",
+      "Intelligent internal thermal management",
+      "High safety standards",
+      "Multi-layer safety protection"
+    ],
+    "applications": [
+      "Commercial facilities",
+      "Industrial sites",
+      "Renewable energy storage",
+      "Smart buildings"
+    ],
+    "imageFile": "12.png"
+  },
+  {
+    "productNum": 13,
+    "categoryId": "industrial",
+    "categoryTitle": "Industrial",
+    "name": "ESS 140 kWh",
+    "subcategory": "Industrial Energy Storage System",
+    "description": "This professional industrial and commercial energy storage system uses intelligent software to automatically manage energy production and consumption. Integrated and modular design with high integration level, equipped with digital operation and maintenance management system, safe and reliable under harsh environmental conditions.",
+    "features": [
+      "Integrated and modular design with high integration",
+      "Digital operation and maintenance management system",
+      "Safe, reliable, and harsh-environment resistant",
+      "Multiple application scenarios",
+      "Grid-On / Grid-Off support"
+    ],
+    "applications": [
+      "Industrial parks",
+      "Commercial infrastructure",
+      "Smart energy systems",
+      "Renewable energy projects"
+    ],
+    "imageFile": "13.png"
+  },
+  {
+    "productNum": 14,
+    "categoryId": "industrial",
+    "categoryTitle": "Industrial",
+    "name": "ESS 160 kWh",
+    "subcategory": "Industrial ESS Cabinet",
+    "description": "This professional industrial and commercial energy storage system uses intelligent software to automatically manage energy production and consumption. Surplus energy is intelligently stored in lithium batteries for use when needed.",
+    "features": [
+      "Fire protection system",
+      "Internal thermal balancing",
+      "High operational safety",
+      "Automated energy optimization",
+      "Industrial-grade reliability",
+      "Multi-layer protection"
+    ],
+    "applications": [
+      "Industrial backup systems",
+      "Commercial facilities",
+      "Manufacturing plants",
+      "Smart energy management"
+    ],
+    "imageFile": "14.png"
+  },
+  {
+    "productNum": 15,
+    "categoryId": "industrial",
+    "categoryTitle": "Industrial",
+    "name": "ESS 215/241 kWh",
+    "subcategory": "Large Commercial ESS",
+    "description": "This professional industrial and commercial energy storage system uses intelligent software to automatically manage energy production and consumption. With high capacity, long lifespan, and excellent safety level, it is a reliable and efficient solution for energy optimization and operational cost reduction.",
+    "features": [
+      "Grid-On / Grid-Off support",
+      "Fire protection system",
+      "Thermal management",
+      "Smart software optimization",
+      "Multi-layer safety",
+      "High-capacity architecture"
+    ],
+    "applications": [
+      "Commercial infrastructure",
+      "Energy optimization projects",
+      "Industrial backup systems",
+      "Smart facilities"
+    ],
+    "imageFile": "15.png"
+  },
+  {
+    "productNum": 16,
+    "categoryId": "industrial",
+    "categoryTitle": "Industrial",
+    "name": "ESS 261 kWh",
+    "subcategory": "Industrial ESS Platform",
+    "description": "This professional industrial and commercial energy storage system offers independent AC/DC design and intelligent switching strategies for Peak Shaving, Valley Filling, capacity management, dynamic capacity expansion, and renewable energy consumption optimization.",
+    "features": [
+      "Independent AC/DC design",
+      "Intelligent switching strategies",
+      "Peak Shaving and Valley Filling",
+      "Three-level fire protection",
+      "Flexible deployment",
+      "Safe and stable system"
+    ],
+    "applications": [
+      "Industrial energy infrastructure",
+      "Grid balancing",
+      "Peak shaving",
+      "Renewable energy optimization"
+    ],
+    "imageFile": "16.png"
+  },
+  {
+    "productNum": 17,
+    "categoryId": "industrial",
+    "categoryTitle": "Industrial",
+    "name": "ESS 261 kWh Liquid Cooling",
+    "subcategory": "Liquid-Cooled Industrial ESS",
+    "description": "This advanced liquid-cooled industrial and commercial energy storage system uses intelligent switching strategies for Peak Shaving and Valley Filling to optimize industrial energy management and offers high thermal stability under demanding conditions.",
+    "features": [
+      "Liquid cooling technology",
+      "Intelligent energy switching",
+      "High thermal stability",
+      "Industrial-grade safety",
+      "Peak shaving optimization",
+      "Independent AC/DC architecture"
+    ],
+    "applications": [
+      "Large-scale industrial projects",
+      "High-load energy systems",
+      "Renewable integration",
+      "Smart industrial facilities"
+    ],
+    "imageFile": "17.png"
+  },
+  {
+    "productNum": 18,
+    "categoryId": "solar",
+    "categoryTitle": "Solar & Hybrid",
+    "name": "120 kWh Outdoor Hybrid ESS",
+    "subcategory": "Outdoor Commercial ESS",
+    "description": "This professional outdoor industrial and commercial energy storage system uses intelligent software to automatically manage energy production and consumption. With high capacity, long lifespan, and excellent safety, it is a reliable solution for outdoor environments.",
+    "features": [
+      "Outdoor-rated structure",
+      "Air cooling system",
+      "Fire protection",
+      "Internal thermal balancing",
+      "Grid-On / Grid-Off support",
+      "Multi-layer safety protection"
+    ],
+    "applications": [
+      "Outdoor industrial systems",
+      "Renewable energy projects",
+      "Commercial infrastructure",
+      "Backup power"
+    ],
+    "imageFile": "18.png"
+  },
+  {
+    "productNum": 19,
+    "categoryId": "solar",
+    "categoryTitle": "Solar & Hybrid",
+    "name": "261 kWh Outdoor Hybrid ESS",
+    "subcategory": "Outdoor Industrial ESS",
+    "description": "This large-capacity outdoor hybrid ESS system is designed for industrial-scale renewable energy management and intelligent power management, using intelligent software to automatically manage energy production and consumption.",
+    "features": [
+      "Outdoor industrial cabinet",
+      "High-capacity lithium storage",
+      "Smart energy management",
+      "Fire protection",
+      "Intelligent thermal control",
+      "High environmental resistance"
+    ],
+    "applications": [
+      "Industrial energy projects",
+      "Outdoor infrastructure",
+      "Renewable power plants",
+      "Grid optimization"
+    ],
+    "imageFile": "19.png"
+  },
+  {
+    "productNum": 20,
+    "categoryId": "large-scale",
+    "categoryTitle": "Large Projects & Microgrid",
+    "name": "20-Foot Containerized ESS",
+    "subcategory": "Container Energy Storage System",
+    "description": "The containerized energy storage system helps optimize energy use and management, reducing electricity costs. These systems can be used in various scenarios including peak-valley arbitrage for customers, grid frequency regulation and peak shifting, improving renewable energy utilization, and enhancing grid power supply stability.",
+    "features": [
+      "Smart fault classification and management",
+      "Automatic fire suppression system",
+      "Plug & Play installation with reduced cost",
+      "Advanced BMS management",
+      "IP54 protection rating"
+    ],
+    "applications": [
+      "Utility-scale projects",
+      "Grid balancing",
+      "Renewable energy plants",
+      "Industrial infrastructure"
+    ],
+    "imageFile": "20.png"
+  },
+  {
+    "productNum": 21,
+    "categoryId": "large-scale",
+    "categoryTitle": "Large Projects & Microgrid",
+    "name": "40-Foot Containerized ESS",
+    "subcategory": "Large-Scale Container ESS",
+    "description": "The large-scale containerized energy storage system helps optimize energy use and management, reducing electricity costs. These systems can be used in various scenarios including peak-valley arbitrage for customers, grid frequency regulation and peak shifting, and enhancing grid power supply stability.",
+    "features": [
+      "Large industrial container system",
+      "Plug-and-play deployment",
+      "Smart fault management",
+      "Automatic fire suppression",
+      "IP54 protection rating",
+      "Smart BMS system"
+    ],
+    "applications": [
+      "Utility-scale energy projects",
+      "Renewable energy infrastructure",
+      "Grid support systems",
+      "Large industrial deployments"
+    ],
+    "imageFile": "21.png"
+  },
+  {
+    "productNum": 22,
+    "categoryId": "ups",
+    "categoryTitle": "Smart Energy Storage",
+    "name": "Energy Management System (EMS)",
+    "subcategory": "Smart Energy Platform",
+    "description": "The dedicated UBETTER app is integrated with the EMS system and displays equipment operation status in chart format, providing users with easy and accessible management of UBETTER energy storage products. The smart operation and maintenance system transfers all energy equipment data and environmental conditions to the cloud platform via IoT technology, enabling centralized storage and analysis.",
+    "features": [
+      "Real-time status monitoring",
+      "Remote monitoring and control",
+      "System operation mode configuration",
+      "Peak and off-peak scheduling",
+      "Cloud connectivity and IoT integration",
+      "Mobile app management",
+      "Smart scheduling",
+      "Effective warning and pre-notification system"
+    ],
+    "applications": [
+      "Smart homes",
+      "Commercial energy systems",
+      "Industrial energy management",
+      "Renewable energy optimization"
+    ],
+    "imageFile": "inventor.png"
+  },
+  {
+    "productNum": 23,
+    "categoryId": "ups",
+    "categoryTitle": "Smart Energy Storage",
+    "name": "Hybrid Microgrid Inverter",
+    "subcategory": "Industrial Hybrid Inverter",
+    "description": "This high-efficiency, high-reliability energy storage inverter is specifically developed for small and medium-scale microgrid energy storage. The device supports photovoltaic system connection and is equipped with seamless switching between On-Grid and Off-Grid modes. It also enables parallel operation of multiple devices, hybrid operation with diesel generator, and fast switching between modes.",
+    "features": [
+      "Grid-forming inverter",
+      "Up to 150% overload capacity",
+      "Seamless switching capability",
+      "Diesel generator hybrid support",
+      "Three-phase independent grid control",
+      "Multi-battery microgrid compatibility",
+      "Parallel operation support"
+    ],
+    "applications": [
+      "Industrial microgrids",
+      "Commercial backup systems",
+      "EV charging stations",
+      "Solar + storage systems",
+      "PV-Storage-Diesel mini microgrid"
+    ],
+    "imageFile": "inventor hybrid.png"
+  }
+]
