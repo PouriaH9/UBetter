@@ -1,4 +1,13 @@
 {
   "app": "ubetter",
-  "platform": "next"
+  "platform": "docker",
+  "port": 3000,
+  "build": {
+    "dockerfile": "Dockerfile",
+    "cache": true
+  },
+  "envs": {
+    "NODE_OPTIONS": "--max-old-space-size=1024",
+    "NEXT_PUBLIC_MEDUSA_URL": "https://api.ubetterenergy.com"
+  }
 }
